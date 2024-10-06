@@ -1,0 +1,122 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+}
+
+.app-background {
+  width: 100vw;  /* Asegura que cubra toda la ventana */
+  height: 100vh;
+}
+
+/* Estilo del contenedor de login */
+.login-container {
+  background: rgba(158, 172, 186, 0.2); /* Fondo translúcido con 20% de opacidad */
+  border-radius: 30px;
+  padding: 40px;
+  box-sizing: border-box;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra */
+  backdrop-filter: blur(10px); /* Efecto de desenfoque */
+}
+
+.login-container h2 {
+  font-size: 24px;
+  color: #FFFFFF;
+  margin-bottom: 20px;
+}
+
+.input-group select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  background-color: #013868; /* Color azul oscuro */
+  color: #FFF;
+  font-size: 16px;
+}
+
+/* Para cambiar el color de las opciones */
+.input-group select option {
+  background-color: #013868; /* Fondo azul */
+  color: #FFFFFF; /* Texto en blanco */
+}
+
+.input-group input {
+  width: 100%; /* Asegura que todos los inputs sean del mismo tamaño */
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  background-color: rgba(217, 217, 217, 0.2);
+  color: #FFF;
+  font-size: 16px;
+  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+}
+
+/* Estilo para el botón en estado normal */
+button {
+  background-color: #0072CE; /* Color azul */
+  color: #FFFFFF;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 30px !important;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Estilo para el botón cuando se pasa el mouse */
+button:hover {
+  background-color: #005bb5;
+  border-radius: 30px;
+}
+
+/* Resto de estilos */
+.extra-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.extra-links a {
+  color: #FFFFFF;
+  margin: 5px 0;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.extra-links a:hover {
+  text-decoration: underline;
+}
+
+.google-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFFFFF;
+  padding: 8px; /* Reducir el padding para hacer el cuadro más pequeño */
+  border-radius: 30px;
+  margin-top: 15px;
+  cursor: pointer;
+  width: fit-content; /* Ajustar el ancho automáticamente según el contenido */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.google-login img {
+  width: 30px;  /* Reducir tamaño del logo */
+  height: 30px;
+}
+
+.google-login span {
+  font-size: 14px; /* Reducir el tamaño del texto */
+  color: #000000;
+}
