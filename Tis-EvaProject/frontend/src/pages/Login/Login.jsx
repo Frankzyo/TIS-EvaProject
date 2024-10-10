@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Background from '../../assets/Background.jpg';  // Imagen de fondo
 import GoogleLogo from '../../assets/LogoGoogle.png';  // Logo de Google
-import '../../styles/App.css';  // Importa el archivo CSS correctamente
+import '../../styles/Login.css';  // Importa el archivo CSS correctamente
 
 function App() {
   const [role, setRole] = useState('Docente');
