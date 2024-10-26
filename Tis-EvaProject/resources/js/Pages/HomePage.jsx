@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaInstagram, FaFacebook, FaLinkedin, FaYoutube } from 'react-icons/fa'; // Iconos sociales
 import { TbBrandX } from 'react-icons/tb'; // Icono actualizado para Twitter (X)
-import '../css/HomePage.css';
+import '../../css/HomePage.css';
 
 function HomePage() {
   return (

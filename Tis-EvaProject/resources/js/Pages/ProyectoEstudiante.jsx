@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../css/ProyectoEstudiante.css';
+import '../../css/ProyectoEstudiante.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const ProyectoEstudiante = () => {

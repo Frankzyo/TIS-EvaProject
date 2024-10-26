@@ -11,7 +11,7 @@
 
 /* -------------------------------------- Header -------------------------------------- */
 .header-planificacion {
-    background-color: #015FA9;
+    background-color: #014D8B;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -137,6 +137,10 @@
     margin-bottom: 10px;
 }
 
+.item-historia.dragging {
+    border: 2px dashed #007bff;
+    background-color: #f0f8ff;
+}
 /* -------------------------------------- Elementos y botones -------------------------------------- */
 .boton-agregar, .boton-panel, .boton-anadir-sprint {
     background-color: #1e88e5;
@@ -223,7 +227,25 @@
     box-sizing: border-box;
 }
 
+.item-historia-sprint {
+    display: flex;
+    justify-content: space-between; /* Mantiene el texto y los íconos separados */
+    align-items: center; /* Alinea el texto y los íconos en el centro vertical */
+    background-color: #1a355b;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
 
+.item-historia-sprint span {
+    flex-grow: 1; /* Asegura que el texto ocupe todo el espacio disponible */
+    margin: 0; /* Elimina cualquier margen que afecte la alineación */
+    display: flex;
+    align-items: center; /* Centra el texto verticalmente */
+}
 
 /* -------------------------------------- Modales generales -------------------------------------- */
 .sprint-modal-overlay {
@@ -244,6 +266,7 @@
     padding: 30px;
     border-radius: 8px;
     width: 450px;
+    height: 250px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -268,7 +291,6 @@
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
 .modale-date-fields input {
@@ -282,7 +304,7 @@
 .field-container {
     display: flex;
     flex-direction: column;
-    width: 48%; /* Ajusta el ancho de los campos para que se distribuyan bien */
+    width: 100%; /* Asegura que el input ocupe el 100% del ancho del modal */
 }
 
 .field-container label {
@@ -295,12 +317,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
-    gap: 15px; /* Espacio entre los botones */
+    margin-top: 10px;
+    gap: 30px; /* Espacio entre los botones */
 }
 
 .modale-button {
-    width: 120px; /* Ancho fijo para los botones */
+    width: 250px; /* Ancho fijo para los botones */
     padding: 10px;
     font-size: 16px;
     border: none;
@@ -334,6 +356,52 @@
     text-align: center;
     margin: 10px 0;
 }
+
+/*----------------------------------------reqmodal---------*/
+.requerimiento-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.requerimiento-modal {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 100%; /* Asegura que no se desborde más allá del tamaño de la pantalla */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box; /* Asegura que el padding no incremente el ancho */
+}
+
+.requerimiento-modal h2 {
+    margin: 0 0 15px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.requerimiento-modal input {
+    width: 100%; /* Asegura que el input use todo el espacio disponible dentro del modal */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box; /* Asegura que el padding no incremente el ancho */
+}
+
+.requerimiento-modal input:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 5px rgba(30, 136, 229, 0.5);
+    outline: none;
+}
+/*----------------------------------------reqmodal---------*/
 
 /* Estilos específicos para el modal de Historia de Usuario */
 .hu-modal-overlay {
@@ -400,7 +468,6 @@ textarea {
     flex-direction: column;
     width: 100%; /* Asegura que ocupe el ancho completo */
     gap: 10px;
-    margin-bottom: 15px;
 }
 
 .adjuntos-info {
@@ -408,7 +475,7 @@ textarea {
     align-items: center;
     justify-content: space-between;
     background-color: #e0e0e0;
-    padding: 10px;
+    padding: 5px;
     border-radius: 4px;
 }
 
@@ -416,7 +483,7 @@ textarea {
     background-color: #1e88e5;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 7px;
     border-radius: 4px;
     cursor: pointer;
 }
@@ -486,12 +553,14 @@ textarea {
 }
 
 .preview-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Ajuste dinámico en columnas */
     gap: 10px;
     width: 100%;
-    position: absolute;
+    position: relative; /* Cambiar a relative para corregir el ajuste en el contenedor */
+    padding: 10px 0;
+    max-height: 150px; /* Limita la altura del contenedor */
+    overflow-y: auto; /* Permite hacer scroll si hay muchos archivos */
 }
 
 .preview-item {
@@ -508,6 +577,26 @@ textarea {
     height: 100%;
     object-fit: cover;
 }
+
+.preview-item img:hover {
+    transform: scale(1.05); /* Zoom leve al hacer hover */
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    .preview-item {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .preview-item {
+        width: 60px;
+        height: 60px;
+    }
+}
+
 
 .boton-eliminar {
     position: absolute;
@@ -544,11 +633,26 @@ textarea {
 
 .iconos-acciones {
     display: flex;
-    gap: 8px; /* Espacio entre los iconos */
+    gap: 10px; /* Espacio de 10px entre los iconos */
     align-items: center;
     justify-content: flex-end; /* Asegura que los iconos estén alineados a la derecha */
 }
 
+.item-historia-sprint .iconos-acciones {
+    display: flex;
+    gap: 8px; /* Espacio entre los iconos */
+    align-items: center; /* Alinea los íconos verticalmente */
+    justify-content: flex-end; /* Alinea los íconos a la derecha */
+}
+
 .texto-item {
     flex-grow: 1; /* Hace que el texto ocupe todo el espacio disponible */
+}
+
+.confirm-modal-content h2 {
+    margin-top: 0; /* Elimina el margen superior */
+    margin-bottom: 10px; /* Si deseas mantener un pequeño espacio debajo del título */
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../css/register.css';
+import '../../css/register.css';
 
 function Register() {
     const [showPassword, setShowPassword] = useState(false);

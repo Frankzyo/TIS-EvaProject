@@ -1,74 +1,574 @@
-.historia-usuario-container {
-    width: 400px;
-    margin: 50px auto;
-    background-color: #f4f4f4;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.h2h {
-    text-align: center;
+body, html {
     margin: 0;
-    margin-bottom: 10px;
-    font-size: 24px;
-    color: #333;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
 }
 
-.form-field {
+.historia-usuario {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    background-color: #76a9d9;
+    box-sizing: border-box;
+    overflow-y: auto; /* El scrollbar principal estará aquí */
 }
 
-.form-field input,
-.form-field textarea {
-    width: 100%;
+/* Estilos específicos para la página de planificación */
+
+/* Header fijo */
+.planificacion-pagina .header-planificacion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Mantiene el ancho completo */
+    background-color: #014D8B; /* Color de fondo que mencionaste */
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    z-index: 1000; /* Asegura que el header esté sobre el contenido */
+}
+
+/* Sidebar fijo */
+/* Sidebar fijo (manteniendo configuración) */
+.planificacion-pagina .sidebar {
+    position: fixed;
+    top: 50px; /* Ajusta el top para dejar espacio al header */
+    left: 0;
+    width: 250px; /* Ancho que mencionaste */
+    background-color: #003B67; /* Color de fondo del sidebar */
+    height: calc(100vh - 50px); /* Ajusta la altura para que ocupe toda la pantalla menos el header */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px;
+    box-sizing: border-box;
+    transition: width 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Mantén la sombra */
+    z-index: 999; /* Debajo del header */
+}
+
+/* Contenido con margen para el sidebar y el header */
+.planificacion-pagina .contenido-con-sidebar {
+    margin-left: 250px; /* Deja espacio para el sidebar */
+    padding-top: 50px; /* Deja espacio para el header */
+    overflow-y: auto; /* Permite scroll solo en el contenido */
+    height: 100%; /* Ajustar la altura para que ocupe todo el espacio visible */
+    overflow-y: auto; /* El scroll solo en el contenido */
+}
+
+/* Si el sidebar está colapsado */
+.planificacion-pagina .sidebar.collapsed {
+    width: 60px;
+    padding: 14px 5px; /* Reduce padding al colapsar */
+}
+.sidebar.collapsed .divisor-side {
+    margin-left: -5px; /* Ajuste más pequeño para sidebar colapsado */
+    margin-right: -5px;
+    width: calc(100% + 10px); /* Ajusta el ancho */
+}
+
+.historia-usuario-contenido {
+    min-width: 800px;
+    width: 850px !important;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: visible; /* No queremos que el contenedor tenga su propio scrollbar */
+}
+
+.hu-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    width: 100%;
+    height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: none; /* Permitir que el contenido fluya sin límite de altura */
+}
+/* -------------------------------------- Header -------------------------------------- */
+/* Estilo del header con título y botón */
+.hu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px; /* Aumentar espacio alrededor */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+.hu-header-text {
+    width: 100%; /* Asegurarse de que el contenedor del título ocupe todo el ancho */
+}
+
+/* Título más grande y con peso */
+.hu-header h1 {
+    font-size: 28px; /* Tamaño mayor para destacar */
+    font-weight: bold;
+    color: #333; /* Texto en color oscuro */
+    margin: 0;
+    margin-bottom: 15px; /* Añade espacio debajo del título */
+}
+
+/* Subtítulo con color más tenue */
+.hu-header p.hu-subtitulo {
+    font-size: 18px; /* Aumentar tamaño de fuente */
+    font-weight: bold; /* Para hacerlo más destacado */
+    color: #666; /* Mantener el color original */
+    margin-top: 4px; /* Ajustar margen si es necesario */
+    margin-bottom: 5px; /* Reducir el margen inferior */
+}
+
+/* Estilo para el input que aparece cuando se edita el título */
+.editing-title {
+    width: 100%; /* Ocupar el 100% del ancho disponible */
+    font-size: 28px; /* Tamaño de fuente adecuado */
+    font-weight: bold; /* Mantener el estilo del título */
+    padding: 10px; /* Aumentar el padding para más espacio interior */
+    border: 1px solid #ccc; /* Bordes más suaves */
+    border-radius: 4px; /* Bordes redondeados */
+    outline: none; /* Eliminar borde azul por defecto */
+    box-sizing: border-box; /* Incluir padding en el ancho total */
+}
+
+/* Cambiar el color del borde al enfocarse en el input */
+.editing-title:focus {
+    border-color: #1976d2;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4); /* Sombras más pronunciadas */
+}
+
+.input-with-icons {
+    display: flex;
+    align-items: center; /* Alinea verticalmente el input y los íconos */
+    width: 100%; /* Asegura que el conjunto ocupe el ancho completo */
+}
+
+.icons-container {
+    display: flex;
+    gap: 10px; /* Espacio entre los íconos */
+    margin-left: 10px; /* Espacio entre el input y los íconos */
+}
+
+.icono-guardar,
+.icono-cancelar {
+    cursor: pointer;
+    font-size: 18px;
+    color: #007bff; /* Color por defecto para los íconos */
+    transition: color 0.3s ease;
+}
+
+.icono-guardar:hover {
+    color: green; /* Cambiar a verde al pasar el cursor sobre guardar */
+}
+
+.icono-cancelar:hover {
+    color: red; /* Cambiar a rojo al pasar el cursor sobre cancelar */
+}
+
+.hu-titulo span.numero-historia {
+    color: #1e88e5; /* Azul similar a los botones */
+    font-weight: bold; /* Mantenerlo destacado */
+}
+
+/* -------------------------------------- Header -------------------------------------- */
+
+.hu-section {
+    margin-top: 10px;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
     box-sizing: border-box;
 }
 
-textarea {
-    resize: none;
-    height: 80px;
+.hu-section ul {
+    list-style-position: inside; /* Asegura que las viñetas estén dentro */
 }
 
-.botones {
+.hu-section h3 {
+    margin-bottom: 10px;
+}
+
+.hu-add-button {
+    background-color: #1e88e5;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
+
+/* Contenedor combinado para Descripción y Criterios */
+.hu-contenido-unido {
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0; /* Borde más definido */
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* Asegura que el contenido fluya verticalmente */
+    position: relative; /* Necesario para usar absolute positioning */
+}
+
+/* Títulos dentro del contenedor combinado */
+.hu-contenido-unido h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px; /* Mayor separación debajo del título */
+}
+
+/* Texto y listas */
+.hu-contenido-unido p,
+.hu-contenido-unido ul {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #444;
+}
+
+/* Lista de criterios de aceptación */
+.hu-contenido-unido ul {
+    padding-left: 20px;
+}
+
+.hu-contenido-unido ul li {
+    margin-bottom: 10px; /* Mayor espacio entre los puntos de la lista */
+}
+
+.react-quill {
+    height: 150px; /* Ajusta la altura según tu necesidad */
+    overflow: hidden; /* Para manejar el overflow si es necesario */
+    margin-bottom: 20px; /* Margen para separarlo de otros elementos */
+}
+
+.edit-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
     gap: 10px;
 }
 
-.boton-cancelar {
-    background-color: #757575;
-    color: white;
+.btn {
+    padding: 8px 16px;
     border: none;
-    padding: 10px;
     border-radius: 4px;
     cursor: pointer;
-    width: 100%;
 }
 
-.boton-cancelar:hover {
-    background-color: #616161;
-}
-
-.boton-guardar {
+.btn-save {
     background-color: #1e88e5;
     color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
 }
 
-.boton-guardar:hover {
-    background-color: #1565c0;
+.btn-cancel {
+    background-color: #948f8e;
+    color: white;
+}
+
+/*-----------------adjuntos-----------*/
+.adjuntos-info h3 {
+    margin: 0; /* Elimina el margen superior e inferior para el título */
+    display: flex;
+    align-items: center; /* Asegura que el texto esté alineado verticalmente dentro del contenedor */
+    font-size: 16px; /* Ajusta el tamaño de la fuente si es necesario */
+}
+
+/* Zona de arrastrar específica para la historia de usuario */
+.drag-drop-zone-historia {
+    margin-top: 10px;
+    padding: 10px;
+    border: 2px dashed #1e88e5;
+    border-radius: 4px;
+    text-align: center;
+    color: #1e88e5;
+    cursor: pointer;
+    display: flex; /* Esto permite centrar el contenido */
+    flex-direction: column;
+    align-items: center; /* Centrado horizontal */
+    justify-content: center; /* Centrado vertical */
+    min-height: 100px; /* Ajusta la altura según la necesidad */
+    max-height: 300px; /* Limita la altura */
+}
+
+.drag-drop-zone-historia .drag-drop-text {
+    font-size: 14px;
+    color: #1e88e5;
+    text-align: center; /* Asegura que el texto esté centrado */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Para asegurarse de que ocupe todo el ancho del contenedor */
+    height: 100%; /* Asegura que ocupe toda la altura disponible */
+}
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Oscurece la pantalla */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Asegura que el modal esté en frente */
+}
+
+.image-modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-modal-content img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+
+/*-----------------adjuntos-----------*/
+/*-----------------tareas-------------*/
+/* Estilo del contenedor de tareas */
+.tareas-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e0e0e0;
+    padding: 10px;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Lista de tareas */
+.tareas-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Estilo de cada tarea */
+.tarea-item {
+    display: flex;
+    justify-content: space-between; /* Título a la izquierda, acciones a la derecha */
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+/* Hover sobre la tarea */
+.tarea-item:hover {
+    background-color: #cee7fd;
+}
+
+/* Contenedor del título de la tarea */
+.tarea-contenido {
+    display: flex;
+    flex-grow: 0.965;
+    gap: 10px;
+    text-align: left; /* Título alineado a la izquierda */
+}
+
+/* Texto del título de la tarea */
+.tarea-texto {
+    font-weight: bold;
+}
+
+/* Contenedor de las acciones (iconos, estado, avatar, etc.) */
+.tarea-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre los elementos de la derecha */
+}
+
+/* Íconos de editar y eliminar */
+.iconos-editar, .iconos-eliminar, .iconos-guardar {
+    cursor: pointer;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.iconos-editar:hover {
+    color: #007bff;
+}
+
+.iconos-guardar:hover{
+    color: #007bff;
+}
+.task-assigned-icon:hover{
+    color: #007bff;
+}
+
+.iconos-eliminar:hover {
+    color: #eb1c1c;
+}
+
+/* Estado de la tarea */
+.tarea-estado {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Imagen del avatar */
+.tarea-perfil-imagen {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    background-color: #ddd;
+}
+
+/* Texto de asignación */
+.tarea-asignado {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Ícono de flecha */
+.icono-flecha {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+.icono-flecha:hover {
+    color: #0056b3;
+}
+
+/* Contenedor del input de tareas */
+.task-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f8f9fa; /* Color de fondo cuando no se está pasando el mouse */
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Cambios cuando el mouse está sobre el contenedor */
+.task-input-container:hover {
+    background-color: #e0f0fa; /* Color de fondo cuando el mouse está sobre el contenedor */
+}
+
+/* Campo de entrada de nueva tarea */
+.task-input-field {
+    flex-grow: 2; /* Aumentar el tamaño del input */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+/* Icono de guardar tarea dentro del input */
+.save-task-icon {
+    font-size: 1.2rem;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    opacity: 0; /* Inicialmente oculto */
+}
+.save-task-icon:hover{
+    color: #0056b3;
+}
+
+/* Mostrar el ícono de guardar cuando el mouse está sobre el input */
+.task-input-container:hover .save-task-icon {
+    opacity: 1;
+}
+
+/* Dropdown para estado de tarea */
+.task-status-dropdown {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.task-assigned-container {
+    display: flex;
+    align-items: center; /* Alinear los elementos verticalmente al centro */
+    gap: 10px; /* Espacio entre el avatar y el texto */
+    height: 40px; /* Asegurar la misma altura que el avatar */
+}
+/* Avatar de la tarea */
+.task-assigned-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    background-color: #ddd; /* Color de fondo del avatar por defecto */
+}
+
+/* Texto "Not assigned" */
+.task-assigned-text {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Ícono de flecha que aparece al hacer hover */
+.task-assigned-icon {
+    font-size: 1.2rem;
+    color: #555;
+    cursor: pointer;
+    opacity: 0; /* Inicialmente oculto */
+    transition: opacity 0.3s ease;
+}
+
+/* Mostrar el ícono de flecha cuando el mouse está sobre el input */
+.task-input-container:hover .task-assigned-icon {
+    opacity: 1;
+}
+
+/* Contenedor de la sección cuando no hay tareas */
+.no-tasks {
+    font-size: 14px;
+    color: #666;
+    padding: 10px;
+}
+
+/* Input para la edición de la tarea */
+.task-edit-input {
+    flex-grow: 2; /* Aumentar el tamaño del input */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+/* Mostrar el ícono de flecha cuando hoveredTaskIndex coincide */
+.tarea-item:hover .task-assigned-icon, .save-task-icon {
+    opacity: 1;
+}
+
+/* Estilo para el número secuencial */
+.numero-tarea {
+    color: #007bff; /* Color azul similar al que aparece en la imagen */
+    font-weight: bold; /* Hacer el número más grueso */
+    margin-right: 5px; /* Espacio entre el número y el texto de la tarea */
+    font-size: 1rem; /* Aumentar el tamaño de la fuente */
+}
+
+.numero-tarea span {
+    font-size: 1rem; /* Tamaño normal para el símbolo # */
+    font-weight: normal; /* Mantener el símbolo # más ligero */
 }
