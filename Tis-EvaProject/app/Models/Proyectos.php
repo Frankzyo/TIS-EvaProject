@@ -5,18 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Proyecto extends Model
+class Proyectos extends Model
 {
     use HasFactory;
-
+    protected $table = 'proyecto';
     // Especifica los campos que pueden ser asignados masivamente
     protected $fillable = [
-        'ID_PROYECTO', 
-        'NOMBRE_PROYECTO', 
-        'FECHA_INICIO_PROYECTO', 
-        'FECHA_FIN_PROYECTO', 
-        'DESCRIP_PROYECTO', 
-        'PORTADA_PROYECTO'
+        'ID_PROYECTO',
+        'NOMBRE_PROYECTO',
+        'FECHA_INICIO_PROYECTO',
+        'FECHA_FIN_PROYECTO',
+        'DESCRIP_PROYECTO',
+        'PORTADA_PROYECTO',
+        'ID_DOCENTE'
     ];
 
     // Si la tabla no utiliza las marcas de tiempo por defecto (created_at, updated_at)

@@ -1,0 +1,281 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+  
+  #root {
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Contenedor principal */
+  .container {
+    padding: 40px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+    margin-bottom: -40px;
+  }
+  
+  /* Header de grupos */
+  .groups-header {
+    background-color: #C8EBFF;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+    height: 60px;
+  }
+  
+  .groups-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: black;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+  
+  .new-group-btn {
+    background-color: #015FA9;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+    width: auto;
+    max-width: 200px;
+    align-items: center;
+  }
+  
+  .new-group-btn:hover {
+    background-color: #002A4C;
+  }
+  
+  /* Lista de grupos */
+  .group-list {
+    margin-top: 20px;
+    width: calc(100% - 20px);
+    padding-right: 20px;
+    height: calc(100% - 40px);
+    overflow-y: auto;
+  }
+  
+  .group-item {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: 18px;
+  }
+  
+  .group-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .group-item .group-info {
+    flex-grow: 1;
+  }
+  
+  .group-item .group-info h3 {
+    margin: 0;
+    font-size: 18px;
+    color: black;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .group-item .group-info h3:hover {
+    color: #015FA9;
+  }
+  
+  .group-item .group-info p {
+    margin: 0;
+    color: #666;
+  }
+  
+  /* Botones de acciones de grupo */
+  .group-item .group-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .group-item .group-actions .action-btn {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .group-item .group-actions .action-btn:hover {
+    background-color: #1558B0;
+    color: white;
+  }
+  
+  /* Modal */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 650px;
+    max-width: 100%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Inputs y áreas de texto en el modal */
+  .input-field, .textarea-field {
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  
+  .input-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .textarea-field {
+    width: 65%;
+    height: 210px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .description-and-photo {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Estilo para el contenedor de la foto */
+  .upload-container {
+    height: 210px;
+    width: 210px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  
+  .upload-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #ccc;
+    border-radius: 50%;
+    text-align: center;
+    margin: auto;
+    cursor: pointer;
+  }
+  
+  .upload-box i {
+    font-size: 40px;
+    color: #ccc;
+    margin-bottom: 5px;
+  }
+  
+  .image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  /* Botones de acción del modal */
+  .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .cancel-btn, .create-btn, .delete-btn {
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    width: auto;
+    max-width: 150px;
+  }
+  
+  .cancel-btn {
+    background-color: #999;
+    color: white;
+  }
+  
+  .create-btn {
+    background-color: #1A73E8;
+    color: white;
+  }
+  
+  .create-btn:hover, .delete-btn:hover, .cancel-btn:hover {
+    background-color: #002A4C;
+  }
+  
+  .delete-btn {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c0392b;
+  }
+  

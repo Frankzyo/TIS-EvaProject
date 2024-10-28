@@ -1,0 +1,246 @@
+/* Estilos generales del contenedor principal */
+.perfil-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #ffffff;
+    height: 100vh;
+    padding-top: 0; /* Elimina el espacio superior */
+    margin: 0;
+}
+
+/* Estilo del contenedor principal de contenido */
+.perfil-content {
+    display: flex;
+    max-width: 100%;
+    background-color: #ffffff;
+    overflow: hidden;
+    height: 100%; /* Ajusta para que llegue hasta el fondo restando el tamaño del header */
+    align-self: stretch;
+}
+
+
+/* Sidebar Styles */
+/* Estilos generales del sidebar */
+.perfil-sidebar {
+    width: 250px;
+    background-color: #f9f9fb;
+    font-family: Arial, sans-serif;
+    height: 100%;
+}
+
+.perfil-sidebar h3 {
+    font-size: 14px;
+    color: #F9F9FB;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.perfil-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.perfil-sidebar ul li {
+    padding: 15px 10px;
+    height: 30px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-top: 2px solid #cacaca98;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    transition: font-size 0.3s ease, color 0.3s ease, background-color 0.3s ease; /* Transición suave */
+}
+.perfil-sidebar ul li:first-child {
+    border-top: none; /* Sin borde superior en el primer elemento */
+}
+
+/* Estilo de la opción activa */
+.perfil-sidebar ul li.active {
+    color: #005499; /* Color azul para la opción activa */
+    background-color: #ffffff; /* Fondo ligero para la opción activa */
+}
+
+/* Efecto hover */
+.perfil-sidebar ul li:hover {
+    color: #666; /* Cambia el color de texto a gris al pasar el mouse */
+    font-size: 14.4px; /* Aumenta ligeramente el tamaño de la fuente */
+    background-color: white; /* Fondo ligero */
+}
+
+
+/* Título del sidebar */
+.perfil-sidebar h3 {
+    font-size: 14px;
+    color: #F9F9FB;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+
+/* Estilo de la sección principal */
+.perfil-main {
+    flex: 1;
+    padding: 1rem;
+    width: auto;
+}
+
+.perfil-main h2 {
+    font-size: 24px;
+    color: #005499;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+
+/* Contenedor de la información del perfil */
+.perfil-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+    width: 750px;
+}
+
+/* Sección de la foto de perfil */
+.perfil-foto-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 200px;
+}
+
+.perfil-foto {
+    width: 150px; /* Tamaño aumentado */
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.change-photo-btn {
+    background-color: #ddd; /* Color de fondo inicial */
+    color: #000000; /* Color del texto inicial */
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
+}
+
+.change-photo-btn:hover {
+    background-color: #005499; /* Color de fondo al pasar el mouse */
+    color: #ffffff; /* Color del texto al pasar el mouse */
+}
+
+.perfil-foto-section a {
+    color: #005499;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.perfil-foto-section a:hover {
+    text-decoration: underline;
+}
+
+/* Formulario de perfil */
+.perfil-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 500px; /* Asegura que el formulario ocupe el 100% del contenedor */
+}
+
+.perfil-form label {
+    font-size: 14px; /* Tamaño de fuente para los labels */
+    color: #333333; /* Color del label */
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.perfil-form input,
+.perfil-form textarea,
+.perfil-form select {
+    width: 100%; /* Asegura que los campos ocupen el 100% del contenedor */
+    box-sizing: border-box; /* Incluye el padding y border en el ancho total */
+    padding: 12px;
+    font-size: 15px;
+    color: #333333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+/* Estilo para los placeholders */
+.perfil-form input::placeholder,
+.perfil-form textarea::placeholder {
+    color: #a0a0a0; /* Color más claro para el placeholder */
+    font-style: italic; /* Estilo cursivo */
+    font-size: 15px; /* Tamaño de fuente del placeholder */
+    opacity: 1;
+}
+
+.perfil-form input:disabled {
+    background-color: #f8f9fa;
+}
+/* Cambiar el color del borde cuando el campo está enfocado */
+.perfil-form input:focus,
+.perfil-form textarea:focus,
+.perfil-form select:focus {
+    border-color: #015FA9; /* Cambia #007bff por el color que prefieras */
+    outline: none; /* Remueve el borde de enfoque predeterminado */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Agrega un pequeño brillo */
+}
+.perfil-form textarea {
+    resize: none;
+    height: 80px;
+}
+
+/* Asegura que el contenedor del botón tenga flexbox y esté centrado */
+.save-btn-container {
+    display: flex;
+    justify-content: center; /* Centra el botón horizontalmente */
+}
+
+/* Aplica al botón el estilo anterior */
+.save-btn {
+    background-color: #015FA9;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    width: 100%; /* Para que ocupe todo el ancho disponible */
+    max-width: 100px; /* Limita el ancho máximo del botón */
+    text-align: center; /* Asegura que el texto esté centrado dentro del botón */
+    display: flex; /* Habilita flexbox */
+    justify-content: center; /* Centra el texto horizontalmente */
+    align-items: center; /* Centra el texto verticalmente */
+}
+
+.save-btn:hover {
+    background-color: #002A4C;
+    color: #ffffff;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.85em;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    text-align: left;
+    margin-left: 0; /* Asegura que esté alineado al borde izquierdo */
+    display: block; /* Asegura que ocupe todo el ancho */
+    width: 100%; /* Ajusta el ancho al campo de entrada */
+}

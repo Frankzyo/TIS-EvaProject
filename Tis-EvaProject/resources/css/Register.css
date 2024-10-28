@@ -1,0 +1,212 @@
+/* Estilo general */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
+  }
+  
+  /* Contenedor principal */
+  .register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('/assets/Background.png');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* Caja del formulario */
+  .register-box {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    backdrop-filter: blur(8px);
+  }
+  
+  /* Estilo del título */
+  .register-box h2 {
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: white;
+  }
+  
+  /* Estilo de los inputs */
+  .input-group {
+    position: relative;
+    width: 100%;
+  }
+  
+  .input-groupr input {
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 30px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 16px;
+    outline: none;
+  }
+
+  .input-group:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Efecto hover */
+    border-radius: 30px;
+}
+  
+  /* Toggle de contraseña */
+  .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+  }
+  
+  /* Botón de Google */
+  .googler-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-radius: 30px;
+    margin: 20px auto; /* Centrar horizontalmente el botón */
+    cursor: pointer;
+    width: auto;
+    height: 42px;
+  }
+
+  .googler-login:hover {
+    background-color: #005bb5;
+  }
+  
+  .googler-login img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px; /* Espacio entre el logo y el texto */
+  }
+  
+  .googler-login span {
+    font-size: 16px;
+    color: #000000;
+  }
+  
+  /* Línea divisoria */
+  .divider {
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.4);
+    margin: 20px 0;
+  }
+  
+ /* Contenedor del título */
+.uploadr-title-container {
+    width: 100%; /* Abarca todo el ancho del contenedor padre */
+    text-align: left; /* Alineado a la izquierda */
+    margin-left: 15px; /* Margen para dar un poco de espacio del borde */
+    margin-bottom: 10px;
+}
+
+.uploadr-title-container p {
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    margin: 0;
+}
+
+/* Contenedor del círculo */
+.uploadr-box-container {
+    display: flex;
+    justify-content: center; /* Alinear al centro horizontalmente */
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.uploadr-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    border: 2px dashed rgba(255, 255, 255, 0.8); /* Color blanco translúcido */
+    border-radius: 50%; /* Forma circular */
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+    transition: background-color 0.3s ease;
+}
+
+.uploadr-box:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Efecto hover */
+}
+
+.uploadr-box i {
+    font-size: 40px;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.uploadr-box p {
+    font-size: 12px;
+    color: #ffffff;
+    text-align: center;
+}
+  
+  /* Checkboxes */
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: white;
+  }
+  
+  .checkbox-group input {
+    margin-right: 10px;
+  }
+  
+  /* Botón de crear cuenta */
+  .create-account-button {
+    width: 100%;
+    height: 42px;
+    padding: 15px;
+    border-radius: 30px;
+    border: none;
+    background-color: #0072CE;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    justify-content: center;
+  }
+  
+  .create-account-button:hover {
+    background-color: #005bb5;
+  }
+  
+  /* Link al login */
+  .back-to-login {
+    margin-top: 15px;
+    display: block;
+    text-decoration: none;
+    color: white; /* Color blanco */
+    font-size: 16px;
+    text-align: center;
+}
+
+.back-to-login:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,658 @@
+/* -------------------------------------- Contenedor principal -------------------------------------- */
+.planificacion-estudiante {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #76a9d9;
+    box-sizing: border-box;
+}
+
+/* -------------------------------------- Header -------------------------------------- */
+.header-planificacion {
+    background-color: #014D8B;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* -------------------------------------- Iconos del usuario -------------------------------------- */
+.iconos-usuario-planificacion {
+    display: flex;
+    align-items: center;
+}
+
+.icono-usuario {
+    color: white;
+    font-size: 30px;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.icono-usuario:hover {
+    color: #1A73E8;
+}
+
+.icono-dropdown {
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.icono-dropdown:hover {
+    color: #1A73E8;
+}
+
+/* -------------------------------------- Títulos y contenedores principales -------------------------------------- */
+.contenedor-titulo-planificacion {
+    width: 100%;
+    padding: 20px 40px;
+    padding-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
+.titulo-planificacion {
+    margin: 0;
+    font-size: 35px;
+    font-weight: bold;
+    color: white;
+    margin-left: 25px;
+    margin-bottom: 5px;
+    margin-top: 20px;
+}
+
+.divisor-planificacion {
+    margin-top: 5px;
+    border: none;
+    border-top: 2px solid var(--divisor-color, white);
+    width: 100%;
+}
+
+/* -------------------------------------- Contenedores secundarios -------------------------------------- */
+.contenedor-principal {
+    display: flex;
+    gap: 20px;
+    justify-content: left;
+    width: 100%;
+    padding-left: 40px;
+    box-sizing: border-box;
+    align-items: flex-start;
+}
+
+/* -------------------------------------- Requerimientos e Historias -------------------------------------- */
+.contenedor-requerimientos, .contenedor-historias {
+    background-color: #0a2540;
+    padding: 20px;
+    border-radius: 12px;
+    width: 370px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    overflow: hidden;
+    height: auto;
+    max-height: 75vh;
+}
+
+/* Títulos */
+.titulo-requerimientos, .titulo-historias, .titulo-sprints {
+    color: white;
+    font-size: 22px;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid white;
+    width: 100%;
+    text-align: center;
+}
+
+/* Listas con Scroll */
+.lista-requerimientos, .lista-historias, .lista-sprints {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: 100%;
+}
+
+/* Elemento de Requerimiento e Historia */
+.item-requerimiento, .item-historia {
+    display: flex;
+    justify-content: space-between; /* Asegura que el texto y los iconos estén en extremos opuestos */
+    align-items: center;
+    background-color: #1a355b;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.item-historia.dragging {
+    border: 2px dashed #007bff;
+    background-color: #f0f8ff;
+}
+/* -------------------------------------- Elementos y botones -------------------------------------- */
+.boton-agregar, .boton-panel, .boton-anadir-sprint {
+    background-color: #1e88e5;
+    border: none;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.boton-agregar:hover, .boton-panel:hover, .boton
+-anadir-sprint:hover {
+    background-color: #1565c0;
+}
+
+/* -------------------------------------- Sprints -------------------------------------- */
+.contenedor-sprints {
+    background-color: #0a2540;
+    padding: 20px;
+    border-radius: 12px;
+    width: 350px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    height: auto;
+    max-height: 75vh;
+    overflow: hidden;
+}
+
+/* Estilo de Sprint Individual */
+.sprint {
+    background-color: #1a355b;
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+
+.sprint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sprint-titulo {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--sprint-titulo-color, white);
+    margin: 0;
+}
+
+/* Fecha del Sprint */
+.sprint-fecha {
+    color: #ccc;
+    font-size: 16px;
+    margin: 5px 0 10px;
+}
+
+/* Divisor debajo del Título del Sprint */
+.divisor-titulo-sprints {
+    margin-top: 5px;
+    border: none;
+    border-top: 2px solid var(--divisor-color, white);
+    width: 100%;
+}
+
+/* Contenido del Sprint */
+.sprint-contenido {
+    background-color: #102a43;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    max-height: 75vh;
+    box-sizing: border-box;
+}
+
+.item-historia-sprint {
+    display: flex;
+    justify-content: space-between; /* Mantiene el texto y los íconos separados */
+    align-items: center; /* Alinea el texto y los íconos en el centro vertical */
+    background-color: #1a355b;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.item-historia-sprint span {
+    flex-grow: 1; /* Asegura que el texto ocupe todo el espacio disponible */
+    margin: 0; /* Elimina cualquier margen que afecte la alineación */
+    display: flex;
+    align-items: center; /* Centra el texto verticalmente */
+}
+
+/* -------------------------------------- Modales generales -------------------------------------- */
+.sprint-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.sprint-modal {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 450px;
+    height: 250px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.sprint-modal h2 {
+    margin: 0 0 15px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.sprint-modal input {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.modale-date-fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.modale-date-fields input {
+    width: 100%; /* Asegura que los inputs ocupen el 100% del ancho de su contenedor */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.field-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Asegura que el input ocupe el 100% del ancho del modal */
+}
+
+.field-container label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.modale-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    gap: 30px; /* Espacio entre los botones */
+}
+
+.modale-button {
+    width: 250px; /* Ancho fijo para los botones */
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.modale-button-cancelar {
+    background-color: #757575;
+    color: white;
+}
+
+.modale-button-cancelar:hover {
+    background-color: #616161;
+}
+
+.modale-button-guardar {
+    background-color: #1e88e5;
+    color: white;
+}
+
+.modale-button-guardar:hover {
+    background-color: #1565c0;
+}
+
+/* Estilo del mensaje cuando no hay sprints,hu */
+.sprint-mensaje-vacio {
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/*----------------------------------------reqmodal---------*/
+.requerimiento-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.requerimiento-modal {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 100%; /* Asegura que no se desborde más allá del tamaño de la pantalla */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box; /* Asegura que el padding no incremente el ancho */
+}
+
+.requerimiento-modal h2 {
+    margin: 0 0 15px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.requerimiento-modal input {
+    width: 100%; /* Asegura que el input use todo el espacio disponible dentro del modal */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box; /* Asegura que el padding no incremente el ancho */
+}
+
+.requerimiento-modal input:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 5px rgba(30, 136, 229, 0.5);
+    outline: none;
+}
+/*----------------------------------------reqmodal---------*/
+
+/* Estilos específicos para el modal de Historia de Usuario */
+.hu-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.hu-modal {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 450px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Título del modal */
+.hu-modal h2 {
+    margin: 0;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* Campos del formulario */
+.modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modal-field label {
+    font-size: 14px;
+    color: #333;
+}
+
+.hu-modal input,
+.hu-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+textarea {
+    resize: none;
+    height: 80px;
+}
+
+/* Contenedor de adjuntos */
+.adjuntos-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Asegura que ocupe el ancho completo */
+    gap: 10px;
+}
+
+.adjuntos-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #e0e0e0;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.boton-adjuntar {
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+    padding: 7px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.boton-adjuntar i {
+    font-size: 16px;
+}
+
+.drag-drop-zone {
+    margin-top: 10px;
+    padding: 20px;
+    border: 2px dashed #1e88e5;
+    border-radius: 4px;
+    text-align: center;
+    color: #1e88e5;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centra el contenido verticalmente */
+    min-height: 150px;
+    position: relative;
+}
+
+.drag-drop-text {
+    font-size: 16px;
+    color: #1e88e5;
+}
+
+/* Botones del modal */
+.hu-modal-buttons {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 30px; /* Espacio entre botones */
+    margin-top: 20px;
+}
+
+.hu-modal-button {
+    width: 250px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    display: flex; /* Asegura la alineación interna */
+    align-items: center; /* Centra verticalmente el contenido */
+    justify-content: center; /* Centra horizontalmente el contenido */
+}
+
+.hu-modal-button-cancelar {
+    background-color: #757575;
+    color: white;
+}
+
+.hu-modal-button-cancelar:hover {
+    background-color: #616161;
+}
+
+.hu-modal-button-crear {
+    background-color: #1e88e5;
+    color: white;
+}
+
+.hu-modal-button-crear:hover {
+    background-color: #1565c0;
+}
+
+.preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Ajuste dinámico en columnas */
+    gap: 10px;
+    width: 100%;
+    position: relative; /* Cambiar a relative para corregir el ajuste en el contenedor */
+    padding: 10px 0;
+    max-height: 150px; /* Limita la altura del contenedor */
+    overflow-y: auto; /* Permite hacer scroll si hay muchos archivos */
+}
+
+.preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-item img:hover {
+    transform: scale(1.05); /* Zoom leve al hacer hover */
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    .preview-item {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .preview-item {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+
+.boton-eliminar {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.boton-eliminar:hover {
+    background-color: rgba(255, 0, 0, 0.8);
+}
+
+.icono-editar:hover {
+    color: #1565c0;
+}
+
+/* Icono Eliminar */
+
+.icono-eliminar:hover {
+    color: #ff1a1a;
+}
+
+.icono-editar, .icono-eliminar {
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.iconos-acciones {
+    display: flex;
+    gap: 10px; /* Espacio de 10px entre los iconos */
+    align-items: center;
+    justify-content: flex-end; /* Asegura que los iconos estén alineados a la derecha */
+}
+
+.item-historia-sprint .iconos-acciones {
+    display: flex;
+    gap: 8px; /* Espacio entre los iconos */
+    align-items: center; /* Alinea los íconos verticalmente */
+    justify-content: flex-end; /* Alinea los íconos a la derecha */
+}
+
+.texto-item {
+    flex-grow: 1; /* Hace que el texto ocupe todo el espacio disponible */
+}
+
+.confirm-modal-content h2 {
+    margin-top: 0; /* Elimina el margen superior */
+    margin-bottom: 10px; /* Si deseas mantener un pequeño espacio debajo del título */
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+}

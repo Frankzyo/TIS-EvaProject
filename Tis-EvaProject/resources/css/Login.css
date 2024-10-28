@@ -1,175 +1,235 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Poppins', sans-serif;
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Poppins", sans-serif;
 }
 
 .app-background {
-  width: 100vw;  
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-size: cover;
-  background-position: center;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
 }
 
 .login-container {
-  background: rgba(255, 255, 255, 0.1); /* Ajusta este valor para mayor transparencia */
-  border-radius: 20px;
-  padding: 40px;
-  box-sizing: border-box;
-  width: 100%;  
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(0.5px); /* Mantiene el desenfoque */
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 40px; /* Solo padding horizontal si es necesario */
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(0.5px);
+}
+
+.divider {
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.4);
+    width: calc(
+        100% + 80px
+    ); /* Ancho total más el padding horizontal del contenedor */
+    margin: 15px 0;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative; /* Mantener la posición relativa para el flujo */
+    left: -40px; /* Ajustar para compensar el padding horizontal del contenedor */
 }
 
 .login-container h2 {
-  font-size: 32px;
-  color: #FFFFFF;
-  margin-bottom: 20px;
+    font-size: 32px;
+    color: #ffffff;
+    margin-bottom: 20px;
 }
 
 .input-group {
-  position: relative;
-  width: 100%; /* Queremos que ocupe todo el contenedor */
-  cursor: pointer;
+    position: relative;
+    width: 100%; /* Queremos que ocupe todo el contenedor */
+    cursor: pointer;
 }
 
-.input-group select, .input-group input {
-  display: block;
-  width: 100% !important;  /* Ocupar todo el ancho del contenedor */
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 30px;
-  border: none;
-  outline: none;
-  background-color: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
-  color: #FFFFFF;
-  font-size: 16px;
-  box-sizing: border-box; /* Asegúrate de que el padding no cause un desbordamiento */
+.input-group select,
+.input-group input {
+    display: block;
+    width: 100% !important; /* Ocupar todo el ancho del contenedor */
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
+    color: #ffffff;
+    font-size: 16px;
+    box-sizing: border-box; /* Asegúrate de que el padding no cause un desbordamiento */
 }
 
 .input-group select option {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #000000; 
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #000000;
 }
 
 /* Ícono de mostrar/ocultar contraseña */
 .toggle-password {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 18px;
-  color: #FFFFFF;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.select-role {
+    padding-right: 40px; /* Espacio para el ícono */
+    cursor: pointer; /* Cursor pointer en todo el select */
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    outline: none;
+    box-sizing: border-box;
 }
 
 /* Ícono del select personalizado con FontAwesome */
 .toggle-select {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none; /* Hace que el ícono sea clickeable a través del select */
-  cursor: pointer;
-  font-size: 18px;
-  color: #FFFFFF;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Hace que el ícono sea clickeable a través del select */
+    cursor: pointer;
+    font-size: 18px;
+    color: #ffffff;
+    z-index: 10;
 }
 
-.input-group:hover .toggle-select, .toggle-password:hover {
-  color: #CCCCCC; /* Color más claro cuando el usuario pasa el mouse por encima */
+.input-group:hover .toggle-select,
+.toggle-password:hover {
+    color: #cccccc; /* Color más claro cuando el usuario pasa el mouse por encima */
 }
 
 /* Ocultar la flecha nativa del select */
 .input-group select {
-  appearance: none; /* Ocultar la flecha nativa del select */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 40px; /* Para dejar espacio para el icono */
+    appearance: none; /* Ocultar la flecha nativa del select */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px; /* Para dejar espacio para el icono */
 }
 
-button {
-  background-color: #0072CE;
-  color: #FFFFFF;
-  padding: 12px;
-  width: 100% !important;  /* El botón también usa el 100% del contenedor */
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  cursor: pointer;
+button:not(
+        .sidebar-collapse,
+        .boton-eliminar,
+        .logout-button,
+        .hu-modal-button,
+        .boton-adjuntar,
+        .edit-profile-button,
+        .btn-primary,
+        .hu-edit-button,
+        .forgot-password-box button,
+        .boton-agregar,
+        .boton-panel,
+        .boton-anadir-sprint,
+        .modale-button,
+        .create-account-button,
+        .create-btn,
+        .cancel-btn,
+        .delete-btn,
+        .save-btn,
+        .change-photo-btn,
+        .btn,
+        .hu-addj-button,
+        .hu-add-button,
+        .dropdown-button,
+        .new-project-btn
+    ) {
+    background-color: #0072ce;
+    color: #ffffff;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    border-radius: 30px !important;
+    font-size: 16px;
+    cursor: pointer;
 }
-
 button:hover {
-  background-color: #005bb5;
+    background-color: #005bb5;
 }
 
 .extra-links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
 }
 
 .extra-links a {
-  color: #FFFFFF;
-  margin: 5px 0;
-  text-decoration: none;
-  font-size: 14px;
+    color: #ffffff;
+    margin: 5px 0;
+    text-decoration: none;
+    font-size: 14px;
 }
 
 .extra-links a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 .google-login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #FFFFFF;
-  border-radius: 30px;
-  margin: 20px auto; /* Centrar horizontalmente el botón */
-  cursor: pointer;
-  width: 230px;
-  height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 30px;
+    margin: 20px auto; /* Centrar horizontalmente el botón */
+    cursor: pointer;
+    width: 230px;
+    height: 42px;
 }
 
 .google-login img {
-  width: 40px;
-  height: 40px;
+    width: 40px;
+    height: 40px;
 }
 
 .google-login span {
-  font-size: 16px;
-  color: #000000;
+    font-size: 16px;
+    color: #000000;
+}
+
+.google-login:hover {
+    background-color: #005bb5;
 }
 
 /* Estilo para los placeholders */
 ::placeholder {
-  color: #CCCCCC; /* Gris claro */
-  opacity: 1; /* Asegura que el color del placeholder no sea translúcido */
+    color: #cccccc; /* Gris claro */
+    opacity: 1; /* Asegura que el color del placeholder no sea translúcido */
 }
 
 /* Para navegadores Webkit (Chrome, Safari, etc.) */
 ::-webkit-input-placeholder {
-  color: #CCCCCC; /* Gris claro */
+    color: #cccccc; /* Gris claro */
 }
 
 /* Para Firefox */
 ::-moz-placeholder {
-  color: #CCCCCC; /* Gris claro */
+    color: #cccccc; /* Gris claro */
 }
 
 /* Para IE */
 :-ms-input-placeholder {
-  color: #CCCCCC; /* Gris claro */
+    color: #cccccc; /* Gris claro */
 }
 
 /* Para Edge */
 ::-ms-input-placeholder {
-  color: #CCCCCC; /* Gris claro */
+    color: #cccccc; /* Gris claro */
 }
