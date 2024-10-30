@@ -210,3 +210,10 @@ body {
 .back-to-login:hover {
     text-decoration: underline;
 }
+/* Imagen de vista previa en el área de carga */
+.preview-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}

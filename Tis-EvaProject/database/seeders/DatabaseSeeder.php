@@ -17,11 +17,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         DB::table('DOCENTE')->insert([
-            'ID_DOCENTE' => '1', // Cambia según sea necesario
+            'ID_DOCENTE' => '3', // Cambia según sea necesario
             'NOMBRE_DOCENTE' => 'Juan',
             'APELLIDO_DOCENTE' => 'Pérez',
             'EMAIL_DOCENTE' => 'juan@gmail.com',
             'PASSWORD_DOCENTE' => Hash::make('tu_password'), // Utiliza PASSWORD_DOCENTE
+            'FOTO_DOCENTE' => 'profile_photos/HofsNfXMYyxJvaGWWSRXYQlMLigQJGODr94VULXA.png',
         ]);
 
     }
