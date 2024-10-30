@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Docente;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use DB;
+use Hash;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        DB::table('DOCENTE')->insert([
+            'ID_DOCENTE' => '1', // Cambia según sea necesario
+            'NOMBRE_DOCENTE' => 'Juan',
+            'APELLIDO_DOCENTE' => 'Pérez',
+            'EMAIL_DOCENTE' => 'juan@gmail.com',
+            'PASSWORD_DOCENTE' => Hash::make('tu_password'), // Utiliza PASSWORD_DOCENTE
         ]);
+
     }
 }

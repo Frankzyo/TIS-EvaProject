@@ -1,0 +1,324 @@
+.hd-pl-dc {
+    height: 60px;
+    width: 100%;
+    background-color: #002A4C;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow: hidden; /* Oculta el contenido que sobresalga */
+}
+
+.i-dc-pl {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+}
+
+.i-dc, .i-dw {
+    color: white;
+    font-size: 30px; /* Ajusta el tamaño aquí */
+    margin-left: 10px;
+    max-width: 30px; /* Máximo ancho del icono */
+    max-height: 30px; /* Máxima altura del icono */
+    cursor: pointer;
+}
+
+
+/* Asegúrate de que el cuerpo ocupe toda la altura */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* Sidebar */
+.dc-sb {
+    width: 250px;
+    background-color: #051B32;
+    height: calc(100vh - 50px); /* Ajusta la altura teniendo en cuenta el navbar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px;
+    box-sizing: border-box;
+    transition: width 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Añade sombra */
+    position: fixed; /* Asegura que el sidebar se mantenga fijo */
+    top: 60px; /* Ajusta esto a la altura de tu navbar */
+    left: 0; /* Alinea el sidebar a la izquierda */
+}
+
+.dc-sb.collapsed {
+    width: 60px;
+    padding: 14px 5px; /* Reduce padding al colapsar */
+}
+
+.dc-hd {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 10px 15px; ; 
+    width: 100%;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 30px;
+    
+}
+
+.dc-sb.collapsed .dc-hd span {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    overflow: hidden;
+}
+
+.dc-ic {
+    font-size: 30px;
+
+}
+
+.dc-mn {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.dc-it {
+    display: flex;
+    align-items: center; /* Centra el contenido dentro del elemento */
+    justify-content:flex-start; /* Asegura que el ícono esté en el centro horizontal */
+    width: 95%;
+    gap: 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px 10px; /* Ajusta padding para asegurar alineación */
+}
+.dc-it-i {
+    display: flex;
+    align-items: center; /* Centra el contenido dentro del elemento */
+    justify-content: space-between; /* Asegura que el ícono esté en el centro horizontal */
+    width: 95%;
+    gap: 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px 10px; /* Ajusta padding para asegurar alineación */
+}
+
+.dc-it i {
+    font-size: 25px;
+    transition: transform 0.3s ease;
+}
+
+/* Texto del Menu */
+.dc-txt {
+    
+    font-size: 18px; /* Evita que el texto se divida */
+    transition: opacity 0.3s ease, width 0.3s ease;
+}
+
+.dc-it:hover {
+    background-color: #1e88e5;
+    border-radius: 8px;
+    transform: scale(1.1); /* Efecto leve de escala */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.dc-it-i:hover {
+    background-color: #1e88e5;
+    border-radius: 8px;
+    transform: scale(1.1); /* Efecto leve de escala */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón de Colapsar */
+.dc-cl {
+    all: unset; /* Resetea todos los estilos heredados */
+    background-color: transparent !important;
+    border: none !important;
+    color: white !important;
+    font-size: 20px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: auto !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: transform 0.2s ease, color 0.3s ease !important;
+    z-index: 1 !important; /* Asegura que el ícono esté al frente */
+    border-radius: 50% !important; /* Hace que el botón sea redondo */
+}
+
+
+/* Efecto de Hover Circular */
+.dc-cl::before {
+    content: '';
+    position: absolute;
+    width: 40px !important;
+    height: 40px   !important;
+    background-color: rgba(30, 136, 229, 0.3);
+    border-radius: 50%; /* Asegura que el efecto sea redondo */
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: scale(0.8); /* Comienza más pequeño */
+    z-index: 0; /* Coloca el círculo detrás del ícono */
+}
+
+/* Animación del Hover */
+.dc-cl:hover::before {
+    opacity: 1;
+    transform: scale(1.3); /* Aumenta ligeramente el tamaño del círculo */
+}
+
+.dc-cl:hover {
+    color: #1e88e5; /* Cambia el color del ícono al hacer hover */
+    transform: scale(1.2) !important; /* Aumenta ligeramente el tamaño del ícono */
+}
+
+/* Ajuste del contenido principal */
+.dc-cp {
+    flex-grow: 1;
+    box-sizing: border-box;
+}
+
+.dc-div {
+    margin-top: 5px;
+    margin-left: -14px; /* Ajusta según el padding del contenedor */
+    margin-right: -14px; /* Ajusta según el padding del contenedor */
+    border: none;
+    border-top: 2px solid var(--divisor-color, white);
+    width: calc(100% + 28px); /* Ajusta la suma al padding eliminado */
+}
+
+.dc-sb.collapsed .dc-div {
+    margin-left: -5px; /* Ajuste más pequeño para sidebar colapsado */
+    margin-right: -5px;
+    width: calc(100% + 10px); /* Ajusta el ancho */
+}
+
+.dc-sb.collapsed .dc-txt {
+    display: none;
+}
+.hidden-icon {
+    display: none;
+}
+
+.dc-sb.collapsed i {
+    transform: scale(1.1); /* Aumenta ligeramente al colapsar */
+}
+
+.dc-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dc-pic img {
+    color: white;
+    width: 100%;
+    height: 100%;
+    border-radius: 30%;
+}
+
+.dc-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* Centra el contenido horizontalmente */
+    justify-content: center;  /* Centra el contenido verticalmente */
+    color: white;
+    overflow: hidden;
+    word-wrap: break-word;
+    max-width: calc(100% - 60px); /* Ajusta según el diseño */
+    text-align: center; /* Alinea el texto al centro */
+}
+
+.dc-info h3 {
+    display: -webkit-box;       /* Para limitar las líneas en navegadores webkit */
+    -webkit-line-clamp: 2;      /* Limita a un máximo de 2 líneas */
+    -webkit-box-orient: vertical; /* Orientación vertical */
+    overflow: hidden; 
+    line-height: 1.2;          /* Oculta el texto sobrante */
+    text-overflow: ellipsis;    /* Muestra puntos suspensivos si el texto excede el límite */
+    max-width: 150px;           /* Ajusta el ancho máximo según el diseño */
+    color: white;
+    font-weight: bold;
+    text-align: center; /* Centra el texto dentro del h3 */
+    margin: 0; /* Remueve margen extra */
+}
+
+.dc-info p {
+    margin: 0;
+    font-size: 12px; /* Ajuste del tamaño del texto */
+    color: #bbb;
+    white-space: normal;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.dc-sb.collapsed .dc-info {
+    display: none;
+}
+
+.dc-sb.collapsed .dc-hd {
+    justify-content: center; /* Centra el icono al colapsar */
+}
+
+.dc-sb.collapsed .dc-pic {
+    width: 50px;
+    height: 50px;
+}
+
+.dc-sb.collapsed .dc-it {
+    justify-content: center;
+    padding: 12px 0;
+}
+.dc-sb.collapsed .dc-it-i {
+    justify-content: center;
+    padding: 12px 0;
+}
+/* Responsive design */
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .i-dc, .i-dw {
+        font-size: 20px; /* Disminuye el tamaño del icono en pantallas pequeñas */
+        margin-left: 8px;
+    }
+
+    .hd-pl-dc {
+        padding: 0 10px; /* Reduce el padding en dispositivos móviles */
+    }
+    .dc-sb {
+        width: 100%; /* Sidebar ocupa toda la pantalla */
+        height: calc(100vh - 50px); /* Altura automática menos la del navbar */
+        top: 60px;
+    }
+
+    .dc-sb.collapsed {
+        width: 100%; /* Sidebar colapsado ocupa toda la pantalla */
+    }
+
+    .dc-cp {
+        margin-left: 0; /* Asegura que no haya margen izquierdo */
+        margin-top: 50px; /* Ajusta el margen superior para el navbar */
+    }
+}
+
+

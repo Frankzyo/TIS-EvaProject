@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocenteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProyectosController;
 use App\Http\Controllers\AuthController;
@@ -15,6 +16,9 @@ Route::prefix('api')->middleware(['auth:docente'])->group(function () {
     Route::post('/proyectos', [ProyectosController::class, 'store']);
     Route::put('/proyectos/{id}', [ProyectosController::class, 'update']);
     Route::delete('/proyectos/{id}', [ProyectosController::class, 'destroy']);
+});
+Route::prefix('api-docente')->middleware(['auth:docente'])->group(function () {
+    Route::get('/proyecto/{id}', [DocenteController::class, 'show']);
 });
 
 // Ruta de prueba para verificar funcionamiento del backend

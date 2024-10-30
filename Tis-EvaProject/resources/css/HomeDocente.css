@@ -1,0 +1,30 @@
+/* styles.css */
+.home-docente {
+    display: flexbox;
+    height: 100vh;
+    background-color: #9EACBA; /* Para ocupar toda la altura de la ventana */
+  }
+  
+.no-collapsed {
+     /* Esto permitirá que el contenido se expanda */
+    position: relative;
+    left: 250px;
+    height:100%; /* Altura automática menos la del navbar */
+    background-color:#9EACBA;
+    top: 40px;
+    width: 100%;
+    transition: width 0.3s ease;
+}
+.si-collapsed {
+    /* Esto permitirá que el contenido se expanda */
+   position: relative;
+   left: 60px;
+   height:100%; /* Altura automática menos la del navbar */
+   background-color: #9EACBA;
+   top: 40px;
+   width: 100%;
+   transition: width 0.3s ease;
+}
+ 
+  
+  

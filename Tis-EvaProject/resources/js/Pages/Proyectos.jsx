@@ -23,7 +23,12 @@ const Proyectos = () => {
     const [projectToEdit, setProjectToEdit] = useState(null); // Estado para el proyecto a editar
     const [isEditing, setIsEditing] = useState(false);
     const docenteId = localStorage.getItem("ID_DOCENTE");
+
     const [image, setImage] = useState(null); // Estado para la imagen seleccionada
+    const navigateDocente = useNavigate();
+    const hadleRedirectDocente = (idProject) => {
+        navigateDocente(`/home-docente/${idProject}`);
+    };
     const isModalOpen =
         showModal ||
         showConfirmModal ||
@@ -32,15 +37,15 @@ const Proyectos = () => {
         showDeleteSuccessMessage ||
         showErrorMessage;
 
-        useEffect(() => {
-            const docenteId = localStorage.getItem("ID_DOCENTE");
-            const role = localStorage.getItem("ROLE");
-    
-            if (!docenteId || role !== "Docente") {
-                // Si no hay un docente logueado, redirige al login
-                navigate("/login");
-            }
-        }, [navigate]);
+    useEffect(() => {
+        const docenteId = localStorage.getItem("ID_DOCENTE");
+        const role = localStorage.getItem("ROLE");
+
+        if (!docenteId || role !== "Docente") {
+            // Si no hay un docente logueado, redirige al login
+            navigate("/login");
+        }
+    }, [navigate]);
     // Obtener lista de proyectos al cargar el componente
     useEffect(() => {
         fetch("http://localhost:8000/api/proyectos", {
@@ -220,43 +225,58 @@ const Proyectos = () => {
                 </div>
 
                 <div className="project-list">
-                    {projects.map((project, index) => (
-                        <div key={index} className="project-item">
-                            {project.PORTADA_PROYECTO ? (
-                                <img
-                                    src={`http://localhost:8000/storage/${project.PORTADA_PROYECTO}`}
-                                    alt="Icono del proyecto"
-                                    width="50"
-                                    height="50"
-                                />
-                            ) : (
-                                <img
-                                    src="https://via.placeholder.com/50"
-                                    alt="Icono del proyecto"
-                                />
-                            )}
-                            <div className="project-info">
-                                <h3>{project.NOMBRE_PROYECTO}</h3>
-                                <p>{project.DESCRIP_PROYECTO}</p>
-                            </div>
-                            <div className="project-actions">
-                                <button
-                                    className="action-btn"
-                                    onClick={() => handleOpenEditModal(index)}
-                                >
-                                    <i className="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    className="action-btn"
-                                    onClick={() =>
-                                        handleOpenConfirmModal(index)
-                                    }
-                                >
-                                    <i className="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                    {projects.map(
+                        (project, index) => (
+                            console.log(project),
+                            (
+                                <div key={index} className="project-item">
+                                    {project.PORTADA_PROYECTO ? (
+                                        <img
+                                            src={`http://localhost:8000/storage/${project.PORTADA_PROYECTO}`}
+                                            alt="Icono del proyecto"
+                                            width="50"
+                                            height="50"
+                                        />
+                                    ) : (
+                                        <img
+                                            src="https://via.placeholder.com/50"
+                                            alt="Icono del proyecto"
+                                        />
+                                    )}
+                                    <div className="project-info">
+                                        <h3
+                                            onClick={() =>
+                                                hadleRedirectDocente(
+                                                    project.ID_PROYECTO
+                                                )
+                                            }
+                                        >
+                                            {project.NOMBRE_PROYECTO}
+                                        </h3>
+                                        <p>{project.DESCRIP_PROYECTO}</p>
+                                    </div>
+                                    <div className="project-actions">
+                                        <button
+                                            className="action-btn"
+                                            onClick={() =>
+                                                handleOpenEditModal(index)
+                                            }
+                                        >
+                                            <i className="fas fa-pen"></i>
+                                        </button>
+                                        <button
+                                            className="action-btn"
+                                            onClick={() =>
+                                                handleOpenConfirmModal(index)
+                                            }
+                                        >
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        )
+                    )}
                 </div>
             </div>
 
