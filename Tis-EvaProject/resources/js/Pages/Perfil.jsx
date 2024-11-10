@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import HeaderProyecto from "../Components/HeaderProyecto";
+import ModalError from "../Components/ModalError";
 import "../../css/Perfil.css";
 
 const Perfil = () => {
@@ -27,6 +28,8 @@ const Perfil = () => {
     ] = useState(false);
     const [errorMessage, setErrorMessage] = useState({}); // Estado para mensajes de error
     const [currentPasswordError, setCurrentPasswordError] = useState("");
+    const [showPhotoError, setShowPhotoError] = useState(false);
+    const [photoError, setPhotoError] = useState("");
     // Cargar datos del usuario
     useEffect(() => {
         fetch("http://localhost:8000/api/usuario-logueado", {
@@ -62,6 +65,13 @@ const Perfil = () => {
     // Manejar carga de nueva imagen
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
+
+        if (file && !file.type.startsWith("image/")) {
+            setPhotoError("Solo se permiten archivos de imagen.");
+            setShowPhotoError(true); // Muestra el modal de error
+            return;
+        }
+
         setNewPhoto(file);
         if (file) {
             const reader = new FileReader();
@@ -221,6 +231,7 @@ const Perfil = () => {
                         <input
                             type="file"
                             id="fileInput"
+                            accept="image/*"
                             style={{ display: "none" }}
                             onChange={handlePhotoChange}
                         />
@@ -232,6 +243,9 @@ const Perfil = () => {
                         >
                             Cambiar Foto
                         </button>
+                        {photoError && (
+                            <p className="error-message">{photoError}</p>
+                        )}
                     </div>
                     <div className="perfil-form">
                         <label>Nombre</label>
@@ -287,7 +301,7 @@ const Perfil = () => {
                         placeholder="Tu contraseña actual"
                     />
                     {currentPasswordError && (
-                        <p className="error-message">{currentPasswordError}</p>
+                        <p className="error-messagep">{currentPasswordError}</p>
                     )}
 
                     <label>Nueva contraseña</label>
@@ -299,7 +313,7 @@ const Perfil = () => {
                         placeholder="Escribe una contraseña nueva"
                     />
                     {errorMessage.newPassword && (
-                        <p className="error-message">
+                        <p className="error-messagep">
                             {errorMessage.newPassword}
                         </p>
                     )}
@@ -313,7 +327,7 @@ const Perfil = () => {
                         placeholder="Reescribe la nueva contraseña"
                     />
                     {errorMessage.confirmNewPassword && (
-                        <p className="error-message">
+                        <p className="error-messagep">
                             {errorMessage.confirmNewPassword}
                         </p>
                     )}
@@ -329,6 +343,12 @@ const Perfil = () => {
     return (
         <div className="perfil-container">
             <HeaderProyecto isModalOpen={isModalOpen} />
+            {showPhotoError && (
+                <ModalError
+                    errorMessage={photoError}
+                    closeModal={() => setShowPhotoError(false)}
+                />
+            )}
             {showEditSuccessMessage && (
                 <div className="success-modal">
                     <div className="success-modal-content">

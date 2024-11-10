@@ -4,6 +4,9 @@ import HeaderProyecto from "../Components/HeaderProyecto";
 import "../../css/Proyectos.css";
 import "../../css/HeaderProyecto.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import ModalConfirmacion from "../Components/ModalConfirmacion";
+import ModalMensajeExito from "../Components/ModalMensajeExito";
+import ModalError from "../Components/ModalError";
 
 const Proyectos = () => {
     const navigate = useNavigate();
@@ -208,7 +211,7 @@ const Proyectos = () => {
 
             <div className={`container ${isModalOpen ? "disabled" : ""}`}>
                 <div className="projects-header">
-                    <h2>Mis proyectos</h2>
+                    <h2>Proyectos</h2>
                     <button
                         className="new-project-btn"
                         onClick={() => {
@@ -225,58 +228,58 @@ const Proyectos = () => {
                 </div>
 
                 <div className="project-list">
-                    {projects.map(
-                        (project, index) => (
-                            console.log(project),
-                            (
-                                <div key={index} className="project-item">
-                                    {project.PORTADA_PROYECTO ? (
-                                        <img
-                                            src={`http://localhost:8000/storage/${project.PORTADA_PROYECTO}`}
-                                            alt="Icono del proyecto"
-                                            width="50"
-                                            height="50"
-                                        />
-                                    ) : (
-                                        <img
-                                            src="https://via.placeholder.com/50"
-                                            alt="Icono del proyecto"
-                                        />
-                                    )}
-                                    <div className="project-info">
-                                        <h3
-                                            onClick={() =>
-                                                hadleRedirectDocente(
-                                                    project.ID_PROYECTO
-                                                )
-                                            }
-                                        >
-                                            {project.NOMBRE_PROYECTO}
-                                        </h3>
-                                        <p>{project.DESCRIP_PROYECTO}</p>
-                                    </div>
-                                    <div className="project-actions">
-                                        <button
-                                            className="action-btn"
-                                            onClick={() =>
-                                                handleOpenEditModal(index)
-                                            }
-                                        >
-                                            <i className="fas fa-pen"></i>
-                                        </button>
-                                        <button
-                                            className="action-btn"
-                                            onClick={() =>
-                                                handleOpenConfirmModal(index)
-                                            }
-                                        >
-                                            <i className="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            )
-                        )
-                    )}
+                    {projects.map((project, index) => (
+                        <div key={index} className="project-item">
+                            {project.PORTADA_PROYECTO ? (
+                                <img
+                                    src={`http://localhost:8000/storage/${project.PORTADA_PROYECTO}`}
+                                    alt="Icono del proyecto"
+                                    width="50"
+                                    height="50"
+                                    onClick={() =>
+                                        hadleRedirectDocente(
+                                            project.ID_PROYECTO
+                                        )
+                                    }
+                                />
+                            ) : (
+                                <img
+                                    src="https://via.placeholder.com/50"
+                                    alt="Icono del proyecto"
+                                />
+                            )}
+                            <div className="project-info">
+                                <h3
+                                    onClick={() =>
+                                        navigate(
+                                            `/grupos/${project.ID_PROYECTO}`
+                                        )
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {project.NOMBRE_PROYECTO}
+                                </h3>
+
+                                <p>{project.DESCRIP_PROYECTO}</p>
+                            </div>
+                            <div className="project-actions">
+                                <button
+                                    className="action-btn"
+                                    onClick={() => handleOpenEditModal(index)}
+                                >
+                                    <i className="fas fa-pen"></i>
+                                </button>
+                                <button
+                                    className="action-btn"
+                                    onClick={() =>
+                                        handleOpenConfirmModal(index)
+                                    }
+                                >
+                                    <i className="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
@@ -362,102 +365,44 @@ const Proyectos = () => {
 
             {/* Modal de confirmación de eliminación */}
             {showConfirmModal && (
-                <div className="confirm-modal">
-                    <div className="confirm-modal-content">
-                        <h3>Confirmar eliminación</h3>
-                        <p>¿Está seguro de que desea eliminar este proyecto?</p>
-                        <div className="confirm-modal-actions">
-                            <button
-                                onClick={() => setShowConfirmModal(false)}
-                                className="cancel-btn"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleDeleteProject}
-                                className="delete-btn"
-                            >
-                                Eliminar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ModalConfirmacion
+                    show={showConfirmModal}
+                    onClose={() => setShowConfirmModal(false)}
+                    onConfirm={handleDeleteProject}
+                    title="Confirmar eliminación"
+                    message="¿Está seguro de que desea eliminar este proyecto?"
+                />
             )}
 
             {/* Mensaje de éxito para creación */}
             {showCreateSuccessMessage && (
-                <div className="success-modal">
-                    <div className="success-modal-content">
-                        <h3>Mensaje</h3>
-                        <div className="success-message">
-                            <i className="fas fa-check-circle"></i>
-                            <p>¡Se creó el proyecto exitosamente!</p>
-                        </div>
-                        <button
-                            onClick={() => setShowCreateSuccessMessage(false)}
-                            className="create-btn"
-                        >
-                            Aceptar
-                        </button>
-                    </div>
-                </div>
+                <ModalMensajeExito
+                    message="¡Se creo el proyecto exitosamente!"
+                    onClose={() => setShowCreateSuccessMessage(false)}
+                />
             )}
-
             {/* Mensaje de éxito para edición */}
             {showEditSuccessMessage && (
-                <div className="success-modal">
-                    <div className="success-modal-content">
-                        <h3>Mensaje</h3>
-                        <div className="success-message">
-                            <i className="fas fa-check-circle"></i>
-                            <p>¡Se guardaron los cambios exitosamente!</p>
-                        </div>
-                        <button
-                            onClick={() => setShowEditSuccessMessage(false)}
-                            className="create-btn"
-                        >
-                            Aceptar
-                        </button>
-                    </div>
-                </div>
+                <ModalMensajeExito
+                    message="¡Se guardaron los cambios exitosamente!"
+                    onClose={() => setShowEditSuccessMessage(false)}
+                />
             )}
 
             {/* Mensaje de éxito para eliminación */}
             {showDeleteSuccessMessage && (
-                <div className="success-modal">
-                    <div className="success-modal-content">
-                        <h3>Mensaje</h3>
-                        <div className="success-message">
-                            <i className="fas fa-check-circle"></i>
-                            <p>¡Se eliminó el proyecto correctamente!</p>
-                        </div>
-                        <button
-                            onClick={() => setShowDeleteSuccessMessage(false)}
-                            className="create-btn"
-                        >
-                            Aceptar
-                        </button>
-                    </div>
-                </div>
+                <ModalMensajeExito
+                    message="¡Se eliminó el proyecto correctamente!"
+                    onClose={() => setShowDeleteSuccessMessage(false)}
+                />
             )}
 
             {/* Modal de error */}
             {showErrorMessage && (
-                <div className="error-modal">
-                    <div className="error-modal-content">
-                        <h3>Error</h3>
-                        <div className="error-message">
-                            <i className="fas fa-exclamation-circle"></i>
-                            <p>Por favor, complete todos los campos.</p>
-                        </div>
-                        <button
-                            onClick={() => setShowErrorMessage(false)}
-                            className="create-btn"
-                        >
-                            Aceptar
-                        </button>
-                    </div>
-                </div>
+                <ModalError
+                    errorMessage="Por favor, complete los campos de titulo y descripción."
+                    closeModal={() => setShowErrorMessage(false)}
+                />
             )}
         </div>
     );

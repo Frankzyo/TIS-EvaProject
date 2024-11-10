@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import '../../css/register.css';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../../css/register.css";
+import axios from "axios";
 
 function Register() {
     const navigate = useNavigate(); // Hook para redireccionar
@@ -10,11 +10,11 @@ function Register() {
     const [previewImage, setPreviewImage] = useState(null);
 
     const [formData, setFormData] = useState({
-        name: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
+        name: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
         photo: null,
         acceptPrivacyPolicy: false,
         receiveNotifications: false,
@@ -24,57 +24,76 @@ function Register() {
         const { name, value, type, checked } = e.target;
         setFormData((prevData) => ({
             ...prevData,
-            [name]: type === 'checkbox' ? checked : value,
+            [name]: type === "checkbox" ? checked : value,
         }));
     };
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
-    const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
+    const toggleConfirmPasswordVisibility = () =>
+        setShowConfirmPassword(!showConfirmPassword);
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
-        setFormData((prevData) => ({
-            ...prevData,
-            photo: file,
-        }));
-        if (file) {
+
+        if (file && file.type.startsWith("image/")) {
+            setFormData((prevData) => ({
+                ...prevData,
+                photo: file,
+            }));
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewImage(reader.result);
             };
             reader.readAsDataURL(file);
+        } else {
+            alert(
+                "Por favor, selecciona un archivo de imagen (jpg, png, gif)."
+            );
+            e.target.value = ""; // Limpia el input si no es un archivo de imagen
         }
     };
 
-    const handleClickUploadBox = () => document.getElementById('photoInput').click();
+    const handleClickUploadBox = () =>
+        document.getElementById("photoInput").click();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const submissionData = new FormData();
-        submissionData.append('nombre', formData.name);
-        submissionData.append('apellido', formData.lastName);
-        submissionData.append('email', formData.email);
-        submissionData.append('password', formData.password);
-        submissionData.append('password_confirmation', formData.confirmPassword);
-        
+        submissionData.append("nombre", formData.name);
+        submissionData.append("apellido", formData.lastName);
+        submissionData.append("email", formData.email);
+        submissionData.append("password", formData.password);
+        submissionData.append(
+            "password_confirmation",
+            formData.confirmPassword
+        );
+
         if (formData.photo) {
-            submissionData.append('foto', formData.photo);
+            submissionData.append("foto", formData.photo);
         }
 
         try {
-            const response = await axios.post('http://localhost:8000/api/register', submissionData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await axios.post(
+                "http://localhost:8000/api/register",
+                submissionData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
             alert(response.data.message);
-            navigate('/login'); // Redirige al login después de registro exitoso
+            navigate("/login"); // Redirige al login después de registro exitoso
         } catch (error) {
             if (error.response) {
                 console.error(error.response.data);
-                alert('Error en el registro: ' + (error.response.data.message || 'Verifica tus datos.'));
+                alert(
+                    "Error en el registro: " +
+                        (error.response.data.message || "Verifica tus datos.")
+                );
             } else {
                 console.error(error);
-                alert('Error en el registro.');
+                alert("Error en el registro.");
             }
         }
     };
@@ -82,7 +101,7 @@ function Register() {
     return (
         <div className="register-container">
             <div className="register-box">
-                <h2>Solicitud de Cuenta</h2>
+                <h2>Registrar Cuenta</h2>
 
                 <div className="googler-login">
                     <img src="/assets/LogoGoogle.png" alt="Google logo" />
@@ -107,7 +126,7 @@ function Register() {
                         <input
                             type="text"
                             name="lastName"
-                            placeholder="Apellido*"
+                            placeholder="Apellidos*"
                             required
                             value={formData.lastName}
                             onChange={handleInputChange}
@@ -127,14 +146,17 @@ function Register() {
 
                     <div className="input-group">
                         <input
-                            type={showPassword ? 'text' : 'password'}
+                            type={showPassword ? "text" : "password"}
                             name="password"
                             placeholder="Contraseña*"
                             required
                             value={formData.password}
                             onChange={handleInputChange}
                         />
-                        <span className="toggle-password" onClick={togglePasswordVisibility}>
+                        <span
+                            className="toggle-password"
+                            onClick={togglePasswordVisibility}
+                        >
                             {showPassword ? (
                                 <i className="fas fa-eye-slash"></i>
                             ) : (
@@ -145,14 +167,17 @@ function Register() {
 
                     <div className="input-group">
                         <input
-                            type={showConfirmPassword ? 'text' : 'password'}
+                            type={showConfirmPassword ? "text" : "password"}
                             name="confirmPassword"
                             placeholder="Repetir contraseña*"
                             required
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
                         />
-                        <span className="toggle-password" onClick={toggleConfirmPasswordVisibility}>
+                        <span
+                            className="toggle-password"
+                            onClick={toggleConfirmPasswordVisibility}
+                        >
                             {showConfirmPassword ? (
                                 <i className="fas fa-eye-slash"></i>
                             ) : (
@@ -166,9 +191,16 @@ function Register() {
                     </div>
 
                     <div className="uploadr-box-container">
-                        <div className="uploadr-box" onClick={handleClickUploadBox}>
+                        <div
+                            className="uploadr-box"
+                            onClick={handleClickUploadBox}
+                        >
                             {previewImage ? (
-                                <img src={previewImage} alt="Vista previa" className="preview-image" />
+                                <img
+                                    src={previewImage}
+                                    alt="Vista previa"
+                                    className="preview-image"
+                                />
                             ) : (
                                 <>
                                     <i className="fas fa-cloud-upload-alt"></i>
@@ -178,7 +210,8 @@ function Register() {
                             <input
                                 type="file"
                                 id="photoInput"
-                                style={{ display: 'none' }}
+                                accept="image/*" // Solo permite archivos de imagen
+                                style={{ display: "none" }}
                                 onChange={handlePhotoChange}
                             />
                         </div>
@@ -193,7 +226,14 @@ function Register() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            He leído y acepto la política de privacidad
+                            He leído y acepto la{" "}
+                            <a
+                                href="/privacy"
+                                target="_blank"
+                                className="privacy-link"
+                            >
+                                política de privacidad
+                            </a>
                         </label>
                         <label>
                             <input
@@ -202,11 +242,14 @@ function Register() {
                                 checked={formData.receiveNotifications}
                                 onChange={handleInputChange}
                             />
-                            Recibir notificaciones, novedades y tendencias por correo
+                            Recibir notificaciones, novedades y tendencias por
+                            correo
                         </label>
                     </div>
 
-                    <button className="create-account-button" type="submit">Solicitar cuenta</button>
+                    <button className="create-account-button" type="submit">
+                        Registrarse
+                    </button>
                 </form>
 
                 <Link to="/login" className="back-to-login">

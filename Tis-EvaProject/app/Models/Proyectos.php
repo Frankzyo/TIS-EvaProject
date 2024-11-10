@@ -27,4 +27,8 @@ class Proyectos extends Model
     protected $primaryKey = 'ID_PROYECTO';
     public $incrementing = false;
     protected $keyType = 'string';
+    public function requerimientos()
+    {
+        return $this->hasMany(Requerimiento::class, 'ID_PROYECTO', 'ID_PROYECTO');
+    }
 }

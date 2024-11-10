@@ -1,0 +1,221 @@
+.container-crearEvaluacion{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+.form-crearEv{
+  width: 70%;
+  height: 95%;
+  padding: 10px;
+  background-color: #ffffff;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-radius: 10px;
+}
+
+.titulo-crearEv{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    padding: 0px 10px;
+}
+.form-crearEv form{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr auto;  
+  
+}
+.container-formulario{
+    height: 100%;
+    display: grid;
+    grid-template-columns: 2fr 1fr;   
+    
+    padding: 10px;
+
+}
+.fila-1{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 10px; 
+    
+}
+.fila-1 input{
+    width: 98%;
+    height: 35px;
+    border: none;
+    background-color: #D9D9D9;
+    outline: 0;
+    border-bottom: 2px solid #000000;
+}
+.fila-2{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 10px;
+   
+}
+.row-date{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 98%;
+    
+}
+.row-date input{
+    width: 40%;
+    height: 38px;
+    border: none;
+    background-color: #D9D9D9;
+    outline: 0;
+    border-bottom: 2px solid #000000;
+}
+.date-entrega{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  
+    width: 98%;
+}
+.date-entrega input{
+    width: 100%;
+    height: 35px;
+    border: none;
+    background-color: #D9D9D9;
+    outline: 0;
+    border-bottom: 2px solid #000000;
+}
+.fila-2 textarea{
+    width: 98%;
+    height: 120px;
+    border: none;
+    background-color: #D9D9D9;
+    outline: 0;
+    border-bottom: 2px solid #000000;
+}
+.met-rub{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    gap:10px;
+    width: 98%;
+}
+.met-rub select{
+    width: 98%;
+    height: 35px;
+    border: none;
+    background-color: #D9D9D9;
+    border-radius: 8px;
+    padding: 10px;
+}
+.met-rub input{
+    width: 98%;
+    height: 35px;
+    border: none;
+    background-color: #D9D9D9;
+    outline: 0;
+    border-bottom: 2px solid #000000;
+    
+}
+.container-btn-crear{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding:10px 20px;
+}
+
+.guardar-btn{
+    width: 23%;
+    height: 35px;
+    border: none;
+    background-color:#015FA9 ;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.cancelar-btn{
+    width: 23%;
+    height: 35px;
+    border: none;
+    background-color:#727F8A ;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.rubrica-btn{
+    width: 98%;
+    height: 35px;
+    border: none;
+    background-color:#015FA9 ;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+.rich-text-editor {
+    display: flex;
+    flex-direction: column-reverse; 
+    width: 95%;
+    max-width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #D9D9D9;
+    border-bottom: 2px solid #000000;
+}
+
+.rich-text-editor .ql-toolbar { /* Fondo de la barra de herramientas */
+    border: none; /* Quita el borde */
+    height: 30px; /* Ajusta la altura fija según tus necesidades */
+    
+}
+
+.rich-text-editor .ql-container {
+    border: none; /* Quita el borde */ /* Borde redondeado en la parte inferior */
+    height: 80px; /* Ajusta la altura fija según tus necesidades */
+    width: 580px;
+    overflow-y: auto;
+    overflow-x:unset; 
+    box-sizing: border-box;
+    
+}
+
+.rich-text-editor .ql-editor {
+   
+    font-family: Arial, sans-serif; /* Fuente personalizada */
+    line-height: 1.5; /* Espacio entre líneas */
+    color: #333; /* Color de texto */
+    height: 100%; /* Asegura que el área de texto ocupe toda la altura del contenedor */
+    width: 95%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    
+}
+
+.rich-text-editor .ql-toolbar button:hover {
+    background-color: #d0d0d0; /* Fondo gris claro para botones al pasar el cursor */
+}
+
+.rich-text-editor .ql-toolbar .ql-active {
+    color: #015FA9; /* Color azul para botones activos */
+}
+.fila-1{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}

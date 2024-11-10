@@ -1,29 +1,14 @@
-/* styles.css */
 .home-docente {
-
-    height: 100vh;
-    width: 100%;
-   /* Para ocupar toda la altura de la ventana */
-  }
-  
-.no-collapsed {
-     /* Esto permitirá que el contenido se expanda */
-    position: relative;
-    left: 250px;
-    height:100%; /* Altura automática menos la del navbar */
-    top: 40px;
-    width: 100%;
-    transition: width 0.3s ease;
+    display:grid;
+    grid-template-rows: auto 1fr;
+    width: 100vw; /* 100% del ancho de la ventana de visualización */
+    height: 100vh; /* 100% de la altura de la ventana de visualización */
 }
-.si-collapsed {
-    /* Esto permitirá que el contenido se expanda */
-   position: relative;
-   left: 60px;
-   height:100%; /* Altura automática menos la del navbar */
-   top: 40px;
-   width: 100%;
-   transition: width 0.3s ease;
+.container-sid{
+    display: grid;
+    width: 100hw;
+    grid-template-columns: auto 1fr;
 }
- 
-  
-  
+.content{       
+    background-color: #9EACBA;
+}

@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Notifications\ResetPasswordNotification;
 
 class Docente extends Authenticatable
 {
     protected $table = 'docente';
- // El nombre de tu tabla en la base de datos
+    // El nombre de tu tabla en la base de datos
     protected $primaryKey = 'ID_DOCENTE'; // La clave primaria de tu tabla
 
     public $timestamps = false; // Deshabilitar timestamps
@@ -33,4 +34,13 @@ class Docente extends Authenticatable
     {
         return $this->is_admin;
     }
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+    public function getEmailForPasswordReset()
+{
+    return $this->EMAIL_DOCENTE;
+}
+
 }

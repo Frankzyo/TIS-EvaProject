@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReactQuill from 'react-quill';
-import Sidebar from "../Components/Sidebar";
-import Header from "../Components/Header";
+import SidebarEstudiante from "../Components/SidebarEstudiante";
+import Header from "../Components/HeaderEstudiante";
+import axios from "axios";
 import "react-quill/dist/quill.snow.css"; // Importar el CSS del tema
-import "../../css/Sidebar.css"; // Importa el CSS del sidebar
+import "../../css/SidebarEstudiante.css"; // Importa el CSS del sidebar
 import "../../css/PlanificacionEstudiante.css"; // Importa el CSS del header
 import "../../css/HistoriaUsuario.css"; // Importa tu CSS específico
 
 const HistoriaUsuario = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [proyecto, setProyecto] = useState(null);
+    const [grupo, setGrupo] = useState(null);
     const historiaRecibida = location.state?.historia || {
         titulo: "",
         descripcion: "",
@@ -36,6 +39,30 @@ const HistoriaUsuario = () => {
     const [showSaveIcon, setShowSaveIcon] = useState(false);
     const [isHovered, setIsHovered] = useState(false); // Controla cuando el mouse está sobre el input
     const [hoveredTaskIndex, setHoveredTaskIndex] = useState(null);
+
+    useEffect(() => {
+        const obtenerDatosEstudiante = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:8000/estudiante/proyecto-grupo",
+                    { withCredentials: true }
+                );
+                console.log("Datos del estudiante:", response.data);
+
+                if (response.data) {
+                    setProyecto(response.data.proyecto);
+                    setGrupo(response.data.grupo);    
+                }
+            } catch (error) {
+                console.error(
+                    "Error al cargar los datos del estudiante:",
+                    error
+                );
+            }
+        };
+
+        obtenerDatosEstudiante();
+    }, []);
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
@@ -198,11 +225,12 @@ const HistoriaUsuario = () => {
             >
                 <Header />
                 <div className="contenido-con-sidebar">
-                    <Sidebar
-                        isSidebarCollapsed={isSidebarCollapsed}
-                        toggleSidebar={toggleSidebar}
-                    />
-
+                <SidebarEstudiante
+                    isSidebarCollapsed={isSidebarCollapsed}
+                    toggleSidebar={toggleSidebar}
+                    nombreProyecto={proyecto?.NOMBRE_PROYECTO} // Campo del nombre del proyecto
+                    fotoProyecto={`http://localhost:8000/storage/${proyecto?.PORTADA_PROYECTO}`} // Ruta completa de la imagen
+                />
                 {/* Contenido principal */}
 
                 <div className="historia-usuario-contenido">

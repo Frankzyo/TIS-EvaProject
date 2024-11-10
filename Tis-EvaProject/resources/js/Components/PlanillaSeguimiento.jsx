@@ -1,5 +1,6 @@
 import React from "react";
 import "../../css/PlanillaSeguimiento.css";
+import Dropdown from "./Dropdown";
 const PlanillaSeguimiento = () => {
     return (
         <div className="container-planilla">
@@ -13,20 +14,7 @@ const PlanillaSeguimiento = () => {
             </div>
             <div className="cont-bot">
                 <div className="cont-sel">
-                    <div className="selec-eq">
-                        <select id="dropdown">
-                            <option value="opcion1">Opción 1</option>
-                            <option value="opcion2">Opción 2</option>
-                            <option value="opcion3">Opción 3</option>
-                        </select>
-                    </div>
-                    <div className="select-sprint">
-                        <select id="dropdown">
-                            <option value="opcion1">Opción 1</option>
-                            <option value="opcion2">Opción 2</option>
-                            <option value="opcion3">Opción 3</option>
-                        </select>
-                    </div>
+                    <Dropdown />
                 </div>
                 <div className="fech">
                     <input type="date" />

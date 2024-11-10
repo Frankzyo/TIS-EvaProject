@@ -1,0 +1,191 @@
+/* SidebarPrueba */
+.sidebar-prueba {
+    width: 250px;
+    background-color: #051b32;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    box-sizing: border-box;
+    transition: width 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-prueba.collapsed {
+    width: 60px;
+    padding: 12px 5px;
+}
+
+/* Header del Sidebar */
+.sidebar-prueba-header {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    gap: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 56px;
+}
+
+.sidebar-prueba.collapsed .sidebar-prueba-header h3 {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+/* Iconos del Sidebar */
+.icon-sidebar-prueba {
+    font-size: 24px;
+}
+
+/* Menú principal */
+.sidebar-prueba-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.menu-item-prueba {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px 0;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.menu-item-prueba:hover {
+    transform: scale(1.1); /* Efecto de aumento */
+    color: #1e88e5; /* Cambia el color al pasar el mouse */
+}
+
+.sidebar-prueba.collapsed .menu-text-prueba {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.menu-item-prueba i {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-text-prueba {
+    font-size: 14px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease, width 0.3s ease;
+}
+
+.icon-menu-prueba {
+    font-size: 20px;
+}
+
+/* Submenú */
+.submenu {
+    padding-left: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.submenu .menu-item-prueba {
+    font-size: 17px;
+    padding: 4px 0;
+}
+
+.submenu .menu-item-prueba:hover {
+    transform: scale(1.05); /* Efecto de aumento en el submenú */
+    color: #1e88e5;
+}
+
+/* Línea divisora */
+.divisor-side-prueba {
+    margin-top: 5px;
+    margin-left: -12px;
+    margin-right: -12px;
+    border: none;
+    border-top: 2px solid white;
+    width: calc(100% + 24px);
+}
+
+/* Botón de colapso */
+/* Estilo del botón de colapso del sidebar */
+.sidebar-prueba-collapse {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    outline: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    width: 3rem;
+    height: 3rem;
+    transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+}
+
+
+.sidebar-prueba-icon {
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.sidebar-prueba-arrow i {
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+}
+
+.sidebar-prueba-collapse:hover .sidebar-prueba-circle {
+    width: 100%;
+}
+
+.sidebar-prueba-collapse:hover .sidebar-prueba-arrow i {
+    transform: translateX(4px);
+}
+
+/* Icono del proyecto */
+.project-icon-prueba {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Información del proyecto */
+.project-info-prueba h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: bold;
+    color: white;
+}
+
+.project-photo-prueba {
+    width: 70px;
+    height: 70px;
+    border-radius: 10%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+/* Icono oculto al colapsar */
+.hidden-icon {
+    display: none;
+}

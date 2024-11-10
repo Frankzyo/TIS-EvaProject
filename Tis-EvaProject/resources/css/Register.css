@@ -217,3 +217,14 @@ body {
   border-radius: 50%;
   object-fit: cover;
 }
+
+.privacy-link {
+  color: #a3c1f0; /* Color claro para el fondo azul */
+  text-decoration: underline;
+  margin-left: 4px; /* Espacio entre el texto y el enlace */
+  cursor: pointer;
+}
+
+.privacy-link:hover {
+  color: #d1e7ff; /* Color aún más claro al pasar el cursor */
+}

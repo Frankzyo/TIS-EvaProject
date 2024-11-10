@@ -56,40 +56,47 @@ const HeaderProyecto = ({ isModalOpen }) => {
     };
 
     // Función para manejar las opciones del dropdown
-    const handleOptionClick = (option) => {
+    // Función para manejar las opciones del dropdown
+    const handleOptionClick = async (option) => {
         if (option === "logout") {
             const role = localStorage.getItem("ROLE");
-            fetch("http://localhost:8000/logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
-                },
-                body: JSON.stringify({ role }),
-                credentials: "include",
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Error al cerrar sesión");
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    localStorage.clear();
-                    window.location.href = "/";
-                })
-                .catch((error) =>
-                    console.error("Error al cerrar sesión:", error)
-                );
+            const logoutUrl = role === "Docente" ? "/docente/logout" : "/estudiante/logout";
+    
+            try {
+                const csrfToken = document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content");
+    
+                const response = await fetch(logoutUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    credentials: "include",
+                });
+    
+                if (!response.ok) {
+                    throw new Error("Error al cerrar sesión");
+                }
+    
+                // Limpia el almacenamiento local y redirige al login
+                localStorage.clear();
+                window.location.href = "/login";
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error);
+            }
         } else if (option === "profile") {
             window.location.href = "/perfil";
-        } else if (option === "approveUsers") {
-            window.location.href = "/approve-accounts"; // Redirige a la página de aprobación de usuarios
+        } else if (option === "projects") {
+            window.location.href = "/proyectos"; // Redirección a la página de proyectos
+        } else if (option === "approveUsers" && userData.isAdmin) {
+            window.location.href = "/approve-accounts";
         }
+    
         setIsDropdownOpen(false);
     };
+    
 
     return (
         <div className={`header ${isModalOpen ? "disabled" : ""}`}>
@@ -151,6 +158,12 @@ const HeaderProyecto = ({ isModalOpen }) => {
                             onClick={() => handleOptionClick("notifications")}
                         >
                             Notificaciones
+                        </li>
+                        <li
+                            className="dropdown-button"
+                            onClick={() => handleOptionClick("projects")}
+                        >
+                            Proyectos
                         </li>
                         {/* Solo mostrar "Aprobar Usuarios" si el usuario es administrador */}
                         {userData.isAdmin ? (

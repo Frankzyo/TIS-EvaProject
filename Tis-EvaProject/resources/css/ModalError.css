@@ -1,0 +1,44 @@
+.error-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: auto;
+    max-width: 100%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column; /* Asegura que los elementos se coloquen en columna */
+    align-items: center; /* Centra el contenido horizontalmente */
+}
+
+.error-message {
+    display: inline-flex; /* Cambia de 'flex' a 'inline-flex' */
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    text-align: left; /* Alinea el contenido a la izquierda */
+}
+
+.error-message p {
+    margin: 0;
+    font-size: 18px;
+    color: black;
+}
+
+.error-message i {
+    font-size: 35px; /* Ajuste del tamaño del ícono */
+    color: #e74c3c; /* Color rojo para el ícono */
+    flex-shrink: 0;
+}

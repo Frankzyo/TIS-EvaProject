@@ -1,0 +1,111 @@
+.container-tipoevaluaciones {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    width: 100%;
+    height: 100%;
+
+}
+.container-titulo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+.container-evaluaciones{
+    display: flex;
+    justify-content:start;
+    align-items:center;
+    flex-direction: column;
+    padding: 40px;
+
+}
+.evaluaciones{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 5px;
+    width: 70%;
+    gap: 2px;
+    height: 400px;
+    overflow-y: auto;   
+}
+.evaluaciones::-webkit-scrollbar{
+    width: 8px;
+}
+.evaluaciones::-webkit-scrollbar-track{
+    background-color: #f1f1f1;
+    border-radius: 4px;
+}
+.evaluaciones::-webkit-scrollbar-thumb{
+    background-color: #888;
+    border-radius: 4px;
+}
+
+.nuevo-eva{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    width: 70%;
+    
+}
+.evaluacion{
+    display: flex;
+    justify-content: space-between;
+    align-items:center;   
+    background-color: #ffffff;
+    padding: 10px 10px;    
+    width: 97%;
+    border-radius:12px;
+    border: #000000 solid 1.5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.evaluacion:hover{
+    background-color: #D9D9D9;
+}
+.evaluacion-titulo{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.evaluacion-titulo i{
+    color: #051B32;
+    font-size: 40px;
+}
+.evaluacion-nombre{
+    display: inline-block;
+    max-width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+}
+.config-evaluacion{
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 12px ;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.btn-evaluacion{
+    background-color:#015FA9 ;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 12px ;
+    cursor: pointer;
+    width: 180px;
+}
+.btn-evaluacion:hover{
+    background-color: #003B67;
+}
+.divisor-eva{
+    margin-top: 5px;
+    border: none;
+    border-top: 2px solid var(--divisor-color, white);
+    width: 95%;
+}

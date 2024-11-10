@@ -1,19 +1,24 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Importación de useNavigate
-import Sidebar from "../Components/Sidebar";
-import Header from "../Components/Header";
+import SidebarEstudiante from "../Components/SidebarEstudiante";
+import Header from "../Components/HeaderEstudiante";
+import axios from "axios";
 import "../../css/PlanificacionEstudiante.css";
-import "../../css/Sidebar.css";
+import "../../css/SidebarEstudiante.css";
 import "../../css/Proyectos.css";
-import "../../css/HistoriaUsuario.css";  
+import "../../css/HistoriaUsuario.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const PlanificacionEstudiante = () => {
     const navigate = useNavigate();
+    const [proyecto, setProyecto] = useState(null);
+    const [grupo, setGrupo] = useState(null);
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [sprints, setSprints] = useState([]); // Inicia como lista vacía
     const [historiasUsuario, setHistoriasUsuario] = useState([]);
     const [requerimientos, setRequerimientos] = useState([]);
+    const [isEditingReq, setIsEditingReq] = useState(false); // Controla si estamos en modo de edición o creación para el requerimiento
+    const [requerimientoAEditar, setRequerimientoAEditar] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // Nuevo estado para modo edición
     const [sprintEditIndex, setSprintEditIndex] = useState(null); // Índice del sprint en edición
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +30,9 @@ const PlanificacionEstudiante = () => {
         fechaInicio: "",
         fechaFin: "",
     });
+    const [isConfirmDeleteReqModalOpen, setConfirmDeleteReqModalOpen] =
+        useState(false); // Modal específico para confirmación
+    const [requerimientoAEliminar, setRequerimientoAEliminar] = useState(null); // Requerimiento a eliminar
     const [selectedImage, setSelectedImage] = useState(null);
     const [isReqModalOpen, setReqModalOpen] = useState(false);
     const [isModalOpenHU, setIsModalOpenHU] = useState(false);
@@ -32,6 +40,92 @@ const PlanificacionEstudiante = () => {
     const [nuevaHU, setNuevaHU] = useState({ titulo: "", descripcion: "" });
     const [archivos, setArchivos] = useState([]);
     const fileInputRef = useRef(null);
+    useEffect(() => {
+        const obtenerDatosEstudiante = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:8000/estudiante/proyecto-grupo",
+                    { withCredentials: true }
+                );
+                console.log("Datos del estudiante:", response.data);
+
+                if (response.data) {
+                    setProyecto(response.data.proyecto);
+                    setGrupo(response.data.grupo);
+
+                    // Extrae los requerimientos de ambos orígenes
+                    const requerimientosDocente =
+                        response.data.proyecto.requerimientos || [];
+                    const requerimientosEstudiante =
+                        response.data.grupo.requerimientos || [];
+
+                    // Combina y actualiza el estado de requerimientos
+                    setRequerimientos([
+                        ...requerimientosDocente,
+                        ...requerimientosEstudiante,
+                    ]);
+                }
+            } catch (error) {
+                console.error(
+                    "Error al cargar los datos del estudiante:",
+                    error
+                );
+            }
+        };
+
+        obtenerDatosEstudiante();
+    }, []);
+
+    const guardarRequerimientoParaGrupo = () => {
+        const idGrupo = grupo?.ID_GRUPO;
+
+        if (isEditingReq) {
+            // Modo edición: actualiza el requerimiento existente
+            axios
+                .put(
+                    `http://localhost:8000/api/requerimientos/${requerimientos[reqEditIndex].ID_REQUERIMIENTO}`,
+                    {
+                        ID_GRUPO: idGrupo,
+                        DESCRIPCION_REQ: nuevoReq,
+                    }
+                )
+                .then((response) => {
+                    console.log("Requerimiento editado:", response.data);
+                    const updatedRequerimientos = [...requerimientos];
+                    updatedRequerimientos[reqEditIndex] = response.data;
+                    setRequerimientos(updatedRequerimientos);
+                    cerrarModalReq();
+                })
+                .catch((error) => {
+                    console.error("Error al editar el requerimiento:", error);
+                    alert(
+                        "Hubo un error al editar el requerimiento. Inténtalo de nuevo."
+                    );
+                });
+        } else {
+            // Modo creación: crea un nuevo requerimiento
+            axios
+                .post(
+                    "http://localhost:8000/api/requerimientos/crear-para-grupo",
+                    {
+                        ID_GRUPO: idGrupo,
+                        DESCRIPCION_REQ: nuevoReq,
+                    }
+                )
+                .then((response) => {
+                    console.log("Requerimiento creado:", response.data);
+                    setRequerimientos([...requerimientos, response.data]);
+                    cerrarModalReq();
+                })
+                .catch((error) => {
+                    console.error("Error al crear el requerimiento:", error);
+                    alert(
+                        "Hubo un error al crear el requerimiento. Inténtalo de nuevo."
+                    );
+                });
+        }
+    };
+
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
     const abrirModal = () => {
         setIsModalOpen(true);
@@ -49,8 +143,10 @@ const PlanificacionEstudiante = () => {
     };
     const editarRequerimiento = (index) => {
         const req = requerimientos[index];
-        setNuevoReq(req); // Cargar el valor actual en el input del modal
-        abrirModalReq(); // Abrir el modal para editar
+        setRequerimientoAEditar(req); // Establece el requerimiento a editar
+        setNuevoReq(req.DESCRIPCION_REQ); // Establece la descripción actual en el estado para el input
+        setIsEditingReq(true); // Cambia el estado a edición
+        setReqModalOpen(true); // Abre el modal
     };
 
     const editarHistoriaUsuario = (index) => {
@@ -74,7 +170,9 @@ const PlanificacionEstudiante = () => {
 
     const cerrarModalReq = () => {
         setReqModalOpen(false);
-        setNuevoReq("");
+        setNuevoReq(""); // Limpia el campo de input
+        setIsEditingReq(false); // Resetea el modo de edición
+        setRequerimientoAEditar(null); // Limpia el requerimiento a editar
     };
 
     const handleHUInputChange = (e) => {
@@ -142,11 +240,9 @@ const PlanificacionEstudiante = () => {
         }
     };
 
-    const guardarRequerimiento = () => {
-        if (nuevoReq) {
-            setRequerimientos([...requerimientos, nuevoReq]);
-            cerrarModalReq();
-        }
+    const abrirModalEliminarRequerimiento = (requerimiento) => {
+        setRequerimientoAEliminar(requerimiento);
+        setConfirmDeleteReqModalOpen(true);
     };
 
     const guardarHU = () => {
@@ -181,17 +277,19 @@ const PlanificacionEstudiante = () => {
         e.preventDefault();
         const origenIndex = parseInt(e.dataTransfer.getData("index"), 10); // Recupera el índice de la historia arrastrada
         const origenType = e.dataTransfer.getData("source"); // Recupera el origen de la historia (historiasUsuario o sprint)
-    
+
         if (!isNaN(origenIndex)) {
             // Si estamos moviendo de historiasUsuario a sprint
             if (origenType === "historiasUsuario" && destinoType === "sprint") {
                 // En lugar de clonar la historia, pasar la referencia original
                 const historiaReferenciada = historiasUsuario[origenIndex]; // Referencia directa al objeto original
-    
+
                 // Actualizar la lista de sprints añadiendo la referencia a la historia
                 const sprintsActualizados = [...sprints];
-                sprintsActualizados[destinoIndex].historias.push(historiaReferenciada); // Inserta la referencia de la historia en el sprint
-    
+                sprintsActualizados[destinoIndex].historias.push(
+                    historiaReferenciada
+                ); // Inserta la referencia de la historia en el sprint
+
                 setSprints(sprintsActualizados); // Actualiza el estado de sprints
                 // No eliminamos la historia de historiasUsuario
             } else if (
@@ -200,13 +298,15 @@ const PlanificacionEstudiante = () => {
             ) {
                 // Reordenar las historias en la misma lista
                 const historiasReordenadas = [...historiasUsuario];
-                const [historiaMovida] = historiasReordenadas.splice(origenIndex, 1); // Elimina la historia del índice original
+                const [historiaMovida] = historiasReordenadas.splice(
+                    origenIndex,
+                    1
+                ); // Elimina la historia del índice original
                 historiasReordenadas.splice(destinoIndex, 0, historiaMovida); // Inserta la historia en el nuevo índice
                 setHistoriasUsuario(historiasReordenadas); // Actualiza la lista de historias
             }
         }
     };
-    
 
     const onDragOver = (e) => {
         e.preventDefault(); // Permite el drop
@@ -246,15 +346,75 @@ const PlanificacionEstudiante = () => {
         setIsConfirmModalOpen(false); // Cierra el modal de confirmación
     };
 
+    const eliminarRequerimiento = (id) => {
+        console.log("Intentando eliminar el requerimiento con ID:", id);
+        axios
+            .delete(
+                `http://localhost:8000/api/requerimientos/estudiante/${id}`,
+                {
+                    withCredentials: true,
+                }
+            )
+            .then((response) => {
+                console.log("Requerimiento eliminado:", response.data);
+                setRequerimientos(
+                    requerimientos.filter((req) => req.ID_REQUERIMIENTO !== id)
+                );
+                setConfirmDeleteReqModalOpen(false);
+            })
+            .catch((error) => {
+                console.error("Error al eliminar el requerimiento:", error);
+                alert("Hubo un error al eliminar el requerimiento.");
+            });
+    };
+    const actualizarRequerimientoParaGrupo = () => {
+        if (requerimientoAEditar && requerimientoAEditar.ID_REQUERIMIENTO) {
+            axios
+                .put(
+                    `http://localhost:8000/api/requerimientos/estudiante/${requerimientoAEditar.ID_REQUERIMIENTO}`,
+                    {
+                        DESCRIPCION_REQ: nuevoReq,
+                    },
+                    { withCredentials: true }
+                )
+                .then((response) => {
+                    console.log("Requerimiento actualizado:", response.data);
+                    setRequerimientos((prevRequerimientos) =>
+                        prevRequerimientos.map((req) =>
+                            req.ID_REQUERIMIENTO ===
+                            requerimientoAEditar.ID_REQUERIMIENTO
+                                ? response.data
+                                : req
+                        )
+                    );
+                    setReqModalOpen(false); // Cierra el modal después de actualizar
+                    setIsEditingReq(false); // Sal del modo de edición
+                })
+                .catch((error) => {
+                    console.error(
+                        "Error al actualizar el requerimiento:",
+                        error
+                    );
+                    alert("Hubo un error al actualizar el requerimiento.");
+                });
+        } else {
+            console.error("ID del requerimiento no está definido.");
+        }
+    };
+
     return (
         <div
-            className={`planificacion-estudiante ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}
+            className={`planificacion-estudiante ${
+                isSidebarCollapsed ? "sidebar-collapsed" : ""
+            }`}
         >
             <Header />
             <div className="contenido-con-sidebar">
-                <Sidebar
+                <SidebarEstudiante
                     isSidebarCollapsed={isSidebarCollapsed}
                     toggleSidebar={toggleSidebar}
+                    nombreProyecto={proyecto?.NOMBRE_PROYECTO} // Campo del nombre del proyecto
+                    fotoProyecto={`http://localhost:8000/storage/${proyecto?.PORTADA_PROYECTO}`} // Ruta completa de la imagen
                 />
 
                 <div className="contenido-principal">
@@ -276,29 +436,39 @@ const PlanificacionEstudiante = () => {
                                         key={index}
                                         className="item-requerimiento"
                                     >
-                                        <span className="texto-item">
-                                            {req}
-                                        </span>
-                                        <div className="iconos-acciones">
-                                            <i
-                                                className="fas fa-edit icono-editar"
-                                                onClick={() =>
-                                                    editarRequerimiento(index)
-                                                }
-                                            ></i>
-                                            <i
-                                                className="fas fa-trash-alt icono-eliminar"
-                                                onClick={() =>
-                                                    abrirModalConfirmacion(
-                                                        "requerimiento",
-                                                        index
-                                                    )
-                                                }
-                                            ></i>
-                                        </div>
+                                        <span
+                                            className="texto-item"
+                                            dangerouslySetInnerHTML={{
+                                                __html: req.DESCRIPCION_REQ,
+                                            }}
+                                        ></span>
+
+                                        {/* Mostrar botones de edición y eliminación solo si fue creado por el estudiante */}
+                                        {req.ID_GRUPO ? (
+                                            <div className="iconos-acciones">
+                                                <i
+                                                    className="fas fa-edit icono-editar"
+                                                    onClick={() =>
+                                                        editarRequerimiento(
+                                                            index
+                                                        )
+                                                    }
+                                                ></i>
+                                                <i
+                                                    className="fas fa-trash-alt icono-eliminar"
+                                                    onClick={() =>
+                                                        abrirModalEliminarRequerimiento(
+                                                            req
+                                                        )
+                                                    }
+                                                ></i>
+                                            </div>
+                                        ) : null}
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Botón para agregar un nuevo requerimiento */}
                             <button
                                 className="boton-agregar"
                                 onClick={abrirModalReq}
@@ -306,7 +476,6 @@ const PlanificacionEstudiante = () => {
                                 + Requerimiento
                             </button>
                         </div>
-
                         <div className="contenedor-historias">
                             <h2 className="titulo-historias">
                                 Historias de Usuario
@@ -378,11 +547,11 @@ const PlanificacionEstudiante = () => {
                             )}
                             <button
                                 className="boton-anadir-sprint"
-                                onClick={abrirModalHU}>
+                                onClick={abrirModalHU}
+                            >
                                 + Historia de usuario
                             </button>
                         </div>
-
                         <div className="contenedor-sprints">
                             <h2 className="titulo-sprints">Sprints</h2>
                             {sprints.length === 0 ? (
@@ -586,7 +755,11 @@ const PlanificacionEstudiante = () => {
             {isReqModalOpen && (
                 <div className="requerimiento-modal-overlay">
                     <div className="requerimiento-modal">
-                        <h2>Nuevo Requerimiento</h2>
+                        <h2>
+                            {isEditingReq
+                                ? "Editar Requerimiento"
+                                : "Nuevo Requerimiento"}
+                        </h2>
                         <div className="field-container">
                             <label htmlFor="requerimiento">
                                 Requerimiento:
@@ -607,10 +780,14 @@ const PlanificacionEstudiante = () => {
                                 Cancelar
                             </button>
                             <button
-                                onClick={guardarRequerimiento}
+                                onClick={
+                                    isEditingReq
+                                        ? actualizarRequerimientoParaGrupo
+                                        : guardarRequerimientoParaGrupo
+                                }
                                 className="modale-button modale-button-guardar"
                             >
-                                Guardar
+                                {isEditingReq ? "Guardar cambios" : "Guardar"}
                             </button>
                         </div>
                     </div>
@@ -761,6 +938,37 @@ const PlanificacionEstudiante = () => {
                             <button
                                 className="delete-btn"
                                 onClick={eliminarElemento}
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isConfirmDeleteReqModalOpen && (
+                <div className="confirm-modal">
+                    <div className="confirm-modal-content">
+                        <h2>Confirmar eliminación</h2>
+                        <p>
+                            ¿Está seguro de que desea eliminar este
+                            requerimiento?
+                        </p>
+                        <div className="confirm-modal-actions">
+                            <button
+                                className="cancel-btn"
+                                onClick={() =>
+                                    setConfirmDeleteReqModalOpen(false)
+                                }
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className="delete-btn"
+                                onClick={() =>
+                                    eliminarRequerimiento(
+                                        requerimientoAEliminar.ID_REQUERIMIENTO
+                                    )
+                                }
                             >
                                 Eliminar
                             </button>

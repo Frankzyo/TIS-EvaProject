@@ -14,7 +14,7 @@
 
 .sidebar.collapsed {
     width: 60px;
-    padding: 14px 5px; /* Reduce padding al colapsar */
+    padding: 12px 5px; /* Reduce padding al colapsar */
 }
 
 .sidebar-header {
@@ -28,11 +28,10 @@
     height: 56px;
 }
 
-.sidebar.collapsed .sidebar-header span {
+.sidebar.collapsed .sidebar-header h3 {
     opacity: 0;
-    visibility: hidden;
     width: 0;
-    overflow: hidden;
+    visibility: hidden;
 }
 
 .icon-sidebar {
@@ -46,14 +45,11 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 20px;
     transition: all 0.3s ease;
 }
 
-.icon-sidebar {
-    font-size: 30px;
-}
 
 /* Contenedor con Sidebar */
 .contenido-con-sidebar {
@@ -62,33 +58,22 @@
     transition: margin-left 0.3s ease;
 }
 
-/* Menú del Sidebar */
-.sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra horizontalmente los íconos */
-    gap: 20px; /* Espacio entre los íconos */
-    transition: all 0.3s ease;
-}
 
 .menu-item {
     display: flex;
-    align-items: center; /* Centra el contenido dentro del elemento */
-    justify-content: center; /* Asegura que el ícono esté en el centro horizontal */
+    align-items: center;
+    justify-content: flex-start;
     width: 100%;
-    gap: 10px;
+    gap: 8px;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 10px 0; /* Ajusta padding para asegurar alineación */
+    padding: 8px 0;
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .menu-item i {
-    font-size: 25px;
+    font-size: 20px;
     transition: transform 0.3s ease;
     margin: 0; /* Asegura que no haya márgenes adicionales */
     padding: 0; /* Elimina padding adicional */
@@ -106,10 +91,8 @@
 }
 
 .menu-item:hover {
-    background-color: #1e88e5;
-    border-radius: 8px;
-    transform: scale(1.1); /* Efecto leve de escala */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1.1); /* Efecto de aumento */
+    color: #1e88e5; /* Cambia el color al pasar el mouse */
 }
 
 .icon-menu {
@@ -118,48 +101,36 @@
 
 /* Botón de Colapsar */
 .sidebar-collapse {
-    all: unset; /* Resetea todos los estilos heredados */
-    background-color: transparent;
-    border: none;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: auto;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s ease, color 0.3s ease;
-    z-index: 1; /* Asegura que el ícono esté al frente */
-    width: 40px;
-    height: 40px;
-    border-radius: 50%; /* Hace que el botón sea redondo */
+    cursor: pointer;
+    outline: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    width: 3rem;
+    height: 3rem;
+    transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
 }
 
-/* Efecto de Hover Circular */
-.sidebar-collapse::before {
-    content: '';
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(30, 136, 229, 0.3);
-    border-radius: 50%; /* Asegura que el efecto sea redondo */
-    opacity: 0;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    transform: scale(0.8); /* Comienza más pequeño */
-    z-index: 0; /* Coloca el círculo detrás del ícono */
+.sidebar-icon {
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+    color: #fff;
+    font-size: 1.2rem;
 }
 
-/* Animación del Hover */
-.sidebar-collapse:hover::before {
-    opacity: 1;
-    transform: scale(1.3); /* Aumenta ligeramente el tamaño del círculo */
+.sidebar-arrow i {
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.076, 1);
 }
 
-.sidebar-collapse:hover {
-    color: #1e88e5; /* Cambia el color del ícono al hacer hover */
-    transform: scale(1.2); /* Aumenta ligeramente el tamaño del ícono */
+.sidebar-collapse:hover .sidebar-prueba-circle {
+    width: 100%;
+}
+
+.sidebar-collapse:hover .sidebar-prueba-arrow i {
+    transform: translateX(4px);
 }
 
 /* Ajuste del contenido principal */
@@ -195,10 +166,8 @@
 }
 
 .project-icon {
-    width: 50px;
-    height: 50px;
-    background-color: #7A42F4;
-    border-radius: 50%;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -222,11 +191,8 @@
 
 .project-info h3 {
     margin: 0;
-    font-size: 17px; /* Ajuste del tamaño */
+    font-size: 17px;
     font-weight: bold;
-    white-space: normal; /* Permite que el texto se divida en líneas */
-    overflow: hidden;
-    line-height: 1.2; /* Ajuste de altura de línea para que se vea más compacto */
     color: white;
 }
 
@@ -255,4 +221,16 @@
 .sidebar.collapsed .menu-item {
     justify-content: center;
     padding: 12px 0;
+}
+
+.project-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 10%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.hidden-icon {
+    display: none;
 }

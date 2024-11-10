@@ -7,6 +7,12 @@ import axios from "axios";
 import EquiposDocente from "../Components/EquiposDocente";
 import PlanillaSeguimiento from "../Components/PlanillaSeguimiento";
 import "../../css/HomeDocente.css";
+import SidebarPrueba from "../Components/SidebarPrueba";
+import HeaderProyecto from "../Components/HeaderProyecto";
+import Grupos from "./Grupos";
+import TposEvaluaciones from "./TposEvaluaciones";
+import CrearEvaluacion from "./CrearEvaluacion";
+import Rubrica from "./Rubrica";
 const HomeDocente = () => {
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
@@ -15,7 +21,7 @@ const HomeDocente = () => {
     const navigate = useNavigate();
     const { idProyecto } = useParams();
     const [vistaActiva, setVistaActiva] = useState("Equipos");
-
+    const isModalOpen = false;
     const manejarCambioDeVista = (vista) => {
         setVistaActiva(vista);
     };
@@ -51,22 +57,37 @@ const HomeDocente = () => {
     return (
         <>
             <div className="home-docente">
-                <HeaderDocente />
-                <SidebarDocente
-                    isSidebarCollapsed={isSidebarCollapsed}
-                    toggleSidebar={toggleSidebar}
-                    imageProject={projectData?.PORTADA_PROYECTO}
-                    cambiarVista={manejarCambioDeVista}
-                />
-                <div
-                    className={`${
-                        isSidebarCollapsed ? "si-collapsed" : "no-collapsed"
-                    }`}
-                >
-                    {vistaActiva === "Equipos" && <EquiposDocente />}
-                    {vistaActiva === "PlanillaSeguimiento" && (
-                        <PlanillaSeguimiento />
-                    )}
+                <HeaderProyecto isModalOpen={isModalOpen} />
+                <div className="container-sid">
+                    <SidebarPrueba
+                        isSidebarCollapsed={isSidebarCollapsed}
+                        toggleSidebar={toggleSidebar}
+                        nombreProyecto={projectData?.NOMBRE_PROYECTO}
+                        fotoProyecto={projectData?.PORTADA_PROYECTO}
+                        projectId={idProyecto}
+                        cambiarVista={manejarCambioDeVista}
+                    />
+                    <div className="content">
+                        {vistaActiva === "Equipos" && (
+                            <Grupos projectId={idProyecto} />
+                        )}
+                        {vistaActiva === "PlanillaSeguimiento" && (
+                            <PlanillaSeguimiento />
+                        )}
+                        {vistaActiva === "TipoEvaluaciones" && (
+                            <TposEvaluaciones
+                                cambiarVista={manejarCambioDeVista}
+                            />
+                        )}
+                        {vistaActiva === "CrearEvaluacion" && (
+                            <CrearEvaluacion
+                                cambiarVista={manejarCambioDeVista}
+                            />
+                        )}
+                        {vistaActiva === "CrearRubrica" && (
+                            <Rubrica cambiarVista={manejarCambioDeVista} />
+                        )}
+                    </div>
                 </div>
             </div>
         </>

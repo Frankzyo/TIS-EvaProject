@@ -49,7 +49,7 @@ body {
 
 .input-group {
     position: relative;
-    width: 100%; /* Queremos que ocupe todo el contenedor */
+    width: auto; /* Queremos que ocupe todo el contenedor */
     cursor: pointer;
 }
 
@@ -125,43 +125,22 @@ body {
     padding-right: 40px; /* Para dejar espacio para el icono */
 }
 
-button:not(
-        .sidebar-collapse,
-        .boton-eliminar,
-        .logout-button,
-        .hu-modal-button,
-        .boton-adjuntar,
-        .edit-profile-button,
-        .btn-primary,
-        .hu-edit-button,
-        .forgot-password-box button,
-        .boton-agregar,
-        .boton-panel,
-        .boton-anadir-sprint,
-        .modale-button,
-        .create-account-button,
-        .create-btn,
-        .cancel-btn,
-        .delete-btn,
-        .save-btn,
-        .change-photo-btn,
-        .btn,
-        .hu-addj-button,
-        .hu-add-button,
-        .dropdown-button,
-        .new-project-btn
-    ) {
-    background-color: #0072ce;
-    color: #ffffff;
-    padding: 12px;
-    width: 100%;
-    border: none;
-    border-radius: 30px !important;
-    font-size: 16px;
+.styled-button {
+    width: 320px;
+    height: 41.77px;
+    border: 3px solid #005bb5;
+    border-radius: 45px;
+    transition: all 0.3s;
     cursor: pointer;
+    background: white;
+    font-size: 1em;
+    font-weight: 550;
+    color: #005bb5;
 }
-button:hover {
-    background-color: #005bb5;
+
+.styled-button:hover {
+    background: #005bb5;
+    color: white;
 }
 
 .extra-links {
@@ -202,6 +181,10 @@ button:hover {
 .google-login span {
     font-size: 16px;
     color: #000000;
+}
+
+.google-login:hover span {
+    color: white; /* Cambia el color del texto a blanco en el hover */
 }
 
 .google-login:hover {

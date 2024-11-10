@@ -155,4 +155,33 @@ class ProyectosController extends Controller
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
     }
+    // Obtener un proyecto específico
+    public function show($id)
+    {
+        // Verificar si el usuario está autenticado
+        $docenteId = Auth::guard('docente')->id();
+        if (!$docenteId) {
+            return response()->json(['message' => 'No autorizado'], 401)
+                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        }
+
+        // Buscar el proyecto por ID y verificar que pertenece al docente autenticado
+        $proyecto = Proyectos::where('ID_PROYECTO', $id)
+            ->where('ID_DOCENTE', $docenteId)
+            ->first();
+
+        if ($proyecto) {
+            return response()->json($proyecto)
+                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        } else {
+            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404)
+                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        }
+    }
 }

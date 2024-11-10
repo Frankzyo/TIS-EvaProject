@@ -1,0 +1,28 @@
+/* Contenedor Principal */
+.equipo-estudiante-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sidebar y contenido principal */
+.equipo-estudiante-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+/* Estilos del Contenido Principal */
+.equipo-estudiante-main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #76a9d9; /* Color de fondo específico */
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+/* Estilo del Título */
+.equipo-estudiante-title {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+}
