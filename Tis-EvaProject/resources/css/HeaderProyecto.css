@@ -88,7 +88,7 @@
 .user-email {
     color: #6b7280;
     font-size: 14px;
-    margin: 4px 0 10px 0;
+    margin: 4px 0 5px 0;
 }
 
 .edit-profile-button {
@@ -167,3 +167,54 @@ ul.dropdown-options {
 .logout-button:focus {
     outline: none;
 }
+
+.profile-image-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.user-role {
+    font-weight: bold;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.user-icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: auto; /* Alineación a la derecha */
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px; /* Ajusta la posición para centrar en la esquina superior derecha */
+    right: -5px; /* Ajusta la posición para centrar en la esquina superior derecha */
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1;
+}
+/* Estilo para los números de notificación en línea */
+.menu-notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px; /* Ajusta la separación */
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    width: 18px; /* Ajusta el tamaño según prefieras */
+    height: 18px; /* Ajusta el tamaño según prefieras */
+    font-size: 12px;
+    font-weight: bold;
+}
+

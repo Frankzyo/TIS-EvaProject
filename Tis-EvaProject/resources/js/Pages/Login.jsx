@@ -62,7 +62,8 @@ function App() {
                 localStorage.setItem("ROLE", "Docente");
                 navigate("/proyectos");
             } else if (data.role === "Estudiante") {
-                localStorage.setItem("ID_ESTUDIANTE", data.id);
+                localStorage.setItem("ID_EST", data.id); // Almacenar el ID como ID_EST
+                localStorage.setItem("IS_RL", data.is_rl);
                 localStorage.setItem("ROLE", "Estudiante");
                 navigate("/planificacion-estudiante");
             }

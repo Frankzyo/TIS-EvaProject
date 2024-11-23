@@ -1,159 +1,129 @@
 /* Contenedor principal */
 .proyecto-estudiante {
   margin: 0;
-  padding: 0;
-  min-height: 100vh;
+  min-height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f5f5f5;
+  background-color: #f0f2f5;
   box-sizing: border-box;
-}
-
-/* Header */
-.proyecto-estudiante .header {
-  background-color: #015FA9;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* Cambiado a 'center' */
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Iconos de usuario */
-.proyecto-estudiante .user-icon-container {
-  display: flex;
-  align-items: center;
-}
-
-.proyecto-estudiante .user-icon {
-  color: white;
-  font-size: 30px;
-  transition: color 0.3s ease;
-  cursor: pointer;
-}
-
-.proyecto-estudiante .user-icon:hover {
-  color: #1A73E8;
-}
-
-.proyecto-estudiante .dropdown-icon {
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.proyecto-estudiante .dropdown-icon:hover {
-  color: #1A73E8;
+  font-family: Arial, sans-serif;
 }
 
 /* Contenedor de la lista de proyectos */
 .proyecto-estudiante .container {
-  width: 100%; /* Asegura que ocupe un mayor ancho */
-  max-width: 100%; /* Ajuste máximo del ancho */
-  margin: auto;
-  padding: 40px;
-  background-color: white;
+  width: 100%;
+  min-height: 100%;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
 /* Título */
 .proyecto-estudiante .title {
-  font-size: 35px;
+  font-size: 34px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: center;
-  color: black;
+  color: #014D8B;
+  text-transform: uppercase;
 }
 
 /* Lista de proyectos */
 .proyecto-estudiante .project-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-left: 300px;
-  margin-right: 300px;
-  margin-top: 0;
-  width: auto;
+  gap: 10px;
 }
 
 /* Elemento individual del proyecto */
 .proyecto-estudiante .project-item {
   display: flex;
   align-items: center;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px;
-  transition: transform 0.3s ease;
+  padding: 10px 15px;
+  transition: box-shadow 0.2s ease;
 }
 
 .proyecto-estudiante .project-item:hover {
-  transform: scale(1.02);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Icono del proyecto */
-.proyecto-estudiante .project-icon {
-  width: 50px;
-  height: 50px;
-  background-color: #7A42F4;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Imagen del proyecto */
+.proyecto-estudiante .project-image {
+  width: 150px;
+  overflow: hidden;
+  border-radius: 8px;
   margin-right: 15px;
 }
 
-.proyecto-estudiante .project-icon i {
-  color: white;
-  font-size: 24px;
+.proyecto-estudiante .project-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Contenedor para la información y botón */
+.proyecto-estudiante .project-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
 }
 
 /* Información del proyecto */
 .proyecto-estudiante .project-info {
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: left;
 }
 
 .proyecto-estudiante .project-info h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
-  color: black;
+  color: #1f2937;
 }
 
 .proyecto-estudiante .project-info p {
   margin: 5px 0 0;
-  font-size: 14px;
-  color: #555;
+  font-size: 18px;
+  color: #6b7280;
 }
 
-/* Botón de aprobar específico */
-.approve-button {
-  background-color: #28a745;
-  color: #ffffff;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 14px;
-}
 
-.approve-button:hover {
-  background-color: #218838;
-}
-
-/* Mensaje cuando no hay usuarios pendientes */
-.no-users {
+/* Mensaje de éxito */
+.success-messages {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 12px 20px;
+  border-radius: 8px;
   text-align: center;
-  color: #999;
-  font-style: italic;
+  font-weight: bold;
   margin-top: 20px;
+  border: 1px solid #bbf7d0;
+  font-size: 16px;
 }
-
+.registered-text {
+  display: inline-block;
+    background: linear-gradient(140.14deg, #007bff 15.05%, #0056b3 114.99%);
+    padding: 8px 20px;
+    border-radius: 7px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    margin-right: 10px;
+    box-shadow: 4px 4px 10px 0px #45090059;
+    text-shadow: 1px 1px 1px #00000040;
+    transition: all 0.3s;
+}

@@ -7,13 +7,13 @@ const HeaderProyecto = ({ isModalOpen }) => {
         nombre: "Usuario",
         email: "usuario@correo.com",
         foto: "https://via.placeholder.com/50",
-        isAdmin: false, // Indica si el usuario es administrador
+        isAdmin: false,
     });
 
-    const dropdownRef = useRef(null);
     const closeTimeoutRef = useRef(null);
+    const [pendingStudents, setPendingStudents] = useState([]);
+    const [pendingTeachers, setPendingTeachers] = useState([]);
 
-    // Función para obtener los datos del usuario logueado
     useEffect(() => {
         fetch("http://localhost:8000/api/usuario-logueado", {
             credentials: "include",
@@ -27,7 +27,7 @@ const HeaderProyecto = ({ isModalOpen }) => {
                         foto: data.foto
                             ? `http://localhost:8000/storage/${data.foto}`
                             : "https://via.placeholder.com/50",
-                        isAdmin: data.is_admin, // Asignamos si es administrador
+                        isAdmin: Boolean(data.is_admin),
                     });
                 }
             })
@@ -36,10 +36,72 @@ const HeaderProyecto = ({ isModalOpen }) => {
             );
     }, []);
 
-    // Función para alternar el menú desplegable
-    const toggleDropdown = () => {
-        setIsDropdownOpen((prevState) => !prevState);
-    };
+    useEffect(() => {
+        const obtenerSolicitudesPendientes = async () => {
+            try {
+                const token = localStorage.getItem("token");
+    
+                const studentResponse = await fetch(
+                    "http://localhost:8000/api/pending-students",
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Accept": "application/json"
+                        },
+                        credentials: "include"
+                    }
+                );
+    
+                const teacherResponse = await fetch(
+                    "http://localhost:8000/api/pending-teachers",
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Accept": "application/json"
+                        },
+                        credentials: "include"
+                    }
+                );
+    
+                // Verifica el status de la respuesta antes de intentar parsearla como JSON
+                if (
+                    studentResponse.ok &&
+                    studentResponse.headers
+                        .get("content-type")
+                        ?.includes("application/json")
+                ) {
+                    const studentData = await studentResponse.json();
+                    setPendingStudents(studentData);
+                } else {
+                    console.error(
+                        `La respuesta de pending-students no es JSON o tuvo un error: ${studentResponse.status}`
+                    );
+                }
+    
+                if (
+                    teacherResponse.ok &&
+                    teacherResponse.headers
+                        .get("content-type")
+                        ?.includes("application/json")
+                ) {
+                    const teacherData = await teacherResponse.json();
+                    setPendingTeachers(teacherData);
+                } else {
+                    console.error(
+                        `La respuesta de pending-teachers no es JSON o tuvo un error: ${teacherResponse.status}`
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "Error al obtener solicitudes pendientes:",
+                    error
+                );
+            }
+        };
+    
+        obtenerSolicitudesPendientes();
+    }, []);
+    
 
     const openDropdown = () => {
         if (closeTimeoutRef.current) {
@@ -52,15 +114,14 @@ const HeaderProyecto = ({ isModalOpen }) => {
     const closeDropdown = () => {
         closeTimeoutRef.current = setTimeout(() => {
             setIsDropdownOpen(false);
-        }, 300); // Ajusta el tiempo según sea necesario
+        }, 300); // Retraso de 300 ms para cerrar el menú
     };
 
-    // Función para manejar las opciones del dropdown
-    // Función para manejar las opciones del dropdown
     const handleOptionClick = async (option) => {
         if (option === "logout") {
             const role = localStorage.getItem("ROLE");
-            const logoutUrl = role === "Docente" ? "/docente/logout" : "/estudiante/logout";
+            const logoutUrl =
+                role === "Docente" ? "/docente/logout" : "/estudiante/logout";
     
             try {
                 const csrfToken = document
@@ -80,7 +141,6 @@ const HeaderProyecto = ({ isModalOpen }) => {
                     throw new Error("Error al cerrar sesión");
                 }
     
-                // Limpia el almacenamiento local y redirige al login
                 localStorage.clear();
                 window.location.href = "/login";
             } catch (error) {
@@ -89,14 +149,18 @@ const HeaderProyecto = ({ isModalOpen }) => {
         } else if (option === "profile") {
             window.location.href = "/perfil";
         } else if (option === "projects") {
-            window.location.href = "/proyectos"; // Redirección a la página de proyectos
+            window.location.href = "/proyectos";
         } else if (option === "approveUsers" && userData.isAdmin) {
             window.location.href = "/approve-accounts";
+        } else if (option === "approveStudent") { // Cualquier docente puede aprobar estudiantes
+            window.location.href = "/approve-estudiante";
         }
     
         setIsDropdownOpen(false);
     };
     
+
+    const totalPending = pendingStudents.length + pendingTeachers.length;
 
     return (
         <div className={`header ${isModalOpen ? "disabled" : ""}`}>
@@ -106,19 +170,23 @@ const HeaderProyecto = ({ isModalOpen }) => {
                 onMouseEnter={openDropdown}
                 onMouseLeave={closeDropdown}
             >
-                <img
-                    src={userData.foto}
-                    alt="Foto de perfil"
-                    className="profile-image"
-                    onClick={() => handleOptionClick("profile")}
-                />
+                <div className="profile-image-wrapper">
+                    <img
+                        src={userData.foto}
+                        alt="Foto de perfil"
+                        className="profile-image"
+                        onClick={() => handleOptionClick("profile")}
+                    />
+                    {totalPending > 0 && (
+                        <div className="notification-badge">{totalPending}</div>
+                    )}
+                </div>
                 <i className="fas fa-chevron-down dropdown-icon"></i>
             </div>
 
             {isDropdownOpen && (
                 <div
                     className="dropdown-menu"
-                    ref={dropdownRef}
                     onMouseEnter={openDropdown}
                     onMouseLeave={closeDropdown}
                 >
@@ -136,6 +204,12 @@ const HeaderProyecto = ({ isModalOpen }) => {
                                 <span className="user-email">
                                     {userData.email}
                                 </span>
+                                <span className="user-role">Docente</span>
+                                {userData.isAdmin && (
+                                    <span className="user-role">
+                                        Administrador
+                                    </span>
+                                )}
                                 <button
                                     className="edit-profile-button"
                                     onClick={() => handleOptionClick("profile")}
@@ -165,17 +239,32 @@ const HeaderProyecto = ({ isModalOpen }) => {
                         >
                             Proyectos
                         </li>
-                        {/* Solo mostrar "Aprobar Usuarios" si el usuario es administrador */}
-                        {userData.isAdmin ? (
+                        <li
+                            className="dropdown-button"
+                            onClick={() => handleOptionClick("approveStudent")}
+                        >
+                            Aprobar Estudiantes
+                            {pendingStudents.length > 0 && (
+                                <span className="menu-notification-badge">
+                                    {pendingStudents.length}
+                                </span>
+                            )}
+                        </li>
+                        {userData.isAdmin && (
                             <li
                                 className="dropdown-button"
                                 onClick={() =>
                                     handleOptionClick("approveUsers")
                                 }
                             >
-                                Aprobar Usuarios
+                                Aprobar Docentes
+                                {pendingTeachers.length > 0 && (
+                                    <span className="menu-notification-badge">
+                                        {pendingTeachers.length}
+                                    </span>
+                                )}
                             </li>
-                        ) : null}
+                        )}
                     </ul>
                     <div className="dropdown-divider"></div>
                     <button

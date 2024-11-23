@@ -1,0 +1,31 @@
+.planilla-seguimiento-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido de la barra lateral y del contenedor principal */
+.planilla-seguimiento-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+.seguimiento-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.seguimiento-table th, .seguimiento-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.seguimiento-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.seguimiento-table td {
+    background-color: #ffffff;
+}

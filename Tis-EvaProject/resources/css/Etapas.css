@@ -1,0 +1,215 @@
+/* Estilos para el contenedor principal que incluye el sidebar y el contenido */
+.etapas-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido de la barra lateral y del contenedor principal */
+.etapas-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+/* Fondo de overlay para el modal de etapas */
+.etapa-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+/* Contenedor del modal de etapas */
+.etapa-modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para el título del modal */
+.etapa-modal-title {
+    margin-top: 0;
+    font-size: 1.75rem;
+    color: #002A4C;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid #002A4C;
+    padding-bottom: 10px;
+}
+
+/* Estilos para las etiquetas del modal */
+.etapa-label {
+    font-size: 1rem;
+    color: #002A4C;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+/* Estilos de entrada para los campos de texto */
+.etapa-input {
+    width: 100%;
+    resize: none;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.etapa-textarea {
+    resize: none; /* Desactiva el redimensionamiento */
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    max-height: 150px;
+    min-height: 100px;
+    box-sizing: border-box;
+}
+/* Ajustes específicos para el textarea */
+.etapa-textarea {
+    resize: vertical;
+    height: 100px;
+}
+
+/* Botones en el modal */
+.etapa-modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.etapa-cancel-btn,
+.etapa-add-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 1rem;
+}
+
+.etapa-cancel-btn {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.etapa-cancel-btn:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+}
+
+.etapa-add-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.etapa-add-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.etapas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.etapas-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+    justify-content: space-between;
+    border-left: 5px solid #1558b0;
+}
+
+.etapas-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.etapas-info {
+    max-width: 80%;
+}
+.etapas-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.etapas-score {
+    color: #016de0;
+    font-weight: bold;
+}
+.etapas-duration {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+}
+
+.etapas-description {
+    font-size: 15px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.etapas-item .etapas-actions {
+    display: flex;
+    align-items: center;
+}
+
+.action-btns {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 12px !important;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.action-btns:hover {
+    background-color: #1558b0;
+    color: white;
+}

@@ -1,6 +1,7 @@
 /* Sidebar */
 .sidebar {
     width: 250px;
+    min-width: 250px;
     background-color: #003B67;
     height: 100%;
     display: flex;
@@ -14,6 +15,7 @@
 
 .sidebar.collapsed {
     width: 60px;
+    min-width: 60px;
     padding: 12px 5px; /* Reduce padding al colapsar */
 }
 
@@ -191,10 +193,13 @@
 
 .project-info h3 {
     margin: 0;
-    font-size: 17px;
     font-weight: bold;
     color: white;
+    font-size: clamp(14px, 2vw, 17px); /* Ajuste dinámico del tamaño de fuente */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es demasiado largo */
 }
+
 
 .project-info p {
     margin: 0;

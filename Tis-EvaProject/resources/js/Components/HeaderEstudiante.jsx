@@ -7,7 +7,7 @@ const HeaderEstudiante = ({ isModalOpen }) => {
         nombre: "Usuario",
         email: "usuario@correo.com",
         foto: "https://via.placeholder.com/50",
-        isAdmin: false, // Indica si el usuario es administrador
+        isRL: false, // Indica si el usuario es Representante Legal
     });
 
     const dropdownRef = useRef(null);
@@ -27,6 +27,7 @@ const HeaderEstudiante = ({ isModalOpen }) => {
                         foto: data.foto
                             ? `http://localhost:8000/storage/${data.foto}`
                             : "https://via.placeholder.com/50",
+                        isRL: Boolean(data.is_rl), // Asegura que se trate como booleano
                     });
                 }
             })
@@ -54,18 +55,16 @@ const HeaderEstudiante = ({ isModalOpen }) => {
         }, 300); // Ajusta el tiempo según sea necesario
     };
 
-    // Función para manejar las opciones del dropdown
-    // Función para manejar las opciones del dropdown
     const handleOptionClick = async (option) => {
         if (option === "logout") {
             const role = localStorage.getItem("ROLE");
             const logoutUrl = role === "Docente" ? "/docente/logout" : "/estudiante/logout";
-    
+
             try {
                 const csrfToken = document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content");
-    
+
                 const response = await fetch(logoutUrl, {
                     method: "POST",
                     headers: {
@@ -74,11 +73,11 @@ const HeaderEstudiante = ({ isModalOpen }) => {
                     },
                     credentials: "include",
                 });
-    
+
                 if (!response.ok) {
                     throw new Error("Error al cerrar sesión");
                 }
-    
+
                 // Limpia el almacenamiento local y redirige al login
                 localStorage.clear();
                 window.location.href = "/login";
@@ -89,11 +88,10 @@ const HeaderEstudiante = ({ isModalOpen }) => {
             window.location.href = "/perfil-estudiante";
         } else if (option === "backlog") {
             window.location.href = "/planificacion-estudiante"; // Redirección a la página de proyectos
-        } 
-    
+        }
+
         setIsDropdownOpen(false);
     };
-    
 
     return (
         <div className={`header-est ${isModalOpen ? "disabled" : ""}`}>
@@ -133,6 +131,12 @@ const HeaderEstudiante = ({ isModalOpen }) => {
                                 <span className="user-email-est">
                                     {userData.email}
                                 </span>
+                                <span className="user-role-est">Estudiante</span>
+                                {userData.isRL && (
+                                    <span className="user-role-est">
+                                        Representante Legal
+                                    </span>
+                                )}
                                 <button
                                     className="edit-profile-button-est"
                                     onClick={() => handleOptionClick("profile")}
@@ -162,17 +166,6 @@ const HeaderEstudiante = ({ isModalOpen }) => {
                         >
                             Backlog
                         </li>
-                        {/* Solo mostrar "Aprobar Usuarios" si el usuario es administrador */}
-                        {userData.isAdmin ? (
-                            <li
-                                className="dropdown-button-est"
-                                onClick={() =>
-                                    handleOptionClick("approveUsers")
-                                }
-                            >
-                                Aprobar Usuarios
-                            </li>
-                        ) : null}
                     </ul>
                     <div className="dropdown-divider-est"></div>
                     <button

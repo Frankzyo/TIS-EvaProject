@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Database\Eloquent\Model;
 
 class Estudiante extends Authenticatable
 {
@@ -17,8 +18,11 @@ class Estudiante extends Authenticatable
         'APELLIDO_EST',
         'EMAIL_EST',
         'PASSWORD_EST',
+        'FOTO_EST',
         'ID_GRUPO',
         'ID_PROYECTO',
+        'IS_RL',
+        'APPROVED',
     ];
 
     protected $hidden = [

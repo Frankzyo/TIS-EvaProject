@@ -1,0 +1,133 @@
+/* CSS para RubricaItem */
+
+.rubrica-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #f9f9f9;
+}
+
+.rubrica-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.rubrica-title-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.rubrica-list {
+    margin-top: 1rem;
+}
+
+.rubrica-header-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.rubrica-title {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+/* Estilo para la descripción de la rúbrica */
+.rubrica-description {
+    font-size: 0.9em; /* Tamaño de fuente ligeramente más pequeño */
+    color: #666; /* Color gris para que sea menos llamativo que el título */
+    margin-bottom: 0;
+    line-height: 1.4; /* Mejorar la legibilidad */
+}
+
+.max-puntaje {
+    font-size: 1.2em;
+    color: #666;
+    font-weight: bold;
+}
+
+.project-actions {
+    display: flex;
+    align-items: center;
+}
+
+.expand-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #333;
+    margin-right: 8px;
+    transition: color 0.3s ease;
+}
+
+.expand-btn:hover {
+    color: #1558b0;
+}
+
+.action-btn {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 12px !important;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.action-btn:hover {
+    background-color: #1558b0;
+    color: white;
+}
+
+.criterios-list {
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+/*----------*/
+/* Estilo general para el contenedor de criterios */
+.criterios-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px 0;
+}
+
+/* Títulos de criterios */
+.criterio-placeholder-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    margin-bottom: 2px;
+}
+
+/* Contenedor de barras de nivel */
+.criterio-placeholder-bars {
+    display: flex;
+    gap: 5px;
+}
+
+/* Barras de nivel con colores graduales */
+.criterio-placeholder-rect {
+    width: 50px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: #ccc;
+}
+
+/* Colores para los niveles de acuerdo al puntaje o al orden */
+.criterio-placeholder-rect:nth-child(1) {
+    background-color: #4caf50; /* Verde para el nivel más alto */
+}
+.criterio-placeholder-rect:nth-child(2) {
+    background-color: #ff9800; /* Naranja para nivel medio */
+}
+.criterio-placeholder-rect:nth-child(3) {
+    background-color: #f44336; /* Rojo para nivel bajo */
+}

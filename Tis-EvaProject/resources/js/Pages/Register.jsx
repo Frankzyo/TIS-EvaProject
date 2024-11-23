@@ -4,7 +4,7 @@ import "../../css/register.css";
 import axios from "axios";
 
 function Register() {
-    const navigate = useNavigate(); // Hook para redireccionar
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
@@ -16,6 +16,7 @@ function Register() {
         password: "",
         confirmPassword: "",
         photo: null,
+        role: "estudiante", // Rol por defecto
         acceptPrivacyPolicy: false,
         receiveNotifications: false,
     });
@@ -34,23 +35,19 @@ function Register() {
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
-
         if (file && file.type.startsWith("image/")) {
             setFormData((prevData) => ({
                 ...prevData,
                 photo: file,
             }));
-
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewImage(reader.result);
             };
             reader.readAsDataURL(file);
         } else {
-            alert(
-                "Por favor, selecciona un archivo de imagen (jpg, png, gif)."
-            );
-            e.target.value = ""; // Limpia el input si no es un archivo de imagen
+            alert("Por favor, selecciona un archivo de imagen (jpg, png, gif).");
+            e.target.value = "";
         }
     };
 
@@ -65,10 +62,8 @@ function Register() {
         submissionData.append("apellido", formData.lastName);
         submissionData.append("email", formData.email);
         submissionData.append("password", formData.password);
-        submissionData.append(
-            "password_confirmation",
-            formData.confirmPassword
-        );
+        submissionData.append("password_confirmation", formData.confirmPassword);
+        submissionData.append("role", formData.role);
 
         if (formData.photo) {
             submissionData.append("foto", formData.photo);
@@ -83,7 +78,7 @@ function Register() {
                 }
             );
             alert(response.data.message);
-            navigate("/login"); // Redirige al login después de registro exitoso
+            navigate("/login");
         } catch (error) {
             if (error.response) {
                 console.error(error.response.data);
@@ -111,6 +106,19 @@ function Register() {
                 <div className="divider"></div>
 
                 <form onSubmit={handleSubmit}>
+                    {/* Campo de selección de rol */}
+                    <div className="input-group">
+                        <select
+                            name="role"
+                            value={formData.role}
+                            onChange={handleInputChange}
+                            required
+                        >
+                            <option value="docente">Docente</option>
+                            <option value="estudiante">Estudiante</option>
+                        </select>
+                    </div>
+
                     <div className="input-group">
                         <input
                             type="text"
@@ -210,7 +218,7 @@ function Register() {
                             <input
                                 type="file"
                                 id="photoInput"
-                                accept="image/*" // Solo permite archivos de imagen
+                                accept="image/*"
                                 style={{ display: "none" }}
                                 onChange={handlePhotoChange}
                             />

@@ -1,0 +1,31 @@
+.nivel-item {
+    background-color: #ffffff;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.nivel-title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 16px;
+    color: #333;
+}
+
+.nivel-title span {
+    font-weight: normal;
+    font-style: italic;
+    color: #666;
+    font-size: 14px;
+    margin-left: auto; /* Asegura que el puntaje esté alineado a la derecha */
+}
+
+.nivel-description {
+    font-size: 14px;
+    color: #666;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}

@@ -89,7 +89,7 @@ class RequerimientoController extends Controller
     public function crearParaGrupo(Request $request)
     {
         $request->validate([
-            'ID_GRUPO' => 'required|string|exists:grupo,ID_GRUPO',
+            'ID_GRUPO' => 'required|integer|exists:grupo,ID_GRUPO',
             'DESCRIPCION_REQ' => 'required|string|max:1000',
         ]);
 

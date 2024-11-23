@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class EstudianteController extends Controller
 {
@@ -31,6 +32,7 @@ class EstudianteController extends Controller
             'PASSWORD_EST' => $hashedPassword,
             'ID_GRUPO' => $request->input('ID_GRUPO'),
             'ID_PROYECTO' => $request->input('ID_PROYECTO'), // Confirmar que se asigna aquí
+            'APPROVED' => 1,
         ]);
 
 
@@ -55,24 +57,47 @@ class EstudianteController extends Controller
     }
     public function index(Request $request)
     {
+        // Obtener el ID del usuario autenticado
+        $estudianteId = Auth::guard('estudiante')->id();
+        $docenteId = Auth::guard('docente')->id();
+
+        // Verificar autenticación
+        if (!$estudianteId && !$docenteId) {
+            return response()->json(['message' => 'No autorizado'], 401);
+        }
+
+        // Obtener el ID del grupo desde la solicitud
         $groupId = $request->input('ID_GRUPO');
 
+        // Validar que el ID del grupo esté presente
+        if (!$groupId) {
+            return response()->json(['error' => 'ID de grupo requerido'], 400);
+        }
+
         try {
-            $estudiantes = Estudiante::where('ID_GRUPO', $groupId)->get();
+            if ($docenteId) {
+                // El docente puede ver todos los estudiantes del grupo
+                $estudiantes = Estudiante::where('ID_GRUPO', $groupId)->get();
+            } else {
+                // El estudiante solo puede ver a los integrantes de su propio grupo
+                $estudiante = Estudiante::find($estudianteId);
+                if ($estudiante && $estudiante->ID_GRUPO == $groupId) {
+                    $estudiantes = Estudiante::where('ID_GRUPO', $groupId)->get();
+                } else {
+                    // Si el estudiante intenta acceder a un grupo que no es el suyo, denegar acceso
+                    return response()->json(['message' => 'No autorizado para ver este grupo'], 403);
+                }
+            }
+
+            // Retornar los estudiantes encontrados en el grupo
             return response()->json($estudiantes, 200);
         } catch (\Exception $e) {
+            // Manejo de errores
             return response()->json(['error' => 'Error al cargar estudiantes'], 500);
         }
     }
-    public function destroy($id)
-    {
-        $estudiante = Estudiante::find($id);
-        if ($estudiante) {
-            $estudiante->delete();
-            return response()->json(['message' => 'Estudiante eliminado'], 200);
-        }
-        return response()->json(['error' => 'Estudiante no encontrado'], 404);
-    }
+
+
     public function obtenerProyectoYGrupo(Request $request)
     {
         try {
@@ -97,6 +122,48 @@ class EstudianteController extends Controller
         } catch (\Exception $e) {
             Log::error("Error al obtener proyecto y grupo: " . $e->getMessage());
             return response()->json(['message' => 'Error al obtener datos del estudiante'], 500);
+        }
+    }
+    public function destroy($id)
+    {
+        try {
+            $estudiante = Estudiante::findOrFail($id); // Busca el estudiante
+            $estudiante->delete(); // Elimina el estudiante
+            return response()->json(['message' => 'Estudiante eliminado'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Estudiante no encontrado'], 404);
+        } catch (\Exception $e) {
+            // Registrar el error para verificar la causa exacta
+            Log::error("Error al eliminar estudiante: " . $e->getMessage());
+            return response()->json(['error' => 'Error al eliminar estudiante'], 500);
+        }
+    }
+    public function obtenerEstudiantesPorGrupo($groupId)
+    {
+        try {
+            // Consulta para obtener todos los estudiantes con el mismo ID_GRUPO
+            $estudiantes = Estudiante::where('ID_GRUPO', $groupId)->get();
+
+            // Verifica si se encontraron estudiantes
+            if ($estudiantes->isEmpty()) {
+                return response()->json(['message' => 'No se encontraron estudiantes para este grupo'], 404);
+            }
+
+            return response()->json($estudiantes, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al cargar estudiantes'], 500);
+        }
+    }
+    public function updateRole(Request $request, $id)
+    {
+        try {
+            $estudiante = Estudiante::findOrFail($id);
+            $estudiante->ROL_EST = $request->input('ROL_EST');
+            $estudiante->save();
+
+            return response()->json(['message' => 'Rol actualizado correctamente'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al actualizar el rol del estudiante'], 500);
         }
     }
 }

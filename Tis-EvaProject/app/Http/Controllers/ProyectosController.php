@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Proyectos;
+use App\Models\Estudiante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Models\Grupo;
 
 class ProyectosController extends Controller
 {
@@ -125,63 +128,107 @@ class ProyectosController extends Controller
     // Eliminar un proyecto
     public function destroy($id)
     {
+        Log::info("Intentando eliminar el grupo con ID: " . $id);
+
+        // Verificar si el usuario está autenticado como docente o estudiante
         $docenteId = Auth::guard('docente')->id();
-        if (!$docenteId) {
-            return response()->json(['message' => 'No autorizado'], 401)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        $estudianteId = Auth::guard('estudiante')->id();
+
+        // Si no hay un usuario autenticado, responder con un error de autorización
+        if (!$docenteId && !$estudianteId) {
+            return response()->json(['message' => 'No autorizado'], 401);
         }
 
-        $proyecto = Proyectos::where('ID_PROYECTO', $id)
-            ->where('ID_DOCENTE', $docenteId)
-            ->first();
+        // Construir la consulta para obtener el grupo
+        $query = Grupo::where('ID_GRUPO', $id);
 
-        if (!$proyecto) {
-            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        // Si el usuario es docente, filtrar por su ID_DOCENTE
+        if ($docenteId) {
+            $query->where('ID_DOCENTE', $docenteId);
+        }
+        // Nota: Si el usuario es un estudiante, no aplicamos el filtro de ID_DOCENTE.
+
+        $grupo = $query->first();
+
+        // Si no se encuentra el grupo, responder con un error
+        if (!$grupo) {
+            Log::info("Grupo no encontrado o no autorizado con ID: " . $id);
+            return response()->json(['message' => 'Grupo no encontrado o no autorizado'], 404);
         }
 
-        if ($proyecto->PORTADA_PROYECTO && Storage::disk('public')->exists($proyecto->PORTADA_PROYECTO)) {
-            Storage::disk('public')->delete($proyecto->PORTADA_PROYECTO);
+        // Eliminar la portada del grupo si existe en el almacenamiento
+        if ($grupo->PORTADA_GRUPO && Storage::disk('public')->exists($grupo->PORTADA_GRUPO)) {
+            Storage::disk('public')->delete($grupo->PORTADA_GRUPO);
         }
 
-        $proyecto->delete();
+        // Eliminar el grupo
+        $grupo->delete();
+        Log::info("Grupo eliminado con éxito con ID: " . $id);
 
-        return response()->json(['message' => 'Proyecto eliminado con éxito'])
-            ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        return response()->json(['message' => 'Grupo eliminado con éxito']);
     }
+
     // Obtener un proyecto específico
     public function show($id)
     {
-        // Verificar si el usuario está autenticado
         $docenteId = Auth::guard('docente')->id();
-        if (!$docenteId) {
-            return response()->json(['message' => 'No autorizado'], 401)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        $estudianteId = Auth::guard('estudiante')->id();
+
+        if (!$docenteId && !$estudianteId) {
+            return response()->json(['message' => 'No autorizado'], 401);
         }
 
-        // Buscar el proyecto por ID y verificar que pertenece al docente autenticado
-        $proyecto = Proyectos::where('ID_PROYECTO', $id)
-            ->where('ID_DOCENTE', $docenteId)
-            ->first();
+        $query = Proyectos::where('ID_PROYECTO', $id);
+
+        // Si es docente, filtra por el ID_DOCENTE
+        if ($docenteId) {
+            $query->where('ID_DOCENTE', $docenteId);
+        }
+
+        // Si es estudiante, filtra por el ID_PROYECTO del estudiante
+        if ($estudianteId) {
+            $estudiante = Estudiante::find($estudianteId);
+            if ($estudiante && $estudiante->ID_PROYECTO != $id) {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+        }
+
+        $proyecto = $query->first();
 
         if ($proyecto) {
-            return response()->json($proyecto)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+            return response()->json($proyecto);
         } else {
-            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404)
+            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404);
+        }
+    }
+
+    // Mostrar todos los proyectos sin restricciones de docente
+    public function indexAll()
+    {
+        try {
+            // Obtener todos los proyectos junto con el nombre y apellido del docente
+            $proyectos = Proyectos::with('docente:ID_DOCENTE,NOMBRE_DOCENTE,APELLIDO_DOCENTE')
+                ->get(['ID_PROYECTO', 'NOMBRE_PROYECTO', 'DESCRIP_PROYECTO', 'PORTADA_PROYECTO', 'ID_DOCENTE']);
+
+            return response()->json($proyectos)
                 ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        } catch (\Exception $e) {
+            Log::error('Error al obtener los proyectos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener los proyectos'], 500);
+        }
+    }
+    public function obtenerGruposYFechas($id_proyecto)
+    {
+        try {
+            $proyecto = Proyectos::with(['grupos.fechasDefensa'])
+                ->findOrFail($id_proyecto);
+
+            return response()->json($proyecto, 200);
+        } catch (\Exception $e) {
+            Log::error("Error al obtener grupos y fechas de defensa: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener grupos y fechas de defensa'], 500);
         }
     }
 }

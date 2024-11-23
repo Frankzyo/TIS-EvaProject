@@ -1,19 +1,10 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    height: 100%;
-}
 
 .historia-usuario {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: #76a9d9;
-    box-sizing: border-box;
-    overflow-y: auto; /* El scrollbar principal estará aquí */
+    min-height: 100vh;
+    overflow: hidden; /* Solo permite el scroll en contenido-scrollable */
 }
 
 /* Estilos específicos para la página de planificación */
@@ -23,20 +14,27 @@ body, html {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%; /* Mantiene el ancho completo */
-    background-color: #014D8B; /* Color de fondo que mencionaste */
+    width: 100%;
+    background-color: #014D8B;
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
-    z-index: 1000; /* Asegura que el header esté sobre el contenido */
+    z-index: 1000;
 }
-
+.contenido-scrollable {
+    width: 100vw;
+    height: calc(100vh - 50px); /* Tamaño completo menos el header */
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* Centra horizontalmente el contenido */
+    align-items: flex-start;
+}
 /* Sidebar fijo */
 /* Sidebar fijo (manteniendo configuración) */
 .planificacion-pagina .sidebar {
-    position: fixed;
     top: 50px; /* Ajusta el top para dejar espacio al header */
     left: 0;
     width: 250px; /* Ancho que mencionaste */
@@ -54,11 +52,9 @@ body, html {
 
 /* Contenido con margen para el sidebar y el header */
 .planificacion-pagina .contenido-con-sidebar {
-    margin-left: 250px; /* Deja espacio para el sidebar */
-    padding-top: 50px; /* Deja espacio para el header */
+    flex-grow: 1;
     overflow-y: auto; /* Permite scroll solo en el contenido */
-    height: 100%; /* Ajustar la altura para que ocupe todo el espacio visible */
-    overflow-y: auto; /* El scroll solo en el contenido */
+    height: auto; /* Ajustar la altura para que ocupe todo el espacio visible */
 }
 
 /* Si el sidebar está colapsado */
@@ -73,15 +69,13 @@ body, html {
 }
 
 .historia-usuario-contenido {
-    min-width: 800px;
-    width: 850px !important;
-    margin: 0 auto;
+    max-width: 850px; /* Ancho máximo del contenedor */
+    width: 100%;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
     box-sizing: border-box;
-    overflow-y: visible; /* No queremos que el contenedor tenga su propio scrollbar */
 }
 
 .hu-container {

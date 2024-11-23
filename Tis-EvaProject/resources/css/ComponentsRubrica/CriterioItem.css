@@ -1,0 +1,41 @@
+.criterio-item {
+    background-color: #ffffff;
+    margin-top: 10px;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.criterio-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Esto moverá la puntuación a la derecha */
+}
+
+.max-score {
+    font-size: 20px; /* Tamaño más grande */
+    color: #333; /* Más oscuro */
+    font-weight: bold;
+}
+
+.criterio-description {
+    font-size: 14px; /* Tamaño más grande para la descripción */
+    color: #444; /* Un poco más oscuro */
+    margin-bottom: 10px;
+}
+
+.niveles-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.criterio-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}

@@ -28,7 +28,7 @@ return [
             'model' => App\Models\User::class,
         ],
         'docentes' => [
-            'driver' => 'custom_docente', // Usa el proveedor personalizado para Docentes
+            'driver' => 'eloquent',  // Usa el proveedor personalizado para Docentes
             'model' => App\Models\Docente::class,
         ],
         'estudiantes' => [

@@ -1,0 +1,91 @@
+.rubrica-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido de la barra lateral y del contenedor principal */
+.rubrica-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+.etapa-container{
+padding-bottom: 1rem;
+
+}
+/* Estilos específicos para el contenedor de información de la etapa */
+.etapa-info {
+    padding: 1.5rem;
+    background-color: #f7fbff;
+    border: 1px solid #d1e7f5;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.etapa-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #004085;
+    margin: 0 0 0.5rem 0;
+}
+
+.etapa-description {
+    font-size: 1rem;
+    color: #495057;
+    margin: 0 0 1rem 0;
+}
+
+.etapa-stats {
+    display: flex;
+    gap: 2rem;
+    font-size: 1rem;
+    color: #495057;
+}
+
+.etapa-score,
+.etapa-duration {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.etapa-score strong,
+.etapa-duration strong {
+    color: #004085;
+    margin-right: 0.3rem;
+}
+
+.available-points {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.available-points.normal {
+    color: #ffffff;
+    background: linear-gradient(135deg, #56ccf2, #2f80ed); /* Degradado azul */
+}
+
+.available-points.exceeded {
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff5f6d, #ffc371); /* Degradado rojo */
+}
+
+
+/*------------------Rubrica-------------*/
+
+
+
+
+
+
+
+

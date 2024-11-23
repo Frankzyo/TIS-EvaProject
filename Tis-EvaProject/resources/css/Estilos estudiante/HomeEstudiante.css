@@ -1,0 +1,12 @@
+.container-home-estudiante {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    width: 100vw; /* 100% del ancho de la ventana de visualización */
+    height: 100vh; /* 100% de la altura de la ventana de visualización */
+}
+.contaner-sidebar {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}

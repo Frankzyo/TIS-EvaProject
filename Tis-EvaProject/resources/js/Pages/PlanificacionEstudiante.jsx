@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Importación de useNavigate
+import { useNavigate, useParams } from "react-router-dom"; // Importación de useNavigate
 import SidebarEstudiante from "../Components/SidebarEstudiante";
 import Header from "../Components/HeaderEstudiante";
+import useProjectAndGroupId from "../Components/useProjectAndGroupId";
+import RegistroModal from "../Components/RegistroModal";
 import axios from "axios";
 import "../../css/PlanificacionEstudiante.css";
 import "../../css/SidebarEstudiante.css";
@@ -13,7 +15,13 @@ const PlanificacionEstudiante = () => {
     const navigate = useNavigate();
     const [proyecto, setProyecto] = useState(null);
     const [grupo, setGrupo] = useState(null);
+    const { projectId, groupId } = useProjectAndGroupId();
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Estado del modal de error
+    const [errorMessage, setErrorMessage] = useState("");
+    const [historiaAEliminar, setHistoriaAEliminar] = useState(null);
+    const [isRepresentanteLegal, setIsRepresentanteLegal] = useState(false);
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [draggedImageIndex, setDraggedImageIndex] = useState(null);
     const [sprints, setSprints] = useState([]); // Inicia como lista vacía
     const [historiasUsuario, setHistoriasUsuario] = useState([]);
     const [requerimientos, setRequerimientos] = useState([]);
@@ -37,9 +45,28 @@ const PlanificacionEstudiante = () => {
     const [isReqModalOpen, setReqModalOpen] = useState(false);
     const [isModalOpenHU, setIsModalOpenHU] = useState(false);
     const [nuevoReq, setNuevoReq] = useState("");
-    const [nuevaHU, setNuevaHU] = useState({ titulo: "", descripcion: "" });
+    const [nuevaHU, setNuevaHU] = useState({
+        titulo: "",
+        descripcion: "",
+        archivos: [],
+    });
     const [archivos, setArchivos] = useState([]);
+    const [groupInfo, setGroupInfo] = useState(null);
     const fileInputRef = useRef(null);
+    useEffect(() => {
+        const role = localStorage.getItem("ROLE");
+        const estudianteId = localStorage.getItem("ID_EST");
+        const representanteLegal = localStorage.getItem("IS_RL");
+
+        // Verificar si el usuario tiene el rol de "Estudiante" y un ID de estudiante
+        if (role !== "Estudiante" || !estudianteId) {
+            navigate("/login"); // Redirige al login si no cumple las condiciones
+        } else {
+            // Solo establece el estado de Representante Legal si es un estudiante autenticado
+            setIsRepresentanteLegal(representanteLegal === "true");
+        }
+    }, [navigate]);
+
     useEffect(() => {
         const obtenerDatosEstudiante = async () => {
             try {
@@ -47,19 +74,16 @@ const PlanificacionEstudiante = () => {
                     "http://localhost:8000/estudiante/proyecto-grupo",
                     { withCredentials: true }
                 );
-                console.log("Datos del estudiante:", response.data);
 
                 if (response.data) {
                     setProyecto(response.data.proyecto);
                     setGrupo(response.data.grupo);
 
-                    // Extrae los requerimientos de ambos orígenes
+                    // Combina los requerimientos
                     const requerimientosDocente =
                         response.data.proyecto.requerimientos || [];
                     const requerimientosEstudiante =
                         response.data.grupo.requerimientos || [];
-
-                    // Combina y actualiza el estado de requerimientos
                     setRequerimientos([
                         ...requerimientosDocente,
                         ...requerimientosEstudiante,
@@ -70,11 +94,38 @@ const PlanificacionEstudiante = () => {
                     "Error al cargar los datos del estudiante:",
                     error
                 );
+                setErrorMessage(
+                    "No has registrado tu participación en un proyecto ni creado tu grupo. Completa este registro para continuar con la planificación de tus tareas."
+                );
+                setIsErrorModalOpen(true); // Muestra el modal si hay error
             }
         };
 
+        const obtenerHistoriasUsuario = async () => {
+            if (!groupId) return; // Evita hacer la solicitud si groupId no está definido
+
+            try {
+                const response = await axios.get(
+                    `http://localhost:8000/api/historias/${groupId}`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                setHistoriasUsuario(response.data); // Actualiza el estado con las HU obtenidas
+            } catch (error) {
+                console.error(
+                    "Error al cargar las Historias de Usuario:",
+                    error
+                );
+            }
+        };
+
+        if (projectId && groupId) {
+            obtenerHistoriasUsuario();
+        }
+        obtenerHistoriasUsuario();
         obtenerDatosEstudiante();
-    }, []);
+    }, [projectId, groupId]);
 
     const guardarRequerimientoParaGrupo = () => {
         const idGrupo = grupo?.ID_GRUPO;
@@ -103,6 +154,11 @@ const PlanificacionEstudiante = () => {
                     );
                 });
         } else {
+            console.log("Datos que se envían:", {
+                ID_GRUPO: idGrupo,
+                DESCRIPCION_REQ: nuevoReq,
+            });
+
             // Modo creación: crea un nuevo requerimiento
             axios
                 .post(
@@ -125,7 +181,9 @@ const PlanificacionEstudiante = () => {
                 });
         }
     };
-
+    const handleImageDragStart = (e, index) => {
+        e.dataTransfer.setData("draggedIndex", index); // Guarda el índice en dataTransfer
+    };
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
     const abrirModal = () => {
         setIsModalOpen(true);
@@ -150,7 +208,8 @@ const PlanificacionEstudiante = () => {
     };
 
     const editarHistoriaUsuario = (index) => {
-        navigate(`/historia-usuario/${index}`, {
+        const historiaId = historiasUsuario[index].ID_HU; // Obtén el ID único de la historia
+        navigate(`/historia-usuario/${historiaId}`, {
             state: { historia: historiasUsuario[index], numero: index + 1 },
         });
     };
@@ -164,8 +223,10 @@ const PlanificacionEstudiante = () => {
     };
 
     const eliminarArchivo = (index) => {
-        const updatedFiles = archivos.filter((_, i) => i !== index);
-        setArchivos(updatedFiles);
+        setNuevaHU((prevHU) => ({
+            ...prevHU,
+            archivos: prevHU.archivos.filter((_, i) => i !== index),
+        }));
     };
 
     const cerrarModalReq = () => {
@@ -189,11 +250,14 @@ const PlanificacionEstudiante = () => {
         );
 
         const filesWithPreview = newFiles.map((file) => ({
-            ...file,
-            preview: URL.createObjectURL(file),
+            file,
+            preview: URL.createObjectURL(file), // Crea una URL de vista previa para cada archivo
         }));
 
-        setArchivos([...archivos, ...filesWithPreview]);
+        setNuevaHU((prevHU) => ({
+            ...prevHU,
+            archivos: [...prevHU.archivos, ...filesWithPreview], // Almacena tanto el archivo como la vista previa
+        }));
     };
 
     const cerrarModalHU = () => {
@@ -207,6 +271,26 @@ const PlanificacionEstudiante = () => {
         setNuevoSprint({ ...nuevoSprint, [name]: value });
     };
 
+    const handleImageDrop = (e, dropIndex) => {
+        e.preventDefault();
+        const draggedIndex = parseInt(
+            e.dataTransfer.getData("draggedIndex"),
+            10
+        );
+        if (isNaN(draggedIndex) || draggedIndex === dropIndex) return;
+
+        // Reordena las imágenes en el array de archivos
+        const updatedArchivos = [...nuevaHU.archivos];
+        const [draggedImage] = updatedArchivos.splice(draggedIndex, 1); // Extrae la imagen arrastrada
+        updatedArchivos.splice(dropIndex, 0, draggedImage); // Inserta en la nueva posición
+
+        // Actualiza el estado con el nuevo orden
+        setNuevaHU((prevHU) => ({
+            ...prevHU,
+            archivos: updatedArchivos,
+        }));
+    };
+
     const handleDrop = (e) => {
         e.preventDefault();
         const newFiles = Array.from(e.dataTransfer.files).filter((file) =>
@@ -214,11 +298,14 @@ const PlanificacionEstudiante = () => {
         );
 
         const filesWithPreview = newFiles.map((file) => ({
-            ...file,
+            file,
             preview: URL.createObjectURL(file),
         }));
 
-        setArchivos([...archivos, ...filesWithPreview]);
+        setNuevaHU((prevHU) => ({
+            ...prevHU,
+            archivos: [...prevHU.archivos, ...filesWithPreview],
+        }));
     };
 
     const guardarSprint = () => {
@@ -246,26 +333,65 @@ const PlanificacionEstudiante = () => {
     };
 
     const guardarHU = () => {
-        // Verifica si ya existe una historia con el mismo título
-        const historiaDuplicada = historiasUsuario.some(
-            (historia) => historia.titulo === nuevaHU.titulo
-        );
-
-        if (historiaDuplicada) {
-            alert("Ya existe una historia con este nombre.");
-            return; // Detiene el proceso de creación si hay un duplicado
-        }
-
+        const idGrupo = grupo?.ID_GRUPO;
         if (nuevaHU.titulo && nuevaHU.descripcion) {
-            const nuevaHistoria = {
-                titulo: nuevaHU.titulo,
-                descripcion: nuevaHU.descripcion,
-            };
-            setHistoriasUsuario([...historiasUsuario, nuevaHistoria]); // Asegúrate de que siempre estás agregando un objeto con las propiedades correctas.
-            cerrarModalHU();
+            const formData = new FormData();
+            formData.append("TITULO_HU", nuevaHU.titulo);
+            formData.append("DESCRIP_HU", nuevaHU.descripcion);
+            formData.append("ID_GRUPO", idGrupo);
+
+            nuevaHU.archivos.forEach((fileObj, index) => {
+                formData.append(`archivos[${index}]`, fileObj.file);
+            });
+
+            axios
+                .post("http://localhost:8000/api/historias", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                })
+                .then((response) => {
+                    console.log("Historia de Usuario creada:", response.data);
+
+                    // Agrega la nueva historia al estado actual sin recargar la página
+                    setHistoriasUsuario((prevHistorias) => [
+                        ...prevHistorias,
+                        response.data, // Agrega la nueva historia a la lista existente
+                    ]);
+
+                    cerrarModalHU(); // Cierra el modal de creación
+                    setNuevaHU({ titulo: "", descripcion: "", archivos: [] }); // Limpia el formulario
+                })
+                .catch((error) => {
+                    console.error(
+                        "Error al crear la Historia de Usuario:",
+                        error
+                    );
+                    alert("Hubo un error al crear la Historia de Usuario.");
+                });
         } else {
             alert("Debes completar el título y la descripción");
         }
+    };
+    const eliminarHistoriaUsuario = (id) => {
+        axios
+            .delete(`http://localhost:8000/api/historias/${id}`, {
+                withCredentials: true,
+            })
+            .then((response) => {
+                console.log("Historia de Usuario eliminada:", response.data);
+                setHistoriasUsuario(
+                    historiasUsuario.filter((historia) => historia.ID_HU !== id)
+                ); // Actualiza la lista de historias
+                setIsConfirmModalOpen(false); // Cierra el modal
+            })
+            .catch((error) => {
+                console.error(
+                    "Error al eliminar la Historia de Usuario:",
+                    error
+                );
+                alert("Hubo un error al eliminar la Historia de Usuario.");
+            });
     };
 
     const onDragStart = (e, index, source) => {
@@ -281,37 +407,38 @@ const PlanificacionEstudiante = () => {
         if (!isNaN(origenIndex)) {
             // Si estamos moviendo de historiasUsuario a sprint
             if (origenType === "historiasUsuario" && destinoType === "sprint") {
-                // En lugar de clonar la historia, pasar la referencia original
-                const historiaReferenciada = historiasUsuario[origenIndex]; // Referencia directa al objeto original
+                const historiaReferenciada = historiasUsuario[origenIndex];
 
-                // Actualizar la lista de sprints añadiendo la referencia a la historia
                 const sprintsActualizados = [...sprints];
                 sprintsActualizados[destinoIndex].historias.push(
                     historiaReferenciada
-                ); // Inserta la referencia de la historia en el sprint
+                );
 
-                setSprints(sprintsActualizados); // Actualiza el estado de sprints
-                // No eliminamos la historia de historiasUsuario
+                setSprints(sprintsActualizados);
             } else if (
                 origenType === "historiasUsuario" &&
                 destinoType === "historiasUsuario"
             ) {
-                // Reordenar las historias en la misma lista
                 const historiasReordenadas = [...historiasUsuario];
                 const [historiaMovida] = historiasReordenadas.splice(
                     origenIndex,
                     1
-                ); // Elimina la historia del índice original
-                historiasReordenadas.splice(destinoIndex, 0, historiaMovida); // Inserta la historia en el nuevo índice
-                setHistoriasUsuario(historiasReordenadas); // Actualiza la lista de historias
+                );
+                historiasReordenadas.splice(destinoIndex, 0, historiaMovida);
+                setHistoriasUsuario(historiasReordenadas);
             }
         }
     };
-
     const onDragOver = (e) => {
         e.preventDefault(); // Permite el drop
     };
-
+    const confirmarEliminacion = () => {
+        if (elementTypeToDelete === "historia" && historiaAEliminar) {
+            eliminarHistoriaUsuario(historiaAEliminar);
+        }
+        // Puedes agregar condiciones para otros tipos de eliminación si los tienes
+        setIsConfirmModalOpen(false); // Cierra el modal
+    };
     const removeItem = (list, setList, index) =>
         setList(list.filter((_, i) => i !== index));
     const removeHistoriaFromSprint = (sprintIndex, historiaIndex) => {
@@ -326,8 +453,10 @@ const PlanificacionEstudiante = () => {
     };
 
     const abrirModalConfirmacion = (type, index) => {
-        setElementTypeToDelete(type); // Establece el tipo de elemento (requerimiento, sprint, historia)
-        setElementToDeleteIndex(index); // Establece el índice del elemento a eliminar
+        if (type === "historia") {
+            setHistoriaAEliminar(historiasUsuario[index].ID_HU); // Guarda el ID de la historia seleccionada
+        }
+        setElementTypeToDelete(type); // Tipo de elemento
         setIsConfirmModalOpen(true); // Abre el modal de confirmación
     };
 
@@ -415,9 +544,38 @@ const PlanificacionEstudiante = () => {
                     toggleSidebar={toggleSidebar}
                     nombreProyecto={proyecto?.NOMBRE_PROYECTO} // Campo del nombre del proyecto
                     fotoProyecto={`http://localhost:8000/storage/${proyecto?.PORTADA_PROYECTO}`} // Ruta completa de la imagen
+                    projectId={projectId}
+                    groupId={grupo?.ID_GRUPO}
+                    isRepresentanteLegal={isRepresentanteLegal}
                 />
 
                 <div className="contenido-principal">
+                    {grupo && (
+                        <div className="planificacion-group-info">
+                            <img
+                                src={
+                                    grupo.PORTADA_GRUPO
+                                        ? `http://localhost:8000/storage/${grupo.PORTADA_GRUPO}`
+                                        : "https://via.placeholder.com/150"
+                                }
+                                alt="Icono del grupo"
+                                className="planificacion-group-image"
+                            />
+                            <div className="planificacion-group-info-text">
+                                <h2 className="planificacion-group-title">
+                                    {grupo.NOMBRE_GRUPO}
+                                </h2>
+                                <p className="planificacion-group-description">
+                                    {grupo.DESCRIP_GRUPO ||
+                                        "Descripción no disponible"}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="planificacion-divisor-container">
+                        <div className="planificacion-divisor-est "></div>
+                    </div>
                     <div className="contenedor-titulo-planificacion">
                         <h1 className="titulo-planificacion">
                             Product Backlog
@@ -433,7 +591,10 @@ const PlanificacionEstudiante = () => {
                             <div className="lista-requerimientos">
                                 {requerimientos.map((req, index) => (
                                     <div
-                                        key={index}
+                                        key={
+                                            req.ID_REQUERIMIENTO ||
+                                            `requerimiento-${index}`
+                                        }
                                         className="item-requerimiento"
                                     >
                                         <span
@@ -489,7 +650,10 @@ const PlanificacionEstudiante = () => {
                                 <div className="lista-historias">
                                     {historiasUsuario.map((historia, index) => (
                                         <div
-                                            key={index}
+                                            key={
+                                                historia.ID_HU ||
+                                                `historia-${index}`
+                                            }
                                             className="item-historia"
                                             draggable
                                             onDragStart={(e) =>
@@ -508,20 +672,14 @@ const PlanificacionEstudiante = () => {
                                                 )
                                             }
                                         >
-                                            {/* Se agrega el número secuencial seguido del título */}
-                                            {typeof historia === "object" &&
-                                            historia !== null ? (
-                                                <span>
-                                                    #{index + 1}{" "}
-                                                    {historia.titulo}{" "}
-                                                    {/* Mostrando el número secuencial */}
-                                                </span>
-                                            ) : (
-                                                <span>
-                                                    Error: historia no es un
-                                                    objeto válido
-                                                </span>
-                                            )}
+                                            <span>
+                                                #
+                                                {historiasUsuario.indexOf(
+                                                    historia
+                                                ) + 1}{" "}
+                                                {historia.TITULO_HU}
+                                            </span>
+                                            {/* Mostrar el título de la HU */}
                                             <div className="iconos-acciones">
                                                 <i
                                                     className="fas fa-edit icono-editar"
@@ -552,6 +710,7 @@ const PlanificacionEstudiante = () => {
                                 + Historia de usuario
                             </button>
                         </div>
+
                         <div className="contenedor-sprints">
                             <h2 className="titulo-sprints">Sprints</h2>
                             {sprints.length === 0 ? (
@@ -562,7 +721,7 @@ const PlanificacionEstudiante = () => {
                                 <div className="lista-sprints">
                                     {sprints.map((sprint, index) => (
                                         <div
-                                            key={index}
+                                            key={sprint.ID || `sprint-${index}`}
                                             className="sprint"
                                             onDrop={(e) => {
                                                 e.preventDefault(); // Evita el comportamiento por defecto
@@ -644,12 +803,17 @@ const PlanificacionEstudiante = () => {
                                             <div className="sprint-contenido">
                                                 {sprint.historias.length > 0 ? (
                                                     sprint.historias.map(
-                                                        (historia, i) => (
+                                                        (
+                                                            historia,
+                                                            historiaIndex
+                                                        ) => (
                                                             <div
-                                                                key={i}
+                                                                key={
+                                                                    historia.ID_HU ||
+                                                                    `historia-${historiaIndex}`
+                                                                }
                                                                 className="item-historia-sprint"
                                                             >
-                                                                {/* Aquí se muestra el número de la historia más su título */}
                                                                 <span>
                                                                     #
                                                                     {historiasUsuario.findIndex(
@@ -667,7 +831,7 @@ const PlanificacionEstudiante = () => {
                                                                         onClick={() =>
                                                                             removeHistoriaFromSprint(
                                                                                 index,
-                                                                                i
+                                                                                historia.ID_HU
                                                                             )
                                                                         }
                                                                     ></i>
@@ -682,6 +846,7 @@ const PlanificacionEstudiante = () => {
                                                     </p>
                                                 )}
                                             </div>
+
                                             <button className="boton-panel">
                                                 Panel de tareas
                                             </button>
@@ -699,7 +864,6 @@ const PlanificacionEstudiante = () => {
                     </div>
                 </div>
             </div>
-
             {isModalOpen && (
                 <div className="sprint-modal-overlay">
                     <div className="sprint-modal">
@@ -824,7 +988,7 @@ const PlanificacionEstudiante = () => {
 
                         <div className="adjuntos-container">
                             <div className="adjuntos-info">
-                                <span>{archivos.length} Adjuntos</span>
+                                <span>{nuevaHU.archivos.length} Adjuntos</span>
                                 <button
                                     className="boton-adjuntar"
                                     onClick={() => fileInputRef.current.click()}
@@ -843,34 +1007,48 @@ const PlanificacionEstudiante = () => {
 
                             <div
                                 className={`drag-drop-zone ${
-                                    archivos.length > 0 ? "with-files" : ""
+                                    nuevaHU.archivos.length > 0
+                                        ? "with-files"
+                                        : ""
                                 }`}
                                 onDrop={handleDrop}
                                 onDragOver={(e) => e.preventDefault()}
                             >
-                                {archivos.length === 0 && (
+                                {nuevaHU.archivos.length === 0 && (
                                     <p className="drag-drop-text">
                                         ¡Arrastre los archivos adjuntos aquí!
                                     </p>
                                 )}
 
                                 <div className="preview-container">
-                                    {archivos.map((file, index) => (
+                                    {nuevaHU.archivos.map((fileObj, index) => (
                                         <div
                                             key={index}
                                             className="preview-item"
+                                            draggable
+                                            onDragStart={(e) =>
+                                                handleImageDragStart(e, index)
+                                            }
+                                            onDrop={(e) =>
+                                                handleImageDrop(e, index)
+                                            }
+                                            onDragOver={(e) =>
+                                                e.preventDefault()
+                                            } // Permite el drop
                                             onClick={() =>
-                                                setSelectedImage(file.preview)
-                                            } // Al hacer clic en la imagen, abrirá el modal
+                                                setSelectedImage(
+                                                    fileObj.preview
+                                                )
+                                            }
                                         >
                                             <img
-                                                src={file.preview}
+                                                src={fileObj.preview}
                                                 alt={`preview-${index}`}
                                             />
                                             <button
                                                 className="boton-eliminar"
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); // Evita que el clic de eliminación abra el modal
+                                                    e.stopPropagation();
                                                     eliminarArchivo(index);
                                                 }}
                                             >
@@ -917,6 +1095,12 @@ const PlanificacionEstudiante = () => {
                     </div>
                 </div>
             )}
+            {isErrorModalOpen && (
+                <RegistroModal
+                    mensaje={errorMessage}
+                    redirectTo="/proyecto-estudiante"
+                />
+            )}
             {isConfirmModalOpen && (
                 <div className="confirm-modal">
                     <div className="confirm-modal-content">
@@ -937,7 +1121,7 @@ const PlanificacionEstudiante = () => {
                             </button>
                             <button
                                 className="delete-btn"
-                                onClick={eliminarElemento}
+                                onClick={confirmarEliminacion}
                             >
                                 Eliminar
                             </button>

@@ -248,3 +248,29 @@
     display: block; /* Asegura que ocupe todo el ancho */
     width: 100%; /* Ajusta el ancho al campo de entrada */
 }
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Asegura que ocupe el ancho del contenedor padre */
+}
+.delete-account-btn {
+    background-color: #C0392B; /* Rojo para el botón de eliminar */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    width: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-account-btn:hover {
+    background-color: #A93226; /* Rojo más oscuro para el hover */
+    color: #ffffff;
+}

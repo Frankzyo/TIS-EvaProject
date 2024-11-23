@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Database\Eloquent\Model;
 
 class Docente extends Authenticatable
 {

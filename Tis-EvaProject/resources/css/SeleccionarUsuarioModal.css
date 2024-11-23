@@ -1,0 +1,120 @@
+.seleccionar-usuario-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.seleccionar-usuario-modal {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 450px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.seleccionar-usuario-modal h2 {
+    margin-top: 0;
+    font-size: 1.75em;
+    color: #333;
+}
+
+.seleccionar-usuario-modal-input {
+    width: 90%;
+    padding: 12px;
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.seleccionar-usuario-modal-list {
+    max-height: 250px; /* Asegúrate de tener suficiente altura */
+    overflow-y: auto;
+    margin-bottom: 20px;
+    text-align: left;
+    -ms-overflow-style: none; /* Para Internet Explorer y Edge */
+    scrollbar-width: none; /* Para Firefox */
+}
+
+.seleccionar-usuario-modal-list::-webkit-scrollbar {
+    display: none; /* Para Chrome, Safari y Opera */
+}
+
+.seleccionar-usuario-modal-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.seleccionar-usuario-modal-item:hover {
+    background-color: #f9f9f9;
+    transform: scale(1.02);
+}
+
+.usuario-item-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.usuario-foto {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.usuario-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.usuario-nombre {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.usuario-rol {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.seleccionar-usuario-modal-close {
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: 0;
+    background-color: rgb(56, 132, 255); /* Azul principal */
+    letter-spacing: 1.5px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-shadow: rgb(46, 92, 201) 0px 10px 0px 0px; /* Sombra azul */
+    color: hsl(0, 0%, 100%); /* Blanco para el texto */
+    cursor: pointer;
+}
+
+.seleccionar-usuario-modal-close:hover {
+    box-shadow: rgb(46, 92, 201) 0px 7px 0px 0px; /* Sombra azul más clara */
+}
+
+.seleccionar-usuario-modal-close:active {
+    background-color: rgb(46, 112, 201); /* Azul más oscuro para el fondo al presionar */
+    box-shadow: rgb(46, 92, 201) 0px 0px 0px 0px;
+    transform: translateY(5px);
+    transition: 200ms;
+}

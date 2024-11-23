@@ -1,0 +1,73 @@
+.registro-modal-overlay-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px); /* Añadir un efecto de desenfoque */
+}
+
+.registro-modal-content-custom {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 350px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    animation: fadeInRegistroModal 0.3s ease-in-out; /* Añadir una animación de entrada */
+}
+
+@keyframes fadeInRegistroModal {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.registro-modal-content-custom h2 {
+    margin-top: 0;
+    font-size: 1.5rem; /* Tamaño del título */
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    text-transform: uppercase;
+}
+
+.registro-modal-content-custom p {
+    color: #333333;
+line-height: 1.55;
+letter-spacing: 1px;
+word-spacing: 1px;
+text-align: center;
+text-decoration: none;
+text-transform: none;
+font-family: 'Arial', sans-serif;
+}
+
+
+.registro-modal-button-custom {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.registro-modal-button-custom:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}

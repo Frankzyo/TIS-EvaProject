@@ -1,0 +1,368 @@
+/*-------------------- ("Overlay del Modal") --------------------*/
+.rubrica-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+/*-------------------- ("Contenido del Modal") --------------------*/
+/* Contenedor principal del modal */
+.rubrica-modal-content {
+    background-color: white;
+    padding: 20px;
+    width: auto;
+    min-width: 860px;
+    max-width: 900px;
+    max-height: 850px;
+    overflow-y: auto; /* Asegura el scroll vertical */
+    overflow-x: hidden; /* Evita el scroll horizontal si no es necesario */
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+    animation: defensa-fadeIn 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+/* Estilos personalizados para el scrollbar del modal */
+.rubrica-modal-content::-webkit-scrollbar {
+    width: 8px; /* Ancho del scrollbar */
+}
+
+.rubrica-modal-content::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* Color de la barra de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados para un aspecto suave */
+}
+
+.rubrica-modal-content::-webkit-scrollbar-thumb:hover {
+    background-color: #888; /* Color más oscuro al pasar el cursor */
+}
+
+.rubrica-modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color del fondo de la pista del scrollbar */
+    border-radius: 4px;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*-------------------- ("Título del Modal") --------------------*/
+.rubrica-modal-content h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/*-------------------- ("Etiquetas") --------------------*/
+.rubrica-modal-content label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    text-align: left;
+}
+
+/*-------------------- ("Campos de Entrada y Textarea") --------------------*/
+.rubrica-modal-input,
+.rubrica-modal-textarea,
+.criterio-input,
+.nivel-input,
+.nivel-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+
+}
+
+.nivel-textarea {
+    height: 120px;
+
+}
+.rubrica-modal-textarea{
+
+    min-height: 100px;
+}
+
+.rubrica-modal-input:focus,
+.rubrica-modal-textarea:focus,
+.criterio-input:focus,
+.nivel-input:focus,
+.nivel-textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/*-------------------- ("Botones de Agregar Criterio y Nivel") --------------------*/
+.criterio-btn,
+.rubrica-modal-button.add-criterio-btn:hover,
+.rubrica-modal-button.add-nivel-btn:hover {
+    display: inline-flex; 
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #1a73e8;
+    justify-content: space-around;
+    color: white;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    width: auto;
+    max-width: 150px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.rubrica-modal-button.add-criterio-btn:hover,
+.rubrica-modal-button.add-nivel-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.03);
+}
+
+/*-------------------- ("Editor de Criterio y Nivel") --------------------*/
+.criterio-editor {
+    border: 1px solid #ddd;
+    padding: 15px;
+    min-width: 840px;
+    max-width: 840px;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    position: relative;
+    margin-top: 10px;
+}
+
+.nivel-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 247px; /* Ancho fijo para que los niveles tengan tamaño consistente */
+    background-color: #e0e0e0; /* Un gris más oscuro que #f2f2f2 */
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    position: relative;
+}
+
+/*-------------------- ("Encabezado del Criterio y Nivel") --------------------*/
+.criterio-info,
+.nivel-info {
+    display: flex;
+    width: 100%;
+    border-radius: 8px;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.criterio-header,
+.nivel-header {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    position: relative;
+}
+
+/*-------------------- ("Contenedor y Botón del Menú") --------------------*/
+.menu-container,
+.nivel-menu-container {
+    position: relative;
+    display: inline-block;
+    margin-left: auto;
+}
+
+.menu-button,
+.nivel-menu-button {
+    background: transparent;
+    width: auto;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.menu-button:hover,
+.nivel-menu-button:hover {
+    color: #007bff;
+}
+
+/*-------------------- ("Menú Desplegable") --------------------*/
+.dropdown-etapa-menu,
+.rubrica-dropdown-etapa-menu,
+.nivel-dropdown-etapa-menu {
+    position: absolute;
+    width: auto;
+    right: 0;
+    top: 35px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    overflow: hidden;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    padding: 5px 5px;
+}
+
+.dropdown-etapa-item,
+.rubrica-dropdown-etapa-item {
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #333;
+    background-color: #ffffff;
+    border: none;
+    cursor: pointer;
+    width: auto;
+    text-align: left;
+    transition: background-color 0.3s;
+}
+
+.dropdown-etapa-item:hover,
+.rubrica-dropdown-etapa-item:hover {
+    background-color: #f1f1f1;
+    color: #000;
+}
+
+/*-------------------- ("Botón de Eliminar") --------------------*/
+.rubrica-action-btn.rubrica-delete-btn {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.rubrica-action-btn.rubrica-delete-btn:hover {
+    color: #c0392b;
+}
+
+/*-------------------- ("Acciones del Modal") --------------------*/
+.rubrica-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.rubrica-modal-button.rubrica-cancel-btn,
+.rubrica-modal-button.rubrica-save-btn {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.rubrica-modal-button.rubrica-cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.rubrica-modal-button.rubrica-cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.rubrica-modal-button.rubrica-save-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.rubrica-modal-button.rubrica-save-btn:hover {
+    background-color: #0056b3;
+}
+
+/*-------------------- ("Contenedor de Niveles") --------------------*/
+.niveles-container {
+    display: flex;
+    flex-wrap: nowrap; /* Coloca los niveles en una fila continua */
+    gap: 10px;
+    max-width: 872px; /* Ancho máximo para el contenedor */
+    overflow-x: auto; /* Permite el desplazamiento horizontal */
+    overflow-y: hidden; /* Oculta el scroll vertical */
+    scrollbar-width: thin;
+}
+
+.niveles-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.niveles-container::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.niveles-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Ocultar el botón "+" por defecto en todos los niveles */
+.nivel-editor .add-nivel-btn {
+    display: none;
+}
+
+/* Mostrar el botón "+" solo en el último nivel dentro de cada criterio */
+.niveles-container .nivel-editor:last-child .add-nivel-btn {
+    display: flex;
+}
+
+/* Botón para agregar nivel en el costado */
+.add-nivel-btn {
+    position: absolute;
+    top: 115px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    z-index: 1001; /* Asegura que el botón esté encima de otros elementos */
+}
+
+/* Posición del botón derecho */
+.add-nivel-btn.right {
+    right: -24px; /* Ajusta la distancia hacia la derecha */
+}
+
+.add-nivel-btn:hover {
+    background-color: #0056b3;
+}

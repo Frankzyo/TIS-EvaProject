@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import HeaderProyecto from "../Components/HeaderProyecto";
 import ModalError from "../Components/ModalError";
+import ModalConfirmacion from "../Components/ModalConfirmacion";
+import ModalMensajeExito from "../Components/ModalMensajeExito";
 import "../../css/Perfil.css";
 
 const Perfil = () => {
@@ -8,6 +10,9 @@ const Perfil = () => {
     const [selectedOption, setSelectedOption] = useState(
         "configuracion-usuario"
     );
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [showDeleteSuccessMessage, setShowDeleteSuccessMessage] =
+        useState(false);
     const [userData, setUserData] = useState({
         nombre: "",
         apellido: "",
@@ -61,7 +66,31 @@ const Perfil = () => {
             [e.target.name]: e.target.value,
         });
     };
-
+    const handleDeleteAccount = () => {
+        fetch("http://localhost:8000/api/usuario-logueado/delete", {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        })
+            .then((response) => {
+                if (response.ok) {
+                    setShowDeleteSuccessMessage(true);
+                    setTimeout(() => {
+                        window.location.href = "/login";
+                    }, 3000);
+                } else {
+                    throw new Error("Error al intentar eliminar la cuenta.");
+                }
+            })
+            .catch((error) =>
+                console.error("Error al eliminar la cuenta:", error)
+            );
+    };
     // Manejar carga de nueva imagen
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
@@ -280,12 +309,20 @@ const Perfil = () => {
                             placeholder="Cuéntanos algo sobre ti..."
                             onChange={handleChange}
                         ></textarea>
-                        <button
-                            className="save-btn"
-                            onClick={handleSaveChanges}
-                        >
-                            Guardar
-                        </button>
+                        <div className="button-container">
+                            <button
+                                className="save-btn"
+                                onClick={handleSaveChanges}
+                            >
+                                Guardar
+                            </button>
+                            <button
+                                className="delete-account-btn"
+                                onClick={() => setShowDeleteConfirmModal(true)}
+                            >
+                                Eliminar cuenta
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
@@ -385,6 +422,19 @@ const Perfil = () => {
                         </button>
                     </div>
                 </div>
+            )}
+            <ModalConfirmacion
+                show={showDeleteConfirmModal}
+                onClose={() => setShowDeleteConfirmModal(false)}
+                onConfirm={handleDeleteAccount}
+                title="¿Estás seguro de que quieres eliminar tu cuenta?"
+                message="Esta acción no se puede deshacer."
+            />
+            {showDeleteSuccessMessage && (
+                <ModalMensajeExito
+                    message="¡Cuenta eliminada exitosamente!"
+                    onClose={() => setShowDeleteSuccessMessage(false)}
+                />
             )}
             <div className="perfil-content">
                 <aside className="perfil-sidebar">

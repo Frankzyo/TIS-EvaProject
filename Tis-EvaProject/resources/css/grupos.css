@@ -1,10 +1,12 @@
 /* Aplica el ancho completo al editor específico para requerimientos */
 .grupos-container {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: rgb(0, 255, 68);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.grupos-sidebar-content {
+    display: flex;
+    height: 100%;
 }
 
 .requerimientos-list .project-item {
@@ -14,36 +16,68 @@
 }
 
 .requirement-quill-editor .ql-editor {
-  font-size: 14px; /* Ajusta al tamaño que deseas */
-  line-height: 1.5;
-  width: 100%;
+    font-size: 14px; /* Ajusta al tamaño que deseas */
+    line-height: 1.5;
+    width: 100%;
 }
 
 .requirement-quill-editor .ql-container {
-  width: 100%;
-  box-sizing: border-box;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .project-info.requerimientos-list {
-  display: flex;
-  align-items: center; /* Alinea el número y el texto verticalmente */
-  padding: 5px 10px;
-  flex-direction: row;
-  color: black;
+    display: flex;
+    align-items: center; /* Alinea el número y el texto verticalmente */
+    padding: 5px 10px;
+    flex-direction: row;
+    color: black;
 }
 
 .requirement-number-container {
-  margin-right: 8px; /* Espacio entre el número y el texto */
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  color: black;
-  font-size: 18px;
+    margin-right: 8px; /* Espacio entre el número y el texto */
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: black;
+    font-size: 18px;
 }
 
 .requirement-text-container {
-  flex: 1; /* Permite que el texto ocupe el espacio disponible */
-  display: flex;
-  align-items: center;
+    flex: 1; /* Permite que el texto ocupe el espacio disponible */
+    display: flex;
+    align-items: center;
+}
+
+.requirement-description * {
+    font-size: 16px !important; /* Fuerza el tamaño para todos los elementos */
+    line-height: 1.5 !important;
+    color: black !important;
+    color: black;
+}
+/* Estilo para el botón de "Registrarse" */
+.registered-button {
+    background: linear-gradient(140.14deg, #007bff 15.05%, #0056b3 114.99%)
+            padding-box,
+        linear-gradient(142.51deg, #80d4ff 8.65%, #004085 88.82%) border-box;
+    border-radius: 7px;
+    border: 2px solid transparent;
+
+    text-shadow: 1px 1px 1px #00000040;
+    box-shadow: 8px 8px 20px 0px #45090059;
+
+    padding: 10px 40px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.registered-button:hover {
+    box-shadow: none;
+    opacity: 80%;
 }
 

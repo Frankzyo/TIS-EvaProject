@@ -180,9 +180,7 @@
 .project-photo-prueba {
     width: 70px;
     height: 70px;
-    border-radius: 10%;
     object-fit: cover;
-    margin-right: 10px;
 }
 
 /* Icono oculto al colapsar */

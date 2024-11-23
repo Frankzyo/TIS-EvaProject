@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import HeaderProyecto from "../Components/HeaderEstudiante";
 import ModalError from "../Components/ModalError";
+import ModalConfirmacion from "../Components/ModalConfirmacion";
+import ModalMensajeExito from "../Components/ModalMensajeExito";
 import "../../css/Perfil.css";
 
 const PerfilEstudiante = () => {
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRepresentanteLegal, setIsRepresentanteLegal] = useState(false);
     const [selectedOption, setSelectedOption] = useState(
         "configuracion-usuario"
     );
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [showDeleteSuccessMessage, setShowDeleteSuccessMessage] =
+        useState(false);
     const [userData, setUserData] = useState({
         nombre: "",
         apellido: "",
@@ -30,7 +38,19 @@ const PerfilEstudiante = () => {
     const [currentPasswordError, setCurrentPasswordError] = useState("");
     const [showPhotoError, setShowPhotoError] = useState(false);
     const [photoError, setPhotoError] = useState("");
+    useEffect(() => {
+        const role = localStorage.getItem("ROLE");
+        const estudianteId = localStorage.getItem("ID_EST");
+        const representanteLegal = localStorage.getItem("IS_RL");
 
+        // Verificar si el usuario tiene el rol de "Estudiante" y un ID de estudiante
+        if (role !== "Estudiante" || !estudianteId) {
+            navigate("/login"); // Redirige al login si no cumple las condiciones
+        } else {
+            // Solo establece el estado de Representante Legal si es un estudiante autenticado
+            setIsRepresentanteLegal(representanteLegal === "true");
+        }
+    }, [navigate]);
     // Cargar datos del usuario
     useEffect(() => {
         fetch("http://localhost:8000/api/usuario-logueado", {
@@ -61,6 +81,31 @@ const PerfilEstudiante = () => {
             ...userData,
             [e.target.name]: e.target.value,
         });
+    };
+    const handleDeleteAccount = () => {
+        fetch("http://localhost:8000/api/usuario-logueado/delete", {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        })
+            .then((response) => {
+                if (response.ok) {
+                    setShowDeleteSuccessMessage(true);
+                    setTimeout(() => {
+                        window.location.href = "/login";
+                    }, 3000);
+                } else {
+                    throw new Error("Error al intentar eliminar la cuenta.");
+                }
+            })
+            .catch((error) =>
+                console.error("Error al eliminar la cuenta:", error)
+            );
     };
 
     // Manejar carga de nueva imagen
@@ -249,54 +294,69 @@ const PerfilEstudiante = () => {
                         )}
                     </div>
                     <div className="perfil-form">
-                        <label>Nombre</label>
+                        <label htmlFor="nombre">Nombre</label>
                         <input
                             type="text"
                             name="nombre"
+                            id="nombre" // Agregado
                             value={userData.nombre}
                             onChange={handleChange}
                         />
-
-                        <label>Apellidos</label>
+                        <label htmlFor="apellido">Apellidos</label>
                         <input
                             type="text"
                             name="apellido"
+                            id="apellido" // Agregado
                             value={userData.apellido}
                             onChange={handleChange}
                         />
 
-                        <label>Email</label>
+                        <label htmlFor="email">Email</label>
                         <input
                             type="email"
                             name="email"
+                            id="email"
                             value={userData.email}
                             onChange={handleChange}
+                            autoComplete="email" // Cambiado a camelCase
                         />
 
-                        <label>Biografía (máx. 210 caracteres)</label>
+                        <label htmlFor="bio">
+                            Biografía (máx. 210 caracteres)
+                        </label>
                         <textarea
                             name="bio"
+                            id="bio" // Agregado
                             value={userData.bio}
                             maxLength="210"
                             placeholder="Cuéntanos algo sobre ti..."
                             onChange={handleChange}
                         ></textarea>
-                        <button
-                            className="save-btn"
-                            onClick={handleSaveChanges}
-                        >
-                            Guardar
-                        </button>
+                        <div className="button-container">
+                            <button
+                                className="save-btn"
+                                onClick={handleSaveChanges}
+                            >
+                                Guardar
+                            </button>
+                            <button
+                                className="delete-account-btn"
+                                onClick={() => setShowDeleteConfirmModal(true)}
+                            >
+                                Eliminar cuenta
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
         } else if (selectedOption === "cambiar-contrasena") {
             return (
                 <div className="perfil-form">
-                    <label>Contraseña actual</label>
+                    <label htmlFor="currentPassword">Contraseña actual</label>
                     <input
                         type="password"
                         name="currentPassword"
+                        id="currentPassword" // Agregado
                         value={passwordData.currentPassword}
                         onChange={handlePasswordChange}
                         placeholder="Tu contraseña actual"
@@ -305,10 +365,11 @@ const PerfilEstudiante = () => {
                         <p className="error-messagep">{currentPasswordError}</p>
                     )}
 
-                    <label>Nueva contraseña</label>
+                    <label htmlFor="newPassword">Nueva contraseña</label>
                     <input
                         type="password"
                         name="newPassword"
+                        id="newPassword" // Agregado
                         value={passwordData.newPassword}
                         onChange={handlePasswordChange}
                         placeholder="Escribe una contraseña nueva"
@@ -319,10 +380,13 @@ const PerfilEstudiante = () => {
                         </p>
                     )}
 
-                    <label>Reescribe la nueva contraseña</label>
+                    <label htmlFor="confirmNewPassword">
+                        Reescribe la nueva contraseña
+                    </label>
                     <input
                         type="password"
                         name="confirmNewPassword"
+                        id="confirmNewPassword" // Agregado
                         value={passwordData.confirmNewPassword}
                         onChange={handlePasswordChange}
                         placeholder="Reescribe la nueva contraseña"
@@ -387,6 +451,20 @@ const PerfilEstudiante = () => {
                     </div>
                 </div>
             )}
+            <ModalConfirmacion
+                show={showDeleteConfirmModal}
+                onClose={() => setShowDeleteConfirmModal(false)}
+                onConfirm={handleDeleteAccount}
+                title="¿Estás seguro de que quieres eliminar tu cuenta?"
+                message="Esta acción no se puede deshacer."
+            />
+            {showDeleteSuccessMessage && (
+                <ModalMensajeExito
+                    message="¡Cuenta eliminada exitosamente!"
+                    onClose={() => setShowDeleteSuccessMessage(false)}
+                />
+            )}
+
             <div className="perfil-content">
                 <aside className="perfil-sidebar">
                     <ul>

@@ -8,7 +8,6 @@ const SidebarPrueba = ({
     nombreProyecto,
     fotoProyecto,
     projectId, // Recibe el projectId como prop
-    cambiarVista,
 }) => {
     const navigate = useNavigate();
     const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
@@ -48,20 +47,37 @@ const SidebarPrueba = ({
                 {/* Equipos */}
                 <li
                     className="menu-item-prueba"
-                    onClick={() => cambiarVista("Equipos")}
+                    onClick={() => navigate(`/grupos/${projectId}`)}
                 >
-                    <i className="fas fa-user-group icon-menu-prueba"></i>
+                    <i className="fas fa-file-signature icon-menu-prueba"></i>
                     <span className="menu-text-prueba">Equipos</span>
+                </li>
+                {/* Requerimientos */}
+                <li
+                    className="menu-item-prueba"
+                    onClick={() => navigate(`/requerimientos/${projectId}`)}
+                >
+                    <i className="fas fa-clipboard-list icon-menu-prueba"></i>
+                    <span className="menu-text-prueba">Requerimientos</span>
+                </li>
+                <li
+                    className="menu-item-prueba"
+                    onClick={() => navigate(`/etapas-proyecto/${projectId}`)}
+                >
+                    <i className="fas fa-tasks icon-menu-prueba"></i>
+                    <span className="menu-text-prueba">Etapas y Rubrica</span>
                 </li>
 
                 {/* Planilla de seguimiento */}
                 <li
                     className="menu-item-prueba"
-                    onClick={() => cambiarVista("PlanillaSeguimiento")}
+                    onClick={() =>
+                        navigate(`/planilla-seguimiento/${projectId}`)
+                    }
                 >
                     <i className="fas fa-paste icon-menu-prueba"></i>
                     <span className="menu-text-prueba">
-                        Planilla de seguimiento
+                        Planilla de Seguimiento
                     </span>
                 </li>
 
@@ -103,7 +119,7 @@ const SidebarPrueba = ({
                         </ul>
                         <ul
                             className="menu-item-prueba"
-                            onClick={() => cambiarVista("TipoEvaluaciones")}
+                            onClick={() => navigate("/tipo-evaluacion")}
                         >
                             <span className="menu-text-prueba">
                                 Tipo de Evaluacion
@@ -123,7 +139,7 @@ const SidebarPrueba = ({
                     >
                         <i className="fas fa-window-restore icon-menu-prueba"></i>
                         <span className="menu-text-prueba">
-                            Seguimientos y reportes
+                            Seguimientos y Reportes
                         </span>
                     </div>
                     <i

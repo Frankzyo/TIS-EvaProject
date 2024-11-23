@@ -2,481 +2,359 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import HeaderProyecto from "../Components/HeaderProyecto";
 import SidebarPrueba from "../Components/SidebarPrueba";
-import "../../css/Proyectos.css"; // Reutiliza el CSS de Proyectos
-import "../../css/Grupos.css"; // Reutiliza el CSS de Proyectos
-import "../../css/HeaderProyecto.css";
-import "../../css/SidebarPrueba.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import ModalConfirmacion from "../Components/ModalConfirmacion";
 import ModalMensajeExito from "../Components/ModalMensajeExito";
-import ModalError from "../Components/ModalError";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import ModalError from "../Components/ModalError"; // Importa el ModalError
+import "../../css/Proyectos.css";
+import "../../css/Grupos.css";
+import "../../css/HeaderProyecto.css";
+import "../../css/SidebarPrueba.css";
+import "../../css/ModalDefensa.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
-const Grupos = ({ projectId }) => {
+const Grupos = () => {
     const navigate = useNavigate();
-    const [showModal, setShowModal] = useState(false);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [showCreateSuccessMessage, setShowCreateSuccessMessage] =
-        useState(false);
-    const [showEditSuccessMessage, setShowEditSuccessMessage] = useState(false);
-    const [showDeleteSuccessMessage, setShowDeleteSuccessMessage] =
-        useState(false);
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [groupName, setGroupName] = useState("");
-    const [groupDescription, setGroupDescription] = useState("");
+    const { projectId } = useParams();
     const [groups, setGroups] = useState([]);
-    const [groupToDelete, setGroupToDelete] = useState(null);
-    const [groupToEdit, setGroupToEdit] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [image, setImage] = useState(null);
-    const [errorMessage, setErrorMessage] = useState({});
-    const isModalOpen =
-        showModal ||
-        showConfirmModal ||
-        showCreateSuccessMessage ||
-        showEditSuccessMessage ||
-        showDeleteSuccessMessage ||
-        showErrorMessage;
-    const [requirements, setRequirements] = useState([]);
     const [projectDetails, setProjectDetails] = useState({});
-    const [editedDescription, setEditedDescription] = useState("");
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [showDefenseModal, setShowDefenseModal] = useState(false);
+    const [defenseDays, setDefenseDays] = useState([]);
+    const [selectedDay, setSelectedDay] = useState("");
+    const [selectedStartTime, setSelectedStartTime] = useState("");
+    const [selectedEndTime, setSelectedEndTime] = useState("");
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editIndex, setEditIndex] = useState(null);
+    const [showErrorModal, setShowErrorModal] = useState(false); // Estado para controlar el modal de error
+    const [errorMessage, setErrorMessage] = useState(""); // Mensaje de error
+    const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal de confirmación
+    const [showSuccessModal, setShowSuccessModal] = useState(false); // Modal de éxito
+    const [successMessage, setSuccessMessage] = useState(""); // Mensaje de éxito
+    const [deleteIndex, setDeleteIndex] = useState(null); // Índice de defensa a eliminar
+
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
+
+    const daysOrder = {
+        Lunes: 1,
+        Martes: 2,
+        Miércoles: 3,
+        Jueves: 4,
+        Viernes: 5,
+        Sábado: 6,
+    };
+
     useEffect(() => {
-        // Lógica para cargar los detalles del proyecto
         fetch(`http://localhost:8000/api/proyectos/${projectId}`)
             .then((response) => response.json())
-            .then((data) => {
-                console.log("Detalles del proyecto:", data);
-                setProjectDetails(data); // Almacena los detalles en el estado
-            })
+            .then((data) => setProjectDetails(data))
             .catch((error) =>
                 console.error("Error al cargar el proyecto:", error)
             );
     }, [projectId]);
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/proyectos/${projectId}/grupos`)
-            .then((response) => response.json())
-            .then((data) => setGroups(data))
-            .catch((error) =>
-                console.error("Error al cargar los grupos:", error)
+        const obtenerGrupos = async () => {
+            const response = await axios.get(
+                `http://localhost:8000/api/proyectos/${projectId}/grupos`,
+                { withCredentials: true }
             );
-    }, [projectId]);
-    useEffect(() => {
-        fetch(`http://localhost:8000/api/proyectos/${projectId}/requerimientos`)
-            .then((response) => response.json())
-            .then((data) => setRequirements(data))
-            .catch((error) =>
-                console.error("Error al cargar los requerimientos:", error)
-            );
+            setGroups(response.data.grupos);
+        };
+
+        obtenerGrupos();
     }, [projectId]);
 
     useEffect(() => {
         const docenteId = localStorage.getItem("ID_DOCENTE");
         const role = localStorage.getItem("ROLE");
-
-        if (!docenteId || role !== "Docente") {
-            // Si no hay un docente logueado, redirige al login
-            navigate("/login");
-        }
+        if (!docenteId || role !== "Docente") navigate("/login");
     }, [navigate]);
 
-    const handleSaveGroup = () => {
-        if (!groupName || !groupDescription) {
-            setErrorMessage(
-                "Por favor, complete todos los campos obligatorios."
-            );
-            setShowErrorMessage(true);
+    useEffect(() => {
+        const obtenerFechasDefensaDocente = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:8000/api/fechas_defensa/docente/${projectId}`,
+                    { withCredentials: true }
+                );
+                setDefenseDays(sortDefenseDays(response.data));
+            } catch (error) {
+                console.error(
+                    "Error al cargar las fechas de defensa para docente:",
+                    error
+                );
+            }
+        };
+
+        obtenerFechasDefensaDocente();
+    }, [projectId]);
+
+    const openDefenseModal = () => {
+        setShowDefenseModal(true);
+        setIsEditMode(false);
+        setSelectedDay("");
+        setSelectedStartTime("");
+        setSelectedEndTime("");
+    };
+    const openConfirmDeleteModal = (index) => {
+        setDeleteIndex(index);
+        setShowConfirmModal(true);
+    };
+
+    const handleAddDefenseDay = async () => {
+        if (!selectedDay || !selectedStartTime || !selectedEndTime) {
+            setErrorMessage("Todos los campos son obligatorios.");
+            setShowErrorModal(true);
             return;
         }
 
-        const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content");
+        const newDefenseDay = {
+            day: selectedDay,
+            startTime: selectedStartTime,
+            endTime: selectedEndTime,
+            ID_PROYECTO: projectId,
+        };
 
-        const formData = new FormData();
-        formData.append("NOMBRE_GRUPO", groupName);
-        formData.append("DESCRIP_GRUPO", groupDescription);
-        formData.append("ID_PROYECTO", projectId);
+        console.log("Nuevo día de defensa a agregar o editar:", newDefenseDay);
 
-        if (image) {
-            formData.append("PORTADA_GRUPO", image);
+        try {
+            if (isEditMode && editIndex !== null) {
+                // Lógica de edición
+                await editDefenseDay(newDefenseDay);
+            } else {
+                // Lógica de creación
+                await createDefenseDay(newDefenseDay);
+            }
+
+            // Cerrar el modal al finalizar
+            setShowDefenseModal(false);
+        } catch (error) {
+            const errorMsg =
+                error.response?.data?.error ||
+                "No se pudo guardar la fecha de defensa.";
+            console.error("Detalles del error:", error.response?.data);
+            setErrorMessage(errorMsg);
+            setShowErrorModal(true);
         }
+    };
 
-        // Forzar el método PUT mediante el campo _method si está en modo edición
-        if (isEditing) {
-            formData.append("_method", "PUT");
+    // Método para crear un nuevo día de defensa
+    const createDefenseDay = async (newDefenseDay) => {
+        console.log("Agregando nuevo día de defensa.");
+        const response = await axios.post(
+            "http://localhost:8000/api/fechas_defensa",
+            newDefenseDay,
+            { withCredentials: true }
+        );
+        newDefenseDay.ID_FECHADEF = response.data.fechaDefensa.ID_FECHADEF;
+        setDefenseDays(sortDefenseDays([...defenseDays, newDefenseDay]));
+    };
+
+    const formatTime = (time) => {
+        // Asegurarse de que el tiempo esté en formato H:i eliminando segundos si están presentes
+        const [hour, minute] = time.split(":");
+        return `${parseInt(hour, 10)}:${minute}`;
+    };
+
+    const editDefenseDay = async (updatedDefenseDay) => {
+        try {
+            // Formatear startTime y endTime al formato H:i
+            updatedDefenseDay.startTime = formatTime(
+                updatedDefenseDay.startTime
+            );
+            updatedDefenseDay.endTime = formatTime(updatedDefenseDay.endTime);
+
+            console.log(
+                "Editando día de defensa:",
+                defenseDays[editIndex].ID_FECHADEF
+            );
+
+            await axios.put(
+                `http://localhost:8000/api/fechas_defensa/${defenseDays[editIndex].ID_FECHADEF}`,
+                updatedDefenseDay,
+                { withCredentials: true }
+            );
+
+            const updatedDefenseDays = defenseDays.map((day, i) =>
+                i === editIndex
+                    ? {
+                          ...updatedDefenseDay,
+                          ID_FECHADEF: defenseDays[editIndex].ID_FECHADEF,
+                      }
+                    : day
+            );
+            setDefenseDays(sortDefenseDays(updatedDefenseDays));
+        } catch (error) {
+            console.error("Detalles del error:", error.response?.data);
+            setErrorMessage(
+                error.response?.data?.error ||
+                    "No se pudo actualizar la fecha de defensa."
+            );
+            setShowErrorModal(true);
         }
+    };
 
-        const url = isEditing
-            ? `http://localhost:8000/api/grupos/${groupToEdit.ID_GRUPO}`
-            : "http://localhost:8000/api/grupos";
+    const handleDeleteDefenseDay = async () => {
+        const fechaDefensa = defenseDays[deleteIndex];
+        try {
+            await axios.delete(
+                `http://localhost:8000/api/fechas_defensa/${fechaDefensa.ID_FECHADEF}`,
+                { withCredentials: true }
+            );
 
-        fetch(url, {
-            method: "POST", // Usamos POST en lugar de PUT
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                Accept: "application/json", // Asegura que Laravel responda en JSON
-            },
-            body: formData,
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(
-                            errorData.message || "Error al guardar el grupo"
-                        );
-                    });
-                }
-                return response.json();
-            })
-            .then((data) => {
-                const updatedGroups = isEditing
-                    ? groups.map((group) =>
-                          group.ID_GRUPO === groupToEdit.ID_GRUPO ? data : group
-                      )
-                    : [...groups, data];
+            // Eliminar la fecha de defensa del estado y ordenar la lista
+            const updatedDefenseDays = defenseDays.filter(
+                (_, i) => i !== deleteIndex
+            );
+            setDefenseDays(sortDefenseDays(updatedDefenseDays));
 
-                setGroups(updatedGroups);
-                setShowModal(false);
-                setShowCreateSuccessMessage(!isEditing);
-                setShowEditSuccessMessage(isEditing);
-            })
-            .catch((error) => {
-                console.error("Error al guardar el grupo:", error);
-                setErrorMessage(
-                    "Hubo un problema al guardar el grupo. Intente nuevamente."
-                );
-                setShowErrorMessage(true);
-            });
+            // Muestra el mensaje de éxito
+            setSuccessMessage("Fecha de defensa eliminada con éxito.");
+            setShowSuccessModal(true);
+        } catch (error) {
+            console.error("Error al eliminar la fecha de defensa:", error);
+            setErrorMessage("No se pudo eliminar la fecha de defensa.");
+            setShowErrorModal(true);
+        } finally {
+            // Cierra el modal de confirmación
+            setShowConfirmModal(false);
+        }
     };
 
     const handleOpenEditModal = (index) => {
-        const group = groups[index];
-        setGroupName(group.NOMBRE_GRUPO || ""); // Asegura que se establezca el nombre
-        setGroupDescription(group.DESCRIP_GRUPO || "");
-        setGroupToEdit(group);
-        setImage(null);
-        setIsEditing(true);
-        setShowModal(true);
+        const defenseDay = defenseDays[index];
+        setSelectedDay(defenseDay.day);
+        setSelectedStartTime(defenseDay.HR_INIDEF);
+        setSelectedEndTime(defenseDay.HR_FINDEF);
+        setEditIndex(index);
+        setIsEditMode(true);
+        setShowDefenseModal(true);
     };
 
-    const handleOpenConfirmModal = (id) => {
-        setGroupToDelete(id); // Ahora estableces el ID del grupo, no el índice
-        setShowConfirmModal(true); // Muestra el modal de confirmación
-    };
-
-    const handleDeleteGroup = () => {
-        const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content");
-
-        fetch(`http://localhost:8000/api/grupos/${groupToDelete}`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al eliminar el grupo");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Grupo eliminado:", data);
-                // Actualizar la lista de grupos en el frontend después de la eliminación
-                const updatedGroups = groups.filter(
-                    (group) => group.ID_GRUPO !== groupToDelete
-                );
-                setGroups(updatedGroups);
-                setShowConfirmModal(false);
-                setGroupToDelete(null);
-                setShowDeleteSuccessMessage(true);
-            })
-            .catch((error) => {
-                console.error("Error al eliminar el grupo:", error);
-            });
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-
-        if (file && validTypes.includes(file.type)) {
-            setImage(file);
-        } else {
-            alert(
-                "Solo se permiten archivos de imagen en formato JPG, JPEG o PNG."
+    const handleOpenConfirmModal = async (index) => {
+        try {
+            const fechaDefensa = defenseDays[index];
+            await axios.delete(
+                `http://localhost:8000/api/fechas_defensa/${fechaDefensa.ID_FECHADEF}`,
+                { withCredentials: true }
             );
+
+            // Elimina la fecha de defensa del estado
+            const updatedDefenseDays = defenseDays.filter(
+                (_, i) => i !== index
+            );
+            setDefenseDays(updatedDefenseDays);
+        } catch (error) {
+            console.error("Error al eliminar la fecha de defensa:", error);
+            setErrorMessage("No se pudo eliminar la fecha de defensa.");
+            setShowErrorModal(true);
         }
     };
 
-    const getImagePreview = () => {
-        if (image) {
-            return URL.createObjectURL(image); // Muestra la imagen seleccionada en el modal
-        }
-        if (isEditing && groupToEdit && groupToEdit.PORTADA_GRUPO) {
-            return `http://localhost:8000/storage/${groupToEdit.PORTADA_GRUPO}`; // Muestra la imagen existente desde el servidor
-        }
-        return null;
-    };
+    const sortDefenseDays = (days) => {
+        return days.sort((a, b) => {
+            // Comparar días usando el objeto daysOrder
+            const dayComparison = daysOrder[a.day] - daysOrder[b.day];
+            if (dayComparison !== 0) return dayComparison;
 
-    const handleAddRequirement = () => {
-        const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content");
-        const newRequirement = {
-            ID_PROYECTO: projectId,
-            DESCRIPCION_REQ: "Descripción del nuevo requerimiento",
-        };
+            // Comparar horas de inicio, asegurándonos de que startTime y endTime existen
+            const startTimeA = a.startTime || a.HR_INIDEF || "";
+            const startTimeB = b.startTime || b.HR_INIDEF || "";
+            const startTimeComparison = startTimeA.localeCompare(startTimeB);
+            if (startTimeComparison !== 0) return startTimeComparison;
 
-        fetch("http://localhost:8000/api/requerimientos", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken,
-            },
-            body: JSON.stringify(newRequirement),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setRequirements([...requirements, data]); // Actualiza la lista con el nuevo requerimiento
-            })
-            .catch((error) => {
-                console.error("Error al agregar requerimiento:", error);
-            });
-    };
-
-    const fetchRequirements = () => {
-        fetch(`http://localhost:8000/api/proyectos/${projectId}/requerimientos`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Requerimientos recibidos desde la API:", data);
-
-                // Combina requerimientosProyecto y requerimientosGrupo en un solo array
-                const allRequirements = [
-                    ...(data.requerimientosProyecto || []),
-                    ...(data.requerimientosGrupo || []),
-                ];
-
-                setRequirements(allRequirements); // Asigna el array combinado al estado
-            })
-            .catch((error) => {
-                console.error("Error al cargar los requerimientos:", error);
-            });
-    };
-
-    useEffect(() => {
-        fetchRequirements();
-    }, []);
-    const toggleEditRequirement = (
-        index,
-        isEditing,
-        currentDescription = ""
-    ) => {
-        setRequirements((prevRequirements) =>
-            prevRequirements.map((req, i) =>
-                i === index ? { ...req, isEditing: isEditing } : req
-            )
-        );
-        setEditedDescription(isEditing ? currentDescription : ""); // Inicializar con la descripción actual o limpiar
-    };
-
-    const handleDeleteRequirement = (requirementId) => {
-        const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content");
-
-        fetch(`http://localhost:8000/api/requerimientos/${requirementId}`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al eliminar el requerimiento");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Requerimiento eliminado:", data);
-                // Actualizar la lista de requerimientos en el estado
-                setRequirements((prevRequirements) =>
-                    prevRequirements.filter(
-                        (req) => req.ID_REQUERIMIENTO !== requirementId
-                    )
-                );
-            })
-            .catch((error) => {
-                console.error("Error al eliminar el requerimiento:", error);
-            });
-    };
-
-    const handleSaveRequirement = (requirement) => {
-        const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content");
-
-        fetch(
-            `http://localhost:8000/api/requerimientos/${requirement.ID_REQUERIMIENTO}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken,
-                },
-                body: JSON.stringify({
-                    DESCRIPCION_REQ: editedDescription,
-                }),
-            }
-        )
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al actualizar el requerimiento");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setRequirements((prevRequirements) =>
-                    prevRequirements.map((req) =>
-                        req.ID_REQUERIMIENTO === data.ID_REQUERIMIENTO
-                            ? {
-                                  ...req,
-                                  DESCRIPCION_REQ: data.DESCRIPCION_REQ,
-                                  isEditing: false,
-                              }
-                            : req
-                    )
-                );
-                setEditedDescription(""); // Limpiar el campo después de guardar
-            })
-            .catch((error) => {
-                console.error("Error al actualizar el requerimiento:", error);
-            });
+            // Comparar horas de fin, asegurándonos de que endTime existe
+            const endTimeA = a.endTime || a.HR_FINDEF || "";
+            const endTimeB = b.endTime || b.HR_FINDEF || "";
+            return endTimeA.localeCompare(endTimeB);
+        });
     };
 
     return (
-        <div className="grupos-container">
-            {/* Header */}
+        <div
+            className={`grupos-container ${
+                isSidebarCollapsed ? "sidebar-collapsed" : ""
+            }`}
+        >
+            <HeaderProyecto />
+            <div className="grupos-sidebar-content">
+                <SidebarPrueba
+                    isSidebarCollapsed={isSidebarCollapsed}
+                    toggleSidebar={toggleSidebar}
+                    nombreProyecto={projectDetails?.NOMBRE_PROYECTO}
+                    fotoProyecto={`http://localhost:8000/storage/${projectDetails?.PORTADA_PROYECTO}`}
+                    projectId={projectId}
+                />
+                <div className="container">
+                    <div className="projects-header">
+                        <h2>Días de defensas</h2>
+                        <button
+                            className="new-project-btn"
+                            onClick={openDefenseModal}
+                        >
+                            <i className="fas fa-plus"></i> Día de defensa
+                        </button>
+                    </div>
+                    <div className="defense-days-list">
+                        {Array.isArray(defenseDays) &&
+                            defenseDays.map((defense, index) => (
+                                <div key={index} className="defense-day-item">
+                                    <div className="defense-day-info">
+                                        <h3 className="defense-day-title">
+                                            {defense.day}
+                                        </h3>
+                                        <p className="defense-day-time">
+                                            {defense.HR_INIDEF} -{" "}
+                                            {defense.HR_FINDEF}
+                                        </p>
+                                    </div>
+                                    <div className="defense-day-status">
+                                        {defense.ID_GRUPO ? (
+                                            <span className="reserved-text">
+                                                Reservado por:{" "}
+                                                {defense.NOMBRE_GRUPO}
+                                            </span>
+                                        ) : (
+                                            <span className="available-text">
+                                                Disponible
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="projects-actions">
+                                        <button
+                                            className="actions-btn"
+                                            onClick={() =>
+                                                handleOpenEditModal(index)
+                                            }
+                                        >
+                                            <i className="fas fa-pen"></i>
+                                        </button>
+                                        <button
+                                            className="actions-btn"
+                                            onClick={() =>
+                                                openConfirmDeleteModal(index)
+                                            }
+                                        >
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
 
-            {/* Contenedor principal que contiene el sidebar y el contenido */}
-
-            {/* Sidebar */}
-
-            {/* Contenedor del contenido principal */}
-            <div className={`container ${isModalOpen ? "disabled" : ""}`}>
-                {/* Sección de "Mis grupos" */}
-                <div className="projects-header">
-                    <h2>Grupos</h2>
-                    <button
-                        className="new-project-btn"
-                        onClick={() => {
-                            setIsEditing(false);
-                            setShowModal(true);
-                            setGroupName("");
-                            setGroupDescription("");
-                            setImage(null);
-                        }}
-                        disabled={isModalOpen}
-                    >
-                        <i className="fas fa-plus"></i> Nuevo grupo
-                    </button>
-                </div>
-
-                {/* Lista de grupos */}
-                <div className="project-list">
-                    {groups.map((group, index) => (
-                        <div key={index} className="project-item">
-                            {group.PORTADA_GRUPO ? (
-                                <img
-                                    src={`http://localhost:8000/storage/${group.PORTADA_GRUPO}`}
-                                    alt="Icono del grupo"
-                                    width="50"
-                                    height="50"
-                                />
-                            ) : (
-                                <img
-                                    src="https://via.placeholder.com/50"
-                                    alt="Icono del grupo"
-                                />
-                            )}
-
-                            <div className="project-info">
-                                <h3
-                                    onClick={() =>
-                                        navigate(
-                                            `/proyectos/${projectId}/grupos/${group.ID_GRUPO}/estudiantes`
-                                        )
-                                    }
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    {group.NOMBRE_GRUPO}
-                                </h3>
-                                <p>{group.DESCRIP_GRUPO}</p>
-                            </div>
-
-                            <div className="project-actions">
-                                <button
-                                    className="action-btn"
-                                    onClick={() => handleOpenEditModal(index)}
-                                >
-                                    <i className="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    className="action-btn"
-                                    onClick={() =>
-                                        handleOpenConfirmModal(group.ID_GRUPO)
-                                    }
-                                >
-                                    <i className="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Sección de "Requerimientos" */}
-                <div className="projects-header">
-                    <h2>Requerimientos</h2>
-                    <button
-                        className="new-project-btn"
-                        onClick={handleAddRequirement}
-                        disabled={isModalOpen}
-                    >
-                        <i className="fas fa-plus"></i> Nuevo requerimiento
-                    </button>
-                </div>
-
-                {/* Lista de requerimientos */}
-                <div className="project-list requerimientos-list">
-                    {Array.isArray(requirements) &&
-                        requirements.map((requirement, index) => (
-                            <div
-                                key={requirement.ID_REQUERIMIENTO}
-                                className="project-item requerimientos-list"
-                            >
-                                {requirement.isEditing ? (
-                                    <ReactQuill
-                                        theme="snow"
-                                        value={
-                                            editedDescription ||
-                                            requirement.DESCRIPCION_REQ
-                                        }
-                                        onChange={(value) =>
-                                            setEditedDescription(value)
-                                        }
-                                        className="requirement-quill-editor"
-                                        placeholder="Descripción del requerimiento"
-                                        style={{ width: "100%" }}
+                    <div className="projects-header">
+                        <h2>Grupo Empresas</h2>
+                    </div>
+                    <div className="project-list">
+                        {groups.map((group, index) => (
+                            <div key={index} className="project-item">
+                                {group.PORTADA_GRUPO ? (
+                                    <img
+                                        src={`http://localhost:8000/storage/${group.PORTADA_GRUPO}`}
+                                        alt="Icono del grupo"
+                                        width="50"
+                                        height="50"
                                     />
                                 ) : (
                                     <div className="project-info requerimientos-list">
@@ -492,151 +370,117 @@ const Grupos = ({ projectId }) => {
                                         </div>
                                     </div>
                                 )}
-                                <div className="project-actions requerimientos-list">
-                                    <button
-                                        className="action-btn"
+                                <div className="project-info">
+                                    <h3
                                         onClick={() =>
-                                            requirement.isEditing
-                                                ? handleSaveRequirement(
-                                                      requirement
-                                                  )
-                                                : toggleEditRequirement(
-                                                      index,
-                                                      true,
-                                                      requirement.DESCRIPCION_REQ
-                                                  )
-                                        }
-                                    >
-                                        <i
-                                            className={
-                                                requirement.isEditing
-                                                    ? "fas fa-save"
-                                                    : "fas fa-pen"
-                                            }
-                                        ></i>
-                                    </button>
-                                    <button
-                                        className="action-btn"
-                                        onClick={() =>
-                                            handleDeleteRequirement(
-                                                requirement.ID_REQUERIMIENTO
+                                            navigate(
+                                                `/proyectos/${projectId}/grupos/${group.ID_GRUPO}/estudiantes`
                                             )
                                         }
+                                        style={{ cursor: "pointer" }}
                                     >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
+                                        {group.NOMBRE_GRUPO}
+                                    </h3>
+                                    <p>{group.DESCRIP_GRUPO}</p>
                                 </div>
                             </div>
                         ))}
+                    </div>
                 </div>
             </div>
 
-            {showModal && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <h3>
-                            {isEditing ? "Editar grupo" : "Detalles del grupo"}
-                        </h3>
-                        <input
-                            type="text"
-                            value={groupName}
-                            onChange={(e) => setGroupName(e.target.value)}
-                            placeholder="Nombre del Grupo*"
-                            className="input-field"
-                        />
-                        <div className="description-and-photo">
-                            <textarea
-                                value={groupDescription}
-                                onChange={(e) =>
-                                    setGroupDescription(e.target.value)
-                                }
-                                placeholder="Descripción del grupo*"
-                                className="textarea-field"
-                            />
-                            <div className="upload-container">
-                                <p className="upload-title">Incluya una foto</p>
-                                <div
-                                    className="upload-box"
-                                    onClick={() =>
-                                        document
-                                            .getElementById("fileInput")
-                                            .click()
-                                    }
-                                >
-                                    {getImagePreview() ? (
-                                        <img
-                                            src={getImagePreview()}
-                                            alt="Vista previa"
-                                            className="image-preview"
-                                        />
-                                    ) : (
-                                        <>
-                                            <i className="fas fa-cloud-upload-alt"></i>
-                                            <p>
-                                                Pulsa aquí para añadir archivos
-                                            </p>
-                                        </>
-                                    )}
-                                </div>
+            {showDefenseModal && (
+                <div className="defensa-modal-overlay">
+                    <div className="defensa-modal-content">
+                        <h2 className="defensa-modal-title">
+                            {isEditMode
+                                ? "Modificar día y hora de defensa"
+                                : "Seleccionar día y hora de defensa"}
+                        </h2>
+
+                        <label className="defensa-modal-label">
+                            Día:
+                            <select
+                                value={selectedDay}
+                                onChange={(e) => setSelectedDay(e.target.value)}
+                                className="defensa-modal-select"
+                            >
+                                <option value="">Seleccione un día</option>
+                                <option value="Lunes">Lunes</option>
+                                <option value="Martes">Martes</option>
+                                <option value="Miércoles">Miércoles</option>
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                                <option value="Sábado">Sábado</option>
+                            </select>
+                        </label>
+
+                        <div className="defensa-modal-time-container">
+                            <label className="defensa-modal-label">
+                                Hora de inicio:
                                 <input
-                                    id="fileInput"
-                                    type="file"
-                                    accept="image/jpeg, image/png, image/jpg"
-                                    style={{ display: "none" }}
-                                    onChange={handleImageChange}
+                                    type="time"
+                                    value={selectedStartTime}
+                                    onChange={(e) =>
+                                        setSelectedStartTime(e.target.value)
+                                    }
+                                    className="defensa-modal-input"
                                 />
-                                {image && <p>{image.name}</p>}
-                            </div>
+                            </label>
+
+                            <label className="defensa-modal-label">
+                                Hora de fin:
+                                <input
+                                    type="time"
+                                    value={selectedEndTime}
+                                    onChange={(e) =>
+                                        setSelectedEndTime(e.target.value)
+                                    }
+                                    className="defensa-modal-input"
+                                />
+                            </label>
                         </div>
+
                         <div className="modal-actions">
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => setShowDefenseModal(false)}
                                 className="cancel-btn"
                             >
-                                Cancelar
+                                Cerrar
                             </button>
                             <button
-                                onClick={handleSaveGroup}
+                                onClick={handleAddDefenseDay}
                                 className="create-btn"
                             >
-                                {isEditing ? "Guardar cambios" : "Crear grupo"}
+                                {isEditMode ? "Modificar" : "Agregar"}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* Modal de error */}
+            {showErrorModal && (
+                <ModalError
+                    title="Error"
+                    errorMessage={errorMessage}
+                    closeModal={() => setShowErrorModal(false)}
+                />
+            )}
             {showConfirmModal && (
                 <ModalConfirmacion
                     show={showConfirmModal}
                     onClose={() => setShowConfirmModal(false)}
-                    onConfirm={handleDeleteGroup}
+                    onConfirm={handleDeleteDefenseDay}
                     title="Confirmar eliminación"
-                    message="¿Está seguro de que desea eliminar este grupo?"
+                    message="¿Estás seguro de que deseas eliminar esta fecha de defensa?"
                 />
             )}
-            {showCreateSuccessMessage && (
+
+            {showSuccessModal && (
                 <ModalMensajeExito
-                    message="¡Se creo el grupo exitosamente!"
-                    onClose={() => setShowCreateSuccessMessage(false)}
-                />
-            )}
-            {showEditSuccessMessage && (
-                <ModalMensajeExito
-                    message="¡Se guardaron los cambios exitosamente!"
-                    onClose={() => setShowEditSuccessMessage(false)}
-                />
-            )}
-            {showDeleteSuccessMessage && (
-                <ModalMensajeExito
-                    message="¡Se eliminó el grupo correctamente!"
-                    onClose={() => setShowDeleteSuccessMessage(false)}
-                />
-            )}
-            {showErrorMessage && (
-                <ModalError
-                    errorMessage="Por favor, complete los campos de título y descripción."
-                    closeModal={() => setShowErrorMessage(false)}
+                    message={successMessage}
+                    onClose={() => setShowSuccessModal(false)}
                 />
             )}
         </div>

@@ -12,46 +12,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'role' => 'required|in:Docente,Estudiante',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-        $role = $request->input('role');
-
-        if ($role == 'Docente') {
-            if (Auth::guard('docente')->attempt(['EMAIL_DOCENTE' => $credentials['email'], 'password' => $credentials['password']])) {
-                $user = Auth::guard('docente')->user();
-
-                if (!$user->approved) {
-                    Auth::guard('docente')->logout();
-                    return response()->json(['error' => 'Tu cuenta está pendiente de aprobación.'], 403);
-                }
-
-                return response()->json([
-                    'role' => 'Docente',
-                    'is_admin' => $user->is_admin,
-                    'message' => 'Login exitoso'
-                ]);
-            } else {
-                return response()->json(['error' => 'Credenciales inválidas'], 401);
-            }
-        } elseif ($role == 'Estudiante') {
-            if (Auth::guard('estudiante')->attempt(['EMAIL_EST' => $credentials['email'], 'password' => $credentials['password']])) {
-                return response()->json(['role' => 'Estudiante', 'message' => 'Login exitoso']);
-            } else {
-                return response()->json(['error' => 'Credenciales inválidas'], 401);
-            }
-        }
-
-        return response()->json(['error' => 'El rol no es válido'], 400);
-    }
-
-
     public function logout(Request $request)
     {
         $role = $request->input('role');
@@ -82,7 +42,8 @@ class AuthController extends Controller
                 'nombre' => $user->NOMBRE_EST,
                 'apellido' => $user->APELLIDO_EST,
                 'email' => $user->EMAIL_EST,
-                'foto' => $user->FOTO_EST ?? 'https://via.placeholder.com/50'
+                'foto' => $user->FOTO_EST ?? 'https://via.placeholder.com/50',
+                'is_rl' => $user->IS_RL
             ]);
         }
 
@@ -210,9 +171,20 @@ class AuthController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'email' => 'required|email|unique:docente,EMAIL_DOCENTE',
+            'email' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('role') === 'docente' && Docente::where('EMAIL_DOCENTE', $value)->exists()) {
+                        $fail('El correo ya está registrado como docente.');
+                    } elseif ($request->input('role') === 'estudiante' && Estudiante::where('EMAIL_EST', $value)->exists()) {
+                        $fail('El correo ya está registrado como estudiante.');
+                    }
+                }
+            ],
             'password' => 'required|string|min:8|confirmed',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'role' => 'required|in:docente,estudiante',
         ]);
 
         $imagePath = null;
@@ -220,19 +192,44 @@ class AuthController extends Controller
             $imagePath = $request->file('foto')->store('profile_photos', 'public');
         }
 
-        $user = Docente::create([
-            'NOMBRE_DOCENTE' => $request->input('nombre'),
-            'APELLIDO_DOCENTE' => $request->input('apellido'),
-            'EMAIL_DOCENTE' => $request->input('email'),
-            'PASSWORD_DOCENTE' => Hash::make($request->input('password')),
-            'FOTO_DOCENTE' => $imagePath,
-            'is_admin' => 0,
-            'approved' => false, // Set the default approval status to false
-        ]);
+        if ($request->input('role') === 'docente') {
+            $user = Docente::create([
+                'NOMBRE_DOCENTE' => $request->input('nombre'),
+                'APELLIDO_DOCENTE' => $request->input('apellido'),
+                'EMAIL_DOCENTE' => $request->input('email'),
+                'PASSWORD_DOCENTE' => Hash::make($request->input('password')),
+                'FOTO_DOCENTE' => $imagePath,
+                'is_admin' => 0,
+                'approved' => false,
+            ]);
+        } else {
+            $user = Estudiante::create([
+                'NOMBRE_EST' => $request->input('nombre'),
+                'APELLIDO_EST' => $request->input('apellido'),
+                'EMAIL_EST' => $request->input('email'),
+                'PASSWORD_EST' => Hash::make($request->input('password')),
+                'FOTO_EST' => $imagePath,
+                'IS_RL' => 0, // Por defecto
+                'APPROVED' => false, // Establece el estado de aprobación por defecto
+            ]);
+        }
 
         return response()->json(['message' => 'Registro exitoso. Espera la aprobación del administrador.', 'user' => $user]);
     }
-    
+    public function deleteUser()
+    {
+        if (Auth::guard('docente')->check()) {
+            $user = Auth::guard('docente')->user();
+            Docente::where('ID_DOCENTE', $user->ID_DOCENTE)->delete();
+        } elseif (Auth::guard('estudiante')->check()) {
+            $user = Auth::guard('estudiante')->user();
+            Estudiante::where('ID_EST', $user->ID_EST)->delete();
+        } else {
+            return response()->json(['error' => 'No autenticado'], 401);
+        }
+
+        return response()->json(['message' => 'Cuenta eliminada exitosamente'], 200);
+    }
 
     // Restablece la contraseña usando el token
 }

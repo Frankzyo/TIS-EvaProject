@@ -51,7 +51,7 @@
 /* -------------------------------------- Títulos y contenedores principales -------------------------------------- */
 .contenedor-titulo-planificacion {
     width: 100%;
-    padding: 20px 40px;
+    padding: 0 40px;
     padding-bottom: 5px;
     display: flex;
     flex-direction: column;
@@ -64,9 +64,9 @@
     font-size: 35px;
     font-weight: bold;
     color: white;
-    margin-left: 25px;
-    margin-bottom: 5px;
-    margin-top: 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-transform: uppercase;
 }
 
 .divisor-planificacion {
@@ -100,7 +100,7 @@
     align-items: center;
     overflow: hidden;
     height: auto;
-    max-height: 75vh;
+    max-height: 600px;
 }
 
 /* Títulos */
@@ -511,6 +511,7 @@ textarea {
 .drag-drop-text {
     font-size: 16px;
     color: #1e88e5;
+    z-index: 0;
 }
 
 /* Botones del modal */
@@ -561,6 +562,7 @@ textarea {
     padding: 10px 0;
     max-height: 150px; /* Limita la altura del contenedor */
     overflow-y: auto; /* Permite hacer scroll si hay muchos archivos */
+    z-index: 1;
 }
 
 .preview-item {
@@ -655,4 +657,60 @@ textarea {
     font-size: 19px;
     font-weight: bold;
     text-align: center;
+}
+
+/* Estilo para la información del grupo en PlanificacionEstudiante */
+.planificacion-group-info {
+    display: flex;
+    align-items: center;
+    background-color: #76a9d9;
+    padding: 0 40px;
+    max-height: 150px;
+    border: none; /* Elimina cualquier borde */
+    box-shadow: none; /* Elimina cualquier sombra */
+    margin-bottom: 10px;
+}
+
+.planificacion-divisor-container {
+    background-color: #76a9d9; /* Fondo blanco para todo el contenedor */
+    padding: 0 40px; /* Espacio a los lados */
+}
+
+.planificacion-divisor-est {
+    height: 2px;
+    background-color: white;
+}
+
+.planificacion-group-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    margin-right: 30px;
+}
+
+.planificacion-container {
+    padding: 40px;
+    padding-top: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 245px); /* Ajusta según la altura de tu header */
+    overflow-y: auto; /* Permite el scroll dentro del contenedor */
+    margin-bottom: -40px; /* Para extender el contenedor hasta el borde inferior */
+}
+
+.planificacion-group-title {
+    font-size: 44px; /* Ajusta el tamaño del título según necesites */
+    font-weight: bold;
+    color: white; /* Color para el título */
+    margin-bottom: 20px;
+}
+
+.planificacion-group-description {
+    font-size: 25px; /* Ajusta el tamaño de la descripción según necesites */
+    color: rgb(78, 78, 78); /* Color para la descripción */
+    margin-top: 5px;
 }
