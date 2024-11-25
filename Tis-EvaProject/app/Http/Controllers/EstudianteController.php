@@ -166,4 +166,15 @@ class EstudianteController extends Controller
             return response()->json(['error' => 'Error al actualizar el rol del estudiante'], 500);
         }
     }
+    public function obtenerEstudiante($estudianteId)
+    {
+        try {
+            $estudiante = Estudiante::findOrFail($estudianteId);
+            return response()->json($estudiante, 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Estudiante no encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al cargar los datos del estudiante'], 500);
+        }
+    }
 }

@@ -271,14 +271,6 @@ const NewRubricaModal = ({
                                     <div className="dropdown-etapa-menu">
                                         <button
                                             onClick={() =>
-                                                cloneCriterio(criterioIndex)
-                                            }
-                                            className="dropdown-etapa-item"
-                                        >
-                                            Clonar
-                                        </button>
-                                        <button
-                                            onClick={() =>
                                                 deleteCriterio(criterioIndex)
                                             }
                                             className="dropdown-etapa-item"
@@ -338,17 +330,6 @@ const NewRubricaModal = ({
                                             {nivelMenuIndex ===
                                                 `${criterioIndex}-${nivelIndex}` && (
                                                 <div className="dropdown-etapa-menu">
-                                                    <button
-                                                        onClick={() =>
-                                                            cloneNivel(
-                                                                criterioIndex,
-                                                                nivelIndex
-                                                            )
-                                                        }
-                                                        className="dropdown-etapa-item"
-                                                    >
-                                                        Clonar
-                                                    </button>
                                                     <button
                                                         onClick={() =>
                                                             deleteNivel(

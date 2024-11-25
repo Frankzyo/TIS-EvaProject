@@ -213,3 +213,25 @@
     background-color: #1558b0;
     color: white;
 }
+.total-puntos {
+    display: flex;
+    align-items: center;
+    margin-top: 20px; 
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    
+}
+
+.total-puntos.normal {
+    color: #ffffff;
+    background: linear-gradient(135deg, #56ccf2, #2f80ed); /* Degradado azul */
+}
+.total-puntos.excede {
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff5f6d, #ffc371); /* Degradado rojo */
+}

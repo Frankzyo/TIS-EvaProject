@@ -27,7 +27,7 @@ class RubricaController extends Controller
 
         $validatedData = $request->validate([
             'titulo' => 'required|string|max:100',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'nullable|string|max:500',
             'projectId' => 'required|string|max:50',
             'etapaId' => 'required|integer',
             'criterios' => 'required|array',

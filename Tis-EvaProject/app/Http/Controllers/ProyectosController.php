@@ -222,13 +222,13 @@ class ProyectosController extends Controller
     public function obtenerGruposYFechas($id_proyecto)
     {
         try {
-            $proyecto = Proyectos::with(['grupos.fechasDefensa'])
+            $proyecto = Proyectos::with(['grupos.fechasDefensa', 'etapas'])
                 ->findOrFail($id_proyecto);
 
             return response()->json($proyecto, 200);
         } catch (\Exception $e) {
-            Log::error("Error al obtener grupos y fechas de defensa: " . $e->getMessage());
-            return response()->json(['error' => 'Error al obtener grupos y fechas de defensa'], 500);
+            Log::error("Error al obtener grupos, fechas de defensa y etapas: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener grupos, fechas de defensa y etapas'], 500);
         }
     }
 }

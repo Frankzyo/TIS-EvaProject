@@ -4,10 +4,10 @@ import HeaderProyecto from "../Components/HeaderProyecto";
 import SidebarPrueba from "../Components/SidebarPrueba";
 import "../../css/HeaderProyecto.css";
 import "../../css/SidebarPrueba.css";
-import "../../css/PlanillaDeSeguimiento.css";
+import "../../css/EvaluacionIndividualEstudiante.css";
 import axios from "axios";
 
-const PlanillaDeSeguimiento = () => {
+const EvaluacionIndividualEstudiante = () => {
     const { projectId } = useParams();
     const [projectDetails, setProjectDetails] = useState({});
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -33,12 +33,12 @@ const PlanillaDeSeguimiento = () => {
 
     return (
         <div
-            className={`planilla-seguimiento-container ${
+            className={`evaluacion-individual-estudiante-container ${
                 isSidebarCollapsed ? "sidebar-collapsed" : ""
             }`}
         >
             <HeaderProyecto />
-            <div className="planilla-seguimiento-sidebar-content">
+            <div className="evaluacion-individual-estudiante-sidebar-content">
                 <SidebarPrueba
                     isSidebarCollapsed={isSidebarCollapsed}
                     toggleSidebar={toggleSidebar}
@@ -46,18 +46,18 @@ const PlanillaDeSeguimiento = () => {
                     fotoProyecto={`http://localhost:8000/storage/${projectDetails?.PORTADA_PROYECTO}`}
                     projectId={projectId}
                 />
-                <div className="container">
-                    <div className="projects-header">
+                <div className="evaluacion-individual-estudiante-container">
+                    <div className="evaluacion-individual-estudiante-header">
                         <h2>Planilla de Seguimiento</h2>
                         <button className="new-project-btn">
                             <i className="fas fa-plus"></i> Nueva Etapa
                         </button>
                     </div>
-                    <div className="planilla-seguimiento"></div>
+                    <div className="evaluacion-individual-estudiante"></div>
                 </div>
             </div>
         </div>
     );
 };
 
-export default PlanillaDeSeguimiento;
+export default EvaluacionIndividualEstudiante;

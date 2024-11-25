@@ -103,10 +103,10 @@ const SidebarPrueba = ({
                     <div className="submenu">
                         <ul
                             className="menu-item-prueba"
-                            onClick={() => navigate("/rubrica-evaluacion")}
+                            onClick={() => navigate(`/evaluacion-individual/${projectId}`)}
                         >
                             <span className="menu-text-prueba">
-                                Rubrica de evaluacion
+                                Evaluacion Individual
                             </span>
                         </ul>
                         <ul

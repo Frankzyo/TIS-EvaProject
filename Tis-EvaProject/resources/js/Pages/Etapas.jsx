@@ -20,6 +20,7 @@ const Etapas = () => {
     const [duracion, setDuracion] = useState("");
     const [isEditMode, setIsEditMode] = useState(false);
     const [editEtapaId, setEditEtapaId] = useState(null);
+    const [totalPuntos, setTotalPuntos] = useState(0);
 
     const handleRubricaClick = (etapaId) => {
         navigate(`/proyectos/${projectId}/rubrica/${etapaId}`);
@@ -45,8 +46,8 @@ const Etapas = () => {
                     `http://localhost:8000/api/proyectos/${projectId}/etapas`,
                     { withCredentials: true }
                 );
-                console.log(response.data); // Verifica la estructura de los datos aquí
                 setEtapas(response.data);
+                calculateTotalPoints(response.data);
             } catch (error) {
                 console.error("Error al cargar las etapas:", error);
             }
@@ -56,6 +57,19 @@ const Etapas = () => {
         fetchEtapas();
     }, [projectId]);
 
+    const calculateTotalPoints = (etapas) => {
+        const total = etapas.reduce(
+            (sum, etapa) => sum + (etapa.ETAPAS_PUNTUACION || 0),
+            0
+        );
+        setTotalPuntos(total);
+    };
+
+    useEffect(() => {
+        const total = etapas.reduce((sum, etapa) => sum + (etapa.ETAPAS_PUNTUACION || 0), 0);
+        setTotalPuntos(total);
+    }, [etapas]);
+    
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
     const openEtapaModal = () => {
@@ -170,6 +184,14 @@ const Etapas = () => {
                             <i className="fas fa-plus"></i> Nueva Etapa
                         </button>
                     </div>
+                    <div
+                        className={`total-puntos ${
+                            totalPuntos > 100 ? "excede" : "normal"
+                        }`}
+                    >
+                        {totalPuntos.toFixed(2)} / 100.00 puntos asignados
+                    </div>
+
                     <div className="etapas-list">
                         {etapas.map((etapa, index) => (
                             <div

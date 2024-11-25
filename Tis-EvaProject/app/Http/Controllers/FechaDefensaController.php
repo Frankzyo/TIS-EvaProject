@@ -253,4 +253,31 @@ class FechaDefensaController extends Controller
             'isRegisteredFech' => $isRegisteredFech,
         ]);
     }
+    public function getDefenseDateByGroup($studentId)
+    {
+        try {
+            // Obtener el grupo del estudiante
+            $grupo = GrupoEstudiante::where('ID_ESTUDIANTE', $studentId)->first();
+
+            if (!$grupo) {
+                return response()->json(['error' => 'El estudiante no pertenece a ningún grupo'], 404);
+            }
+
+            // Buscar la fecha de defensa asociada al grupo
+            $fechaDefensa = FechaDefensa::where('ID_GRUPO', $grupo->ID_GRUPO)->first();
+
+            if (!$fechaDefensa) {
+                return response()->json(['error' => 'No se encontró una fecha de defensa para el grupo'], 404);
+            }
+
+            return response()->json([
+                'day' => $fechaDefensa->day,
+                'HR_INIDEF' => Carbon::parse($fechaDefensa->HR_INIDEF)->format('H:i'),
+                'HR_FINDEF' => Carbon::parse($fechaDefensa->HR_FINDEF)->format('H:i'),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error al obtener la fecha de defensa del grupo: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener la fecha de defensa del grupo'], 500);
+        }
+    }
 }

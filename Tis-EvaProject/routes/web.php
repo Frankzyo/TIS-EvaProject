@@ -15,6 +15,8 @@ use App\Http\Controllers\HistoriaUsuarioController;
 use App\Http\Controllers\FechaDefensaController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\RubricaController;
+use App\Http\Controllers\EvaluacionIndividualController;
+use App\Http\Controllers\EvaluacionIndividualEstudianteController;
 
 // Ruta de login para cargar la aplicación React
 Route::get('/login', function () {
@@ -82,6 +84,7 @@ Route::prefix('api')->middleware(['auth:docente,estudiante'])->group(function ()
 });
 
 Route::get('/api/estudiantes/grupo/{groupId}', [EstudianteController::class, 'obtenerEstudiantesPorGrupo']);
+Route::get('/api/estudiantes/{estudianteId}', [EstudianteController::class, 'obtenerEstudiante']);
 
 // Rutas para actualizar perfil y cambiar contraseña, protegidas por autenticación de docente y estudiante
 Route::middleware('auth:docente,estudiante')->group(function () {
@@ -152,7 +155,8 @@ Route::prefix('api')->group(function () {
     Route::get('/proyectos/{projectId}/fechas_defensa/{studentId}', [FechaDefensaController::class, 'getFechasByProject']);
     Route::get('/estudiante/{studentId}/group-defense-registration-status', [FechaDefensaController::class, 'getGroupDefenseRegistrationStatus']); // Obtener estado de registro de defensa del grupo
     Route::get('/fechas_defensa/docente/{projectId}', [FechaDefensaController::class, 'getFechasByProjectForDocente']);
-   
+    Route::get('/defensa/grupo/{studentId}', [FechaDefensaController::class, 'getDefenseDateByGroup']);
+
     Route::get('proyectos/{projectId}/etapas', [EtapaController::class, 'index']);
     Route::post('etapas', [EtapaController::class, 'store']);
     Route::put('etapas/{id}', [EtapaController::class, 'update']);
@@ -163,6 +167,9 @@ Route::prefix('api')->group(function () {
 
     Route::get('/etapas/{etapaId}', [EtapaController::class, 'show']);
 
+    Route::post('/evaluaciones-individuales-estudiantes', [EvaluacionIndividualEstudianteController::class, 'store']);
+    Route::get('/evaluaciones/{estudianteId}/{etapaId}', [EvaluacionIndividualEstudianteController::class, 'show']);
+
 });
 
 // Rutas de la API para rubricas (protegidas con autenticación)
@@ -172,6 +179,14 @@ Route::prefix('api/rubricas')->middleware(['auth:docente,estudiante'])->group(fu
     Route::get('/{id}', [RubricaController::class, 'show']); // Ver rúbrica específica
     Route::put('/{id}', [RubricaController::class, 'update']); // Actualizar rúbrica
     Route::delete('/{id}', [RubricaController::class, 'destroy']); // Eliminar rúbrica
+});
+
+Route::prefix('api/evaluaciones-individuales')->group(function () {
+    Route::get('/proyecto/{projectId}', [EvaluacionIndividualController::class, 'index']); // Obtener todas las evaluaciones de un proyecto
+    Route::post('/', [EvaluacionIndividualController::class, 'store']); // Crear nueva evaluación
+    Route::get('/{examenId}', [EvaluacionIndividualController::class, 'show']);
+    Route::put('/{id}', [EvaluacionIndividualController::class, 'update']); // Actualizar evaluación
+    Route::delete('/{id}', [EvaluacionIndividualController::class, 'destroy']); // Eliminar evaluación
 });
 
 // Ruta de prueba para verificar funcionamiento del backend

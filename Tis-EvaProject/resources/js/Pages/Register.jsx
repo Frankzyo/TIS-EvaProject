@@ -46,7 +46,9 @@ function Register() {
             };
             reader.readAsDataURL(file);
         } else {
-            alert("Por favor, selecciona un archivo de imagen (jpg, png, gif).");
+            alert(
+                "Por favor, selecciona un archivo de imagen (jpg, png, gif)."
+            );
             e.target.value = "";
         }
     };
@@ -62,7 +64,10 @@ function Register() {
         submissionData.append("apellido", formData.lastName);
         submissionData.append("email", formData.email);
         submissionData.append("password", formData.password);
-        submissionData.append("password_confirmation", formData.confirmPassword);
+        submissionData.append(
+            "password_confirmation",
+            formData.confirmPassword
+        );
         submissionData.append("role", formData.role);
 
         if (formData.photo) {
@@ -97,11 +102,6 @@ function Register() {
         <div className="register-container">
             <div className="register-box">
                 <h2>Registrar Cuenta</h2>
-
-                <div className="googler-login">
-                    <img src="/assets/LogoGoogle.png" alt="Google logo" />
-                    <span>Iniciar sesión con Google</span>
-                </div>
 
                 <div className="divider"></div>
 

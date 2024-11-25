@@ -39,4 +39,9 @@ class Proyectos extends Model
     {
         return $this->hasMany(Grupo::class, 'ID_PROYECTO', 'ID_PROYECTO');
     }
+    // En el modelo Proyectos
+    public function etapas()
+    {
+        return $this->hasMany(Etapa::class, 'ID_PROYECTO', 'ID_PROYECTO');
+    }
 }

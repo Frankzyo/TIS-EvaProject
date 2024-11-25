@@ -1,0 +1,210 @@
+.evaluacion-grupo-individual-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor de la barra lateral y del contenido principal */
+.evaluacion-grupo-individual-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+/* Contenedor principal de la barra lateral */
+.evaluacion-grupo-individual-sidebar-container {
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+    margin-bottom: -40px;
+}
+
+/* Encabezado de la evaluación */
+.evaluacion-grupo-individual-header {
+    background-color: #d9eaff; /* Fondo azul claro */
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.evaluacion-grupo-individual-header h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Contenedor de los detalles de evaluación */
+.evaluacion-grupo-individual-details {
+    display: flex;
+    align-items: flex-start; /* Alinea el contenido verticalmente */
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+}
+
+/* Título y detalles de la evaluación */
+.evaluacion-grupo-individual-details h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #004085; /* Color azul para destacar */
+    margin: 10px 0;
+}
+
+.evaluacion-grupo-individual-details p {
+    color: #555;
+    margin: 5px;
+}
+
+/* Contenedor de la imagen del grupo */
+.grupo-fotos-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Imagen del grupo en el lado izquierdo */
+.grupo-fotos {
+    width: 180px;
+    height: auto;
+    border-radius: 10%;
+    object-fit: cover;
+}
+
+/* Contenedor de los detalles a la derecha de la imagen */
+.evaluacion-grupo-individual-details-content {
+    flex-grow: 1; /* Permite que el contenido ocupe el espacio disponible */
+}
+
+/* Información del representante legal */
+.representante-info {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    background-color: #f9fbfd;
+    padding: 0 10px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+    margin: 0;
+}
+
+.representante-info h4 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-right: 10px;
+}
+
+.representante-info p {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0;
+}
+
+
+
+/*----------------------------------*/
+
+.estudiantes-grupo-container {
+    background-color: #f9fbfd; /* Fondo claro para el contenedor principal */
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el contenedor */
+    margin-top: 10px;
+}
+
+.estudiantes-grupo-container h3 {
+    font-size: 1.8rem;
+    color: #004085;
+    margin-bottom: 10px;
+}
+
+.estudiante-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave para cada contenedor */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.estudiante-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al hacer hover */
+}
+
+.estudiante-info {
+    display: flex;
+    align-items: center;
+}
+
+.estudiante-foto {
+    width: 70px;
+    height: 70px;
+    border-radius: 10%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.estudiante-texto {
+    display: flex;
+    flex-direction: column;
+}
+
+.estudiante-nombre {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.estudiante-rol {
+    font-size: 1rem;
+    color: #777;
+}
+
+.estudiante-controles {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.toggle-info-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.informacion-adicional {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #eef1f5;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.comentarios-textarea {
+    width: 100%;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    margin-top: 5px;
+}

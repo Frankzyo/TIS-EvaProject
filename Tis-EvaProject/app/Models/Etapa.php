@@ -24,4 +24,8 @@ class Etapa extends Model
     {
         return $this->belongsTo(Proyectos::class, 'ID_PROYECTO');
     }
+    public function rubricas()
+    {
+        return $this->hasMany(Rubrica::class, 'ID_ETAPA', 'ID_ETAPA');
+    }
 }
