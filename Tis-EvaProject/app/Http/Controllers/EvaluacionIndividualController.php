@@ -13,6 +13,10 @@ class EvaluacionIndividualController extends Controller
     {
         $evaluaciones = EvaluacionIndividual::with(['grupo', 'etapa'])
             ->where('ID_PROYECTO', $projectId)
+            ->whereHas('etapa', function ($query) {
+                // Excluir títulos 'ev es' y 'sdf' de la tabla 'etapa'
+                $query->whereNotIn('ETAPAS_TITULO', ['ev cruz', 'auto ev']);
+            })
             ->get()
             ->map(function ($evaluacion) {
                 // Obtener el representante legal del grupo

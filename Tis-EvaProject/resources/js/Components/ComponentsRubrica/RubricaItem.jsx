@@ -1,7 +1,7 @@
 // RubricaItem.jsx
 import React, { useState } from "react";
 import CriterioItem from "./CriterioItem";
-import "../../../css/ComponentsRubrica/RubricaItem.css";
+import "../../../css/EstilosRubrica/RubricaItem.css";
 
 const RubricaItem = ({ rubrica, onEdit, onDelete }) => {
     const [isExpanded, setIsExpanded] = useState(false);

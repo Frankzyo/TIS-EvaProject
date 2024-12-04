@@ -2,34 +2,48 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./Pages/Login";
-import Proyectos from "./Pages/Proyectos";
-import HomePage from "./Pages/HomePage";
-import Register from "./Pages/Register";
-import ForgotPassword from "./Pages/ForgotPassword";
-import ResetPassword from "./Pages/ResetPassword";
-import ProyectoEstudiante from "./Pages/ProyectoEstudiante";
-import PlanificacionEstudiante from "./Pages/PlanificacionEstudiante";
-import HistoriaUsuario from "./Pages/HistoriaUsuario";
-import Perfil from "./Pages/Perfil";
-import PerfilEstudiante from "./Pages/PerfilEstudiante";
-import ApproveAccounts from "./Pages/ApproveAccounts";
-import ApproveEstudiante from "./Pages/ApproveEstudiante";
-import Grupos from "./Pages/Grupos";
-import GrupoEstudiante from "./Pages/GrupoEstudiante";
-import Estudiantes from "./Pages/Estudiantes";
-import AgregarEstudiante from "./Pages/AgregarEstudiante";
-import EquipoEstudiante from "./Pages/EquipoEstudiante";
-import TareasEstudiante from "./Pages/TareasEstudiante";
-import RequerimientosDocente from "./Pages/RequerimientosDocente";
-import Etapas from "./Pages/Etapas";
-import PlanillaDeSeguimiento from "./Pages/PlanilaDeSeguimiento";
-import Rubrica from "./Pages/Rubrica";
-import EvaluacionIndividual from "./Pages/EvaluacionIndividual";
-import EvaluacionGrupoIndividual from "./Pages/EvaluacionGrupoIndividual";
-import EvaluacionIndividualEstudiante from "./Pages/EvaluacionIndividualEstudiante";
 import "../css/NotFound.css";
 
+// Importación de componentes
+import HomePage from "./Pages/HomePage/HomePage";
+import Login from "./Pages/Auth/Login";
+import Register from "./Pages/Auth/Register";
+import ForgotPassword from "./Pages/Auth/ForgotPassword";
+import ResetPassword from "./Pages/Auth/ResetPassword";
+
+// Rutas de proyectos
+import Proyectos from "./Pages/ProyectoPage/Proyectos";
+import Grupos from "./Pages/GruposPage/Grupos";
+import Estudiantes from "./Pages/EstudiantePage/Estudiantes";
+import AgregarEstudiante from "./Pages/EstudiantePage/AgregarEstudiante";
+import Rubrica from "./Pages/EtapasPage/Rubrica";
+
+// Rutas de estudiantes
+import ProyectoEstudiante from "./Pages/EstudiantePage/ProyectoEstudiante";
+import PlanificacionEstudiante from "./Pages/PlanificacionPage/PlanificacionEstudiante";
+import HistoriaUsuario from "./Pages/PlanificacionPage/HistoriaUsuario";
+import PerfilEstudiante from "./Pages/EstudiantePage/PerfilEstudiante";
+import EquipoEstudiante from "./Pages/EstudiantePage/EquipoEstudiante";
+import TareasEstudiante from "./Pages/EstudiantePage/TareasEstudiante";
+
+// Rutas docentes
+import RequerimientosDocente from "./Pages/DocentePage/RequerimientosDocente";
+import PlanillaDeSeguimiento from "./Pages/DocentePage/PlanilaDeSeguimiento";
+import EvaluacionIndividual from "./Pages/EvaluacionesPage/EvaluacionIndividual";
+import EvaluacionGrupoIndividual from "./Pages/EvaluacionesPage/EvaluacionGrupoIndividual";
+import EvaluacionIndividualEstudiante from "./Pages/EvaluacionesPage/EvaluacionIndividualEstudiante";
+import EvaluacionDePares from "./Pages/EvaluacionesPage/EvaluacionDePares";
+import EvaluacionCruzada from "./Pages/EvaluacionesPage/EvaluacionCruzada";
+
+// Rutas de aprobación
+import ApproveAccounts from "./Pages/Auth/ApproveAccounts";
+import ApproveEstudiante from "./Pages/Auth/ApproveEstudiante";
+
+// Rutas de grupos y gestión
+import GrupoEstudiante from "./Pages/GruposPage/GrupoEstudiante";
+import Etapas from "./Pages/EtapasPage/Etapas";
+
+// Componente para manejar rutas no encontradas
 function NotFound() {
     return (
         <div className="notfound-container">
@@ -54,15 +68,16 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+
+                {/* Proyectos */}
                 <Route path="/proyectos" element={<Proyectos />} />
                 <Route path="/grupos/:projectId" element={<Grupos />} />
                 <Route
                     path="/proyectos/:projectId/grupos-estudiante"
                     element={<GrupoEstudiante />}
-                />
-                <Route
-                    path="/requerimientos/:projectId"
-                    element={<RequerimientosDocente />}
                 />
                 <Route
                     path="/proyectos/:projectId/grupos/:groupId/estudiantes"
@@ -76,8 +91,8 @@ function App() {
                     path="/proyectos/:projectId/rubrica/:etapaId"
                     element={<Rubrica />}
                 />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
+
+                {/* Estudiantes */}
                 <Route
                     path="/proyecto-estudiante"
                     element={<ProyectoEstudiante />}
@@ -90,17 +105,10 @@ function App() {
                     path="/historia-usuario/:id"
                     element={<HistoriaUsuario />}
                 />
-                <Route path="/perfil" element={<Perfil />} />
                 <Route
                     path="/perfil-estudiante"
                     element={<PerfilEstudiante />}
                 />
-                <Route path="/approve-accounts" element={<ApproveAccounts />} />
-                <Route
-                    path="/approve-estudiante"
-                    element={<ApproveEstudiante />}
-                />
-                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                     path="/equipo-estudiante"
                     element={<EquipoEstudiante />}
@@ -109,13 +117,15 @@ function App() {
                     path="/tareas-estudiante"
                     element={<TareasEstudiante />}
                 />
+
+                {/* Docentes */}
+                <Route
+                    path="/requerimientos/:projectId"
+                    element={<RequerimientosDocente />}
+                />
                 <Route
                     path="/planilla-seguimiento/:projectId"
                     element={<PlanillaDeSeguimiento />}
-                />
-                <Route
-                    path="/etapas-proyecto/:projectId"
-                    element={<Etapas />}
                 />
                 <Route
                     path="/evaluacion-individual/:projectId"
@@ -129,6 +139,30 @@ function App() {
                     path="/evaluacion-estudiante/:projectId/:examenId/:estudianteId/:etapaId"
                     element={<EvaluacionIndividualEstudiante />}
                 />
+                <Route
+                    path="/evaluacion-de-pares/:projectId"
+                    element={<EvaluacionDePares />}
+                />
+                <Route
+                    path="/evaluacion-cruzada/:projectId"
+                    element={<EvaluacionCruzada />}
+                />
+
+                {/* Aprobación */}
+                <Route path="/approve-accounts" element={<ApproveAccounts />} />
+                <Route
+                    path="/approve-estudiante"
+                    element={<ApproveEstudiante />}
+                />
+                <Route
+                    path="/etapas-proyecto/:projectId"
+                    element={<Etapas />}
+                />
+                <Route
+                    path="/proyectos/:projectId/rubrica/:etapaId"
+                    element={<Rubrica />}
+                />
+                {/* Ruta para páginas no encontradas */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>

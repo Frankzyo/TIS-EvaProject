@@ -222,8 +222,14 @@ class ProyectosController extends Controller
     public function obtenerGruposYFechas($id_proyecto)
     {
         try {
-            $proyecto = Proyectos::with(['grupos.fechasDefensa', 'etapas'])
+            $proyecto = Proyectos::with([
+                'grupos.fechasDefensa',
+                'etapas' => function ($query) {
+                    $query->whereNotIn('ETAPAS_TITULO', ['ev cruz', 'auto ev']);
+                }
+            ])
                 ->findOrFail($id_proyecto);
+
 
             return response()->json($proyecto, 200);
         } catch (\Exception $e) {

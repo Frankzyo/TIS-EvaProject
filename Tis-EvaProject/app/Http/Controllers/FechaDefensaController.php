@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\FechaDefensa;
 use App\Models\GrupoEstudiante;
+use App\Models\Estudiante;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -254,30 +255,30 @@ class FechaDefensaController extends Controller
         ]);
     }
     public function getDefenseDateByGroup($studentId)
-    {
-        try {
-            // Obtener el grupo del estudiante
-            $grupo = GrupoEstudiante::where('ID_ESTUDIANTE', $studentId)->first();
+{
+    try {
+        // Buscar al estudiante
+        $estudiante = Estudiante::find($studentId);
 
-            if (!$grupo) {
-                return response()->json(['error' => 'El estudiante no pertenece a ningún grupo'], 404);
-            }
-
-            // Buscar la fecha de defensa asociada al grupo
-            $fechaDefensa = FechaDefensa::where('ID_GRUPO', $grupo->ID_GRUPO)->first();
-
-            if (!$fechaDefensa) {
-                return response()->json(['error' => 'No se encontró una fecha de defensa para el grupo'], 404);
-            }
-
-            return response()->json([
-                'day' => $fechaDefensa->day,
-                'HR_INIDEF' => Carbon::parse($fechaDefensa->HR_INIDEF)->format('H:i'),
-                'HR_FINDEF' => Carbon::parse($fechaDefensa->HR_FINDEF)->format('H:i'),
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error("Error al obtener la fecha de defensa del grupo: " . $e->getMessage());
-            return response()->json(['error' => 'Error al obtener la fecha de defensa del grupo'], 500);
+        if (!$estudiante || !$estudiante->ID_GRUPO) {
+            return response()->json(['error' => 'El estudiante no pertenece a ningún grupo'], 404);
         }
+
+        // Buscar la fecha de defensa asociada al grupo
+        $fechaDefensa = FechaDefensa::where('ID_GRUPO', $estudiante->ID_GRUPO)->first();
+
+        if (!$fechaDefensa) {
+            return response()->json(['error' => 'No se encontró una fecha de defensa para el grupo'], 404);
+        }
+
+        return response()->json([
+            'day' => $fechaDefensa->day,
+            'HR_INIDEF' => Carbon::parse($fechaDefensa->HR_INIDEF)->format('H:i'),
+            'HR_FINDEF' => Carbon::parse($fechaDefensa->HR_FINDEF)->format('H:i'),
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error("Error al obtener la fecha de defensa del grupo: " . $e->getMessage());
+        return response()->json(['error' => 'Error al obtener la fecha de defensa del grupo'], 500);
     }
+}
 }

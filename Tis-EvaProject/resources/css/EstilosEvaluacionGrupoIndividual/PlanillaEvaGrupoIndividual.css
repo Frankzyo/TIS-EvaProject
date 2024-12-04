@@ -1,0 +1,32 @@
+.planilla-eva-grupo-container {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.planilla-eva-grupo-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.planilla-eva-grupo-table th,
+.planilla-eva-grupo-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.planilla-eva-grupo-table th {
+    background-color: #f0f0f0;
+}
+
+.planilla-eva-grupo-table tr:nth-child(even) {
+    background-color: #fdfdfd;
+}
+
+.planilla-eva-grupo-table tr:nth-child(odd) {
+    background-color: #f7f7f7;
+}

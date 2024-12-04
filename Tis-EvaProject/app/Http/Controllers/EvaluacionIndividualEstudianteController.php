@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\EvaluacionIndividualEstudiante;
 use App\Models\NotaRubrica;
 use App\Models\NotaCriterio;
+use App\Models\Rubrica;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EvaluacionIndividualEstudianteController extends Controller
 {
@@ -133,6 +135,9 @@ class EvaluacionIndividualEstudianteController extends Controller
 
     private function calcularPuntuacionAjustada($puntuacion, $pesoCriterio, $pesoRubrica, $pesoRubricaAjustado, $maxPuntos)
     {
+        if ($pesoCriterio <= 0 || $pesoRubrica <= 0 || $maxPuntos <= 0) {
+            return 0; // Retornar 0 si alguno de los valores no es válido
+        }
         $pesoCriterioAjustado = ($pesoCriterio / $pesoRubrica) * $pesoRubricaAjustado;
         return ($puntuacion / $maxPuntos) * $pesoCriterioAjustado;
     }
@@ -140,39 +145,82 @@ class EvaluacionIndividualEstudianteController extends Controller
     public function show($idEstudiante, $idEtapa)
     {
         try {
+            // Obtener todas las rúbricas asociadas a la etapa
+            $rubricas = Rubrica::where('ID_ETAPA', $idEtapa)
+                ->with(['criterios.niveles'])
+                ->get();
+
             // Obtener la evaluación individual
             $evaluacion = EvaluacionIndividualEstudiante::with('notasRubricas.notasCriterios')
                 ->where('ID_ESTUDIANTE', $idEstudiante)
                 ->where('ID_ETAPA', $idEtapa)
                 ->first();
 
-            // Validar si la evaluación existe
+            // Si no existe evaluación, devolver solo las rúbricas con criterios y niveles
             if (!$evaluacion) {
                 return response()->json([
-                    'message' => 'Evaluación no encontrada para el estudiante y la etapa especificada.'
-                ], 404);
+                    'message' => 'El estudiante aún no tiene evaluación registrada para esta etapa.',
+                    'notas_rubricas' => $rubricas->map(function ($rubrica) {
+                        return [
+                            'ID_RUBRICA' => $rubrica->ID_RUBRICA,
+                            'NOMBRE_RUBRICA' => $rubrica->NOMBRE_RUBRICA,
+                            'PESO_RUBRICA' => $rubrica->PESO_RUBRICA,
+                            'criterios' => $rubrica->criterios->map(function ($criterio) {
+                                return [
+                                    'ID_CRITERIO' => $criterio->ID_CRITERIO,
+                                    'NOMBRE_CRITERIO' => $criterio->NOMBRE_CRITERIO,
+                                    'DESCRIPCION_CRITERIO' => $criterio->DESCRIPCION_CRITERIO,
+                                    'PESO_CRITERIO' => $criterio->PESO_CRITERIO,
+                                    'PUNTUACION_NO_AJUSTADA' => null, // Nota aún no asignada
+                                    'niveles' => $criterio->niveles->map(function ($nivel) {
+                                        return [
+                                            'ID_NIVEL' => $nivel->ID_NIVEL,
+                                            'TITULO_NIVEL' => $nivel->TITULO_NIVEL,
+                                            'PUNTOS' => $nivel->PUNTOS,
+                                        ];
+                                    }),
+                                ];
+                            }),
+                        ];
+                    }),
+                ], 200);
             }
 
-            // Construir la respuesta con las rúbricas y criterios
-            $notasRubricas = $evaluacion->notasRubricas->map(function ($notaRubrica) {
+            // Construir las rúbricas combinando las existentes y las asociadas sin notas
+            $notasRubricas = $rubricas->map(function ($rubrica) use ($evaluacion) {
+                $notaRubrica = $evaluacion->notasRubricas->firstWhere('ID_RUBRICA', $rubrica->ID_RUBRICA);
+
                 return [
-                    'ID_RUBRICA' => $notaRubrica->ID_RUBRICA,
-                    'NOMBRE_RUBRICA' => $notaRubrica->rubrica->NOMBRE_RUBRICA ?? 'Sin Nombre',
-                    'PUNTUACION_OBTENIDA' => $notaRubrica->PUNTUACION_OBTENIDA,
-                    'PUNTUACION_NO_AJUSTADA' => $notaRubrica->PUNTUACION_NO_AJUSTADA,
-                    'PESO_RUBRICA' => $notaRubrica->rubrica->PESO_RUBRICA ?? 0,
-                    'criterios' => $notaRubrica->notasCriterios->map(function ($notaCriterio) {
+                    'ID_RUBRICA' => $rubrica->ID_RUBRICA,
+                    'NOMBRE_RUBRICA' => $rubrica->NOMBRE_RUBRICA,
+                    'PESO_RUBRICA' => $rubrica->PESO_RUBRICA,
+                    'PUNTUACION_NO_AJUSTADA' => $notaRubrica->PUNTUACION_NO_AJUSTADA ?? null,
+                    'PUNTUACION_OBTENIDA' => $notaRubrica->PUNTUACION_OBTENIDA ?? null,
+                    'criterios' => $rubrica->criterios->map(function ($criterio) use ($notaRubrica) {
+                        $notaCriterio = $notaRubrica
+                            ? $notaRubrica->notasCriterios->firstWhere('ID_CRITERIO', $criterio->ID_CRITERIO)
+                            : null;
+
                         return [
-                            'ID_CRITERIO' => $notaCriterio->ID_CRITERIO,
-                            'NOMBRE_CRITERIO' => $notaCriterio->criterio->NOMBRE_CRITERIO ?? 'Sin Nombre',
-                            'PESO_CRITERIO' => $notaCriterio->criterio->PESO_CRITERIO ?? 0,
-                            'PUNTUACION_OBTENIDA' => $notaCriterio->PUNTUACION_OBTENIDA,
-                            'PUNTUACION_NO_AJUSTADA' => $notaCriterio->PUNTUACION_NO_AJUSTADA,
+                            'ID_CRITERIO' => $criterio->ID_CRITERIO,
+                            'NOMBRE_CRITERIO' => $criterio->NOMBRE_CRITERIO,
+                            'DESCRIPCION_CRITERIO' => $criterio->DESCRIPCION_CRITERIO,
+                            'PESO_CRITERIO' => $criterio->PESO_CRITERIO,
+                            'PUNTUACION_NO_AJUSTADA' => $notaCriterio->PUNTUACION_NO_AJUSTADA ?? null,
+                            'PUNTUACION_OBTENIDA' => $notaCriterio->PUNTUACION_OBTENIDA ?? null,
+                            'niveles' => $criterio->niveles->map(function ($nivel) {
+                                return [
+                                    'ID_NIVEL' => $nivel->ID_NIVEL,
+                                    'TITULO_NIVEL' => $nivel->TITULO_NIVEL,
+                                    'PUNTOS' => $nivel->PUNTOS,
+                                ];
+                            }),
                         ];
                     }),
                 ];
             });
 
+            // Devolver rúbricas combinadas con las notas de la evaluación
             return response()->json([
                 'ID_EVALUACION' => $evaluacion->ID_EVALUACION_INDIVIDUAL,
                 'FECHA_REVISION' => $evaluacion->FECHA_REVISION,
@@ -186,122 +234,253 @@ class EvaluacionIndividualEstudianteController extends Controller
         }
     }
 
+
     public function update(Request $request, $idEvaluacion)
-{
-    try {
-        // Validación de los datos
-        $validatedData = $request->validate([
-            'FECHA_REVISION' => 'nullable|date',
-            'rubricas' => 'required|array|min:1',
-            'rubricas.*.ID_RUBRICA' => 'required|exists:rubricas,ID_RUBRICA',
-            'rubricas.*.criterios' => 'required|array|min:1',
-            'rubricas.*.criterios.*.ID_CRITERIO' => 'required|exists:criterios,ID_CRITERIO',
-            'rubricas.*.criterios.*.PUNTUACION_SIN_AJUSTAR' => 'required|numeric|min:0',
-        ]);
+    {
+        try {
+            // Iniciar el registro de logs para depuración
+            Log::info('Inicio de actualización de evaluación:', ['id' => $idEvaluacion]);
 
-        // Buscar la evaluación
-        $evaluacion = EvaluacionIndividualEstudiante::find($idEvaluacion);
-
-        if (!$evaluacion) {
-            return response()->json(['message' => 'Evaluación no encontrada.'], 404);
-        }
-
-        DB::beginTransaction();
-
-        // Actualizar la fecha de revisión si está presente
-        if (isset($validatedData['FECHA_REVISION'])) {
-            $evaluacion->update(['FECHA_REVISION' => $validatedData['FECHA_REVISION']]);
-        }
-
-        $totalPuntajeAjustado = 0;
-        $totalPuntajeSinAjustar = 0;
-
-        // Obtener la puntuación máxima de la etapa
-        $etapaPuntajeTotal = DB::table('etapas')
-            ->where('ID_ETAPA', $evaluacion->ID_ETAPA)
-            ->value('ETAPAS_PUNTUACION');
-
-        foreach ($validatedData['rubricas'] as $rubricaData) {
-            $notaRubrica = NotaRubrica::where('ID_EVALUACION_INDIVIDUAL', $idEvaluacion)
-                ->where('ID_RUBRICA', $rubricaData['ID_RUBRICA'])
-                ->first();
-
-            if (!$notaRubrica) {
-                return response()->json([
-                    'message' => 'Rúbrica no encontrada en la evaluación.',
-                    'rubrica_id' => $rubricaData['ID_RUBRICA'],
-                ], 404);
-            }
-
-            $puntajeRubricaAjustada = 0;
-            $puntajeRubricaSinAjustar = 0;
-
-            foreach ($rubricaData['criterios'] as $criterioData) {
-                $notaCriterio = NotaCriterio::where('ID_NOTA_RUBRICA', $notaRubrica->ID_NOTA_RUBRICA)
-                    ->where('ID_CRITERIO', $criterioData['ID_CRITERIO'])
-                    ->first();
-
-                if (!$notaCriterio) {
-                    return response()->json([
-                        'message' => 'Criterio no encontrado en la rúbrica.',
-                        'criterio_id' => $criterioData['ID_CRITERIO'],
-                    ], 404);
-                }
-
-                // Obtener los niveles y su puntaje máximo
-                $niveles = DB::table('niveles')
-                    ->where('ID_CRITERIO', $criterioData['ID_CRITERIO'])
-                    ->pluck('PUNTOS');
-                $maxPuntos = $niveles->max();
-
-                // Calcular la puntuación ajustada
-                $puntuacionAjustada = $this->calcularPuntuacionAjustada(
-                    $criterioData['PUNTUACION_SIN_AJUSTAR'],
-                    $notaCriterio->criterio->PESO_CRITERIO ?? 0,
-                    $notaRubrica->rubrica->PESO_RUBRICA ?? 0,
-                    ($notaRubrica->rubrica->PESO_RUBRICA / 100) * $etapaPuntajeTotal,
-                    $maxPuntos
-                );
-
-                // Actualizar la nota del criterio
-                $notaCriterio->update([
-                    'PUNTUACION_OBTENIDA' => $puntuacionAjustada,
-                    'PUNTUACION_NO_AJUSTADA' => $criterioData['PUNTUACION_SIN_AJUSTAR'],
-                ]);
-
-                $puntajeRubricaAjustada += $puntuacionAjustada;
-                $puntajeRubricaSinAjustar += $criterioData['PUNTUACION_SIN_AJUSTAR'];
-            }
-
-            // Actualizar la nota de la rúbrica
-            $notaRubrica->update([
-                'PUNTUACION_OBTENIDA' => $puntajeRubricaAjustada,
-                'PUNTUACION_NO_AJUSTADA' => $puntajeRubricaSinAjustar,
+            // Validar los datos enviados
+            $validatedData = $request->validate([
+                'FECHA_REVISION' => 'nullable|date',
+                'rubricas' => 'required|array|min:1',
+                'rubricas.*.ID_RUBRICA' => 'required|exists:rubricas,ID_RUBRICA',
+                'rubricas.*.criterios' => 'required|array|min:1',
+                'rubricas.*.criterios.*.ID_CRITERIO' => 'required|exists:criterios,ID_CRITERIO',
+                'rubricas.*.criterios.*.PUNTUACION_SIN_AJUSTAR' => 'required|numeric|min:0',
             ]);
 
-            $totalPuntajeAjustado += $puntajeRubricaAjustada;
-            $totalPuntajeSinAjustar += $puntajeRubricaSinAjustar;
+            Log::info('Datos validados:', $validatedData);
+
+            // Buscar la evaluación en la base de datos
+            $evaluacion = EvaluacionIndividualEstudiante::find($idEvaluacion);
+
+            if (!$evaluacion) {
+                Log::warning('Evaluación no encontrada:', ['id' => $idEvaluacion]);
+                return response()->json(['message' => 'Evaluación no encontrada.'], 404);
+            }
+
+            Log::info('Estado de la evaluación antes de actualizar:', $evaluacion->toArray());
+
+            // Bloquear evaluación si el estudiante tiene falta asignada
+            if ($evaluacion->FALTA) {
+                Log::warning('Intento de evaluar a un estudiante con falta asignada.', ['id' => $idEvaluacion]);
+                return response()->json([
+                    'message' => 'No se puede evaluar a un estudiante con falta asignada.'
+                ], 400);
+            }
+
+            // Iniciar transacción
+            DB::beginTransaction();
+
+            // Actualizar la fecha de revisión si se proporciona
+            if (isset($validatedData['FECHA_REVISION'])) {
+                $evaluacion->update(['FECHA_REVISION' => $validatedData['FECHA_REVISION']]);
+                Log::info('Fecha de revisión actualizada:', ['FECHA_REVISION' => $validatedData['FECHA_REVISION']]);
+            }
+
+            $totalPuntajeAjustado = 0;
+            $totalPuntajeSinAjustar = 0;
+
+            // Obtener la puntuación máxima de la etapa
+            $etapaPuntajeTotal = DB::table('etapas')
+                ->where('ID_ETAPA', $evaluacion->ID_ETAPA)
+                ->value('ETAPAS_PUNTUACION');
+
+            if (!$etapaPuntajeTotal || $etapaPuntajeTotal <= 0) {
+                Log::error('Puntuación total de la etapa no válida.', ['ID_ETAPA' => $evaluacion->ID_ETAPA]);
+                return response()->json(['message' => 'Puntuación total de la etapa no válida.'], 400);
+            }
+
+            // Procesar cada rúbrica y criterio
+            foreach ($validatedData['rubricas'] as $rubricaData) {
+                // Intentar encontrar la rúbrica asociada a la evaluación
+                $notaRubrica = NotaRubrica::firstOrCreate(
+                    [
+                        'ID_EVALUACION_INDIVIDUAL' => $idEvaluacion,
+                        'ID_RUBRICA' => $rubricaData['ID_RUBRICA'],
+                    ],
+                    [
+                        'PUNTUACION_OBTENIDA' => 0,
+                        'PUNTUACION_NO_AJUSTADA' => 0,
+                    ]
+                );
+
+                if (!$notaRubrica) {
+                    Log::warning('No se pudo crear o encontrar la rúbrica.', ['ID_RUBRICA' => $rubricaData['ID_RUBRICA']]);
+                    continue;
+                }
+
+                $puntajeRubricaAjustada = 0;
+                $puntajeRubricaSinAjustar = 0;
+
+                foreach ($rubricaData['criterios'] as $criterioData) {
+                    // Intentar encontrar o crear la nota del criterio
+                    $notaCriterio = NotaCriterio::firstOrCreate(
+                        [
+                            'ID_NOTA_RUBRICA' => $notaRubrica->ID_NOTA_RUBRICA,
+                            'ID_CRITERIO' => $criterioData['ID_CRITERIO'],
+                        ],
+                        [
+                            'PUNTUACION_OBTENIDA' => 0,
+                            'PUNTUACION_NO_AJUSTADA' => 0,
+                        ]
+                    );
+
+                    // Obtener los niveles y su puntaje máximo
+                    $niveles = DB::table('niveles')
+                        ->where('ID_CRITERIO', $criterioData['ID_CRITERIO'])
+                        ->pluck('PUNTOS');
+                    $maxPuntos = $niveles->max();
+
+                    if (!$maxPuntos || $maxPuntos <= 0) {
+                        Log::error('Puntaje máximo no válido para el criterio.', ['ID_CRITERIO' => $criterioData['ID_CRITERIO']]);
+                        return response()->json(['message' => 'Puntaje máximo no válido para el criterio.'], 400);
+                    }
+
+                    // Calcular la puntuación ajustada
+                    $puntuacionAjustada = $this->calcularPuntuacionAjustada(
+                        $criterioData['PUNTUACION_SIN_AJUSTAR'],
+                        $notaCriterio->criterio->PESO_CRITERIO ?? 0,
+                        $notaRubrica->rubrica->PESO_RUBRICA ?? 0,
+                        ($notaRubrica->rubrica->PESO_RUBRICA / 100) * $etapaPuntajeTotal,
+                        $maxPuntos
+                    );
+
+                    // Actualizar la nota del criterio
+                    $notaCriterio->update([
+                        'PUNTUACION_OBTENIDA' => $puntuacionAjustada,
+                        'PUNTUACION_NO_AJUSTADA' => $criterioData['PUNTUACION_SIN_AJUSTAR'],
+                    ]);
+
+                    $puntajeRubricaAjustada += $puntuacionAjustada;
+                    $puntajeRubricaSinAjustar += $criterioData['PUNTUACION_SIN_AJUSTAR'];
+                }
+
+                // Actualizar la nota de la rúbrica
+                $notaRubrica->update([
+                    'PUNTUACION_OBTENIDA' => $puntajeRubricaAjustada,
+                    'PUNTUACION_NO_AJUSTADA' => $puntajeRubricaSinAjustar,
+                ]);
+
+                $totalPuntajeAjustado += $puntajeRubricaAjustada;
+                $totalPuntajeSinAjustar += $puntajeRubricaSinAjustar;
+            }
+
+            // Actualizar la evaluación con las nuevas puntuaciones totales
+            $evaluacion->update([
+                'PUNTUACION_TOTAL' => $totalPuntajeAjustado,
+                'PUNTUACION_NO_AJUSTADA' => $totalPuntajeSinAjustar,
+            ]);
+
+            DB::commit();
+
+            Log::info('Evaluación actualizada exitosamente:', $evaluacion->toArray());
+
+            return response()->json([
+                'message' => 'Evaluación actualizada correctamente.',
+                'data' => $evaluacion->load(['notasRubricas.notasCriterios']),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar la evaluación:', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Ocurrió un error al actualizar la evaluación.'], 500);
         }
-
-        // Actualizar la evaluación con las nuevas puntuaciones totales
-        $evaluacion->update([
-            'PUNTUACION_TOTAL' => $totalPuntajeAjustado,
-            'PUNTUACION_NO_AJUSTADA' => $totalPuntajeSinAjustar,
-        ]);
-
-        DB::commit();
-
-        return response()->json([
-            'message' => 'Evaluación actualizada correctamente.',
-            'data' => $evaluacion->load(['notasRubricas.notasCriterios']),
-        ], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Ocurrió un error al actualizar la evaluación.',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 
+    public function actualizarFaltaRetraso(Request $request, $idEstudiante, $idEtapa)
+    {
+        try {
+            // Validar los datos enviados
+            $validatedData = $request->validate([
+                'FALTA' => 'required|boolean',
+                'RETRASO' => 'required|boolean',
+            ]);
+
+            // Obtener el grupo del estudiante desde la tabla correcta
+            $grupo = DB::table('estudiante') // Cambiado de 'estudiantes' a 'estudiante'
+                ->where('ID_EST', $idEstudiante)
+                ->value('ID_GRUPO');
+
+            if (!$grupo) {
+                return response()->json([
+                    'message' => 'El estudiante no pertenece a un grupo, no se puede crear la evaluación.',
+                ], 422);
+            }
+
+            // Verificar si ya existe una evaluación para este estudiante y etapa
+            $evaluacion = EvaluacionIndividualEstudiante::where('ID_ESTUDIANTE', $idEstudiante)
+                ->where('ID_ETAPA', $idEtapa)
+                ->first();
+
+            if ($evaluacion) {
+                // Actualizar la evaluación existente
+                $evaluacion->update([
+                    'FALTA' => $validatedData['FALTA'],
+                    'RETRASO' => $validatedData['RETRASO'],
+                ]);
+
+                $message = 'Datos de falta y retraso actualizados correctamente.';
+            } else {
+                // Crear una nueva evaluación para el estudiante
+                $evaluacion = EvaluacionIndividualEstudiante::create([
+                    'ID_ESTUDIANTE' => $idEstudiante,
+                    'ID_ETAPA' => $idEtapa,
+                    'ID_GRUPO' => $grupo,
+                    'FECHA_REVISION' => now(),
+                    'FALTA' => $validatedData['FALTA'],
+                    'RETRASO' => $validatedData['RETRASO'],
+                    'PUNTUACION_TOTAL' => 0,
+                    'PUNTUACION_NO_AJUSTADA' => 0,
+                ]);
+
+                $message = 'Evaluación creada y datos de falta y retraso asignados correctamente.';
+            }
+
+            // Respuesta exitosa
+            return response()->json([
+                'message' => $message,
+                'data' => $evaluacion,
+            ], 200);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Manejo de errores de consulta
+            return response()->json([
+                'message' => 'Error al procesar la solicitud.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Manejo de errores de validación
+            return response()->json([
+                'message' => 'Error en los datos enviados.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            // Manejo de errores generales
+            return response()->json([
+                'message' => 'Error al procesar la solicitud.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function obtenerFaltaRetrasoPorGrupo($idGrupo, $idEtapa)
+    {
+        try {
+            // Obtener todas las evaluaciones para los estudiantes del grupo y etapa
+            $evaluaciones = EvaluacionIndividualEstudiante::where('ID_GRUPO', $idGrupo)
+                ->where('ID_ETAPA', $idEtapa)
+                ->get(['ID_ESTUDIANTE', 'FALTA', 'RETRASO']);
+
+            return response()->json([
+                'message' => 'Estados de falta y retraso obtenidos correctamente.',
+                'data' => $evaluaciones,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los estados de falta y retraso.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

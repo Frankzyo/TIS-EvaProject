@@ -169,6 +169,9 @@ Route::prefix('api')->group(function () {
 
     Route::post('/evaluaciones-individuales-estudiantes', [EvaluacionIndividualEstudianteController::class, 'store']);
     Route::get('/evaluaciones/{estudianteId}/{etapaId}', [EvaluacionIndividualEstudianteController::class, 'show']);
+    Route::put('/evaluaciones-individuales-estudiantes/{id}', [EvaluacionIndividualEstudianteController::class, 'update']);
+    Route::put('/evaluaciones-individuales/{idEstudiante}/{idEtapa}/falta-retraso', [EvaluacionIndividualEstudianteController::class, 'actualizarFaltaRetraso']);
+    Route::get('/evaluaciones-individuales/{idGrupo}/{idEtapa}/falta-retraso', [EvaluacionIndividualEstudianteController::class, 'obtenerFaltaRetrasoPorGrupo']);
 
 });
 

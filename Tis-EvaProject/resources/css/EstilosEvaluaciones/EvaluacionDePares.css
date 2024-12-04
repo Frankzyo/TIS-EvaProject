@@ -1,0 +1,11 @@
+.evaluacion-pares-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido de la barra lateral y del contenedor principal */
+.evaluacion-pares-sidebar-content {
+    display: flex;
+    height: 100%;
+}

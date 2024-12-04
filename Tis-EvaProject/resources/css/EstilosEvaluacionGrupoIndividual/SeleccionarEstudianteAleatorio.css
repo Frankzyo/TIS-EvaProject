@@ -1,0 +1,107 @@
+/* Contenedor principal */
+.seleccionar-estudiante-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Botón para seleccionar aleatorio */
+.seleccionar-estudiante-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.seleccionar-estudiante-btn:hover:enabled {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.seleccionar-estudiante-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Contenedor de la ruleta */
+.ruleta-container {
+    margin-top: 20px;
+    width: 300px;
+    height: 300px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/* Ruleta con la animación */
+.ruleta {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 10px solid #007bff;
+    display: flex;
+    position: absolute;
+    transition: transform 3s ease-out;
+    transform-origin: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Secciones de la ruleta */
+.seccion-ruleta {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    transform-origin: center center;
+    padding: 10px;
+}
+
+.seccion-ruleta span {
+    font-size: 12px;
+    color: #333;
+}
+
+/* Animación de giro de la ruleta */
+.girando {
+    animation: girar 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
+}
+
+@keyframes girar {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Título de estudiante seleccionado */
+.seleccionar-estudiante-titulo {
+    margin-top: 30px;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Datos del estudiante seleccionado */
+.seleccionar-estudiante-datos {
+    font-size: 16px;
+    color: #007bff;
+    margin-top: 10px;
+}
+
+/* Mensaje cuando no se ha seleccionado ningún estudiante */
+.seleccionar-estudiante-mensaje {
+    font-size: 16px;
+    color: #666;
+    margin-top: 10px;
+}

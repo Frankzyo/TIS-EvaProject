@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../../../css/ComponentsRubrica/NewRubricaModal.css";
+import "../../../css/EstilosRubrica/NewRubricaModal.css";
 import axios from "axios";
 
 const NewRubricaModal = ({
@@ -34,18 +34,21 @@ const NewRubricaModal = ({
                     })),
                 })) || []
             );
-    
+
             // Log para mostrar los IDs de criterio y nivel
-            const criterioIds = rubrica.criterios?.map((criterio) => criterio.ID_CRITERIO) || [];
-            const nivelIds = rubrica.criterios?.flatMap((criterio) => 
-                criterio.niveles?.map((nivel) => nivel.ID_NIVEL) || []
-            ) || [];
-    
+            const criterioIds =
+                rubrica.criterios?.map((criterio) => criterio.ID_CRITERIO) ||
+                [];
+            const nivelIds =
+                rubrica.criterios?.flatMap(
+                    (criterio) =>
+                        criterio.niveles?.map((nivel) => nivel.ID_NIVEL) || []
+                ) || [];
+
             console.log("Criterio IDs:", criterioIds);
             console.log("Nivel IDs:", nivelIds);
         }
     }, [isEditMode, rubrica]);
-    
 
     const addCriterio = () => {
         setCriterios([
@@ -74,22 +77,25 @@ const NewRubricaModal = ({
             setError("El título de la rúbrica es obligatorio.");
             return;
         }
-    
+
         const newCriterios = criterios.map((criterio, criterioIndex) => {
             const maxPuntaje = Math.max(
                 ...criterio.niveles.map((nivel) => Number(nivel.puntos || 0))
             );
-    
+
             // Console para verificar el ID de cada criterio
-            console.log(`Criterio ${criterioIndex} - ID_CRITERIO:`, criterio.id);
-    
+            console.log(
+                `Criterio ${criterioIndex} - ID_CRITERIO:`,
+                criterio.id
+            );
+
             const niveles = criterio.niveles.map((nivel, nivelIndex) => {
                 // Console para verificar el ID de cada nivel
                 console.log(
                     `Criterio ${criterioIndex} - Nivel ${nivelIndex} - ID_NIVEL:`,
                     nivel.id
                 );
-    
+
                 return {
                     id: nivel.id, // Esto mantiene el ID existente del nivel
                     puntos: nivel.puntos,
@@ -97,7 +103,7 @@ const NewRubricaModal = ({
                     descripcion: nivel.descripcion,
                 };
             });
-    
+
             return {
                 id: criterio.id, // Esto mantiene el ID existente del criterio
                 titulo: criterio.titulo,
@@ -106,7 +112,7 @@ const NewRubricaModal = ({
                 niveles,
             };
         });
-    
+
         const newRubrica = {
             titulo,
             descripcion,
@@ -114,10 +120,10 @@ const NewRubricaModal = ({
             projectId,
             etapaId,
         };
-    
+
         console.log("isEditMode:", isEditMode);
         console.log("rubrica.ID_RUBRICA:", rubrica?.ID_RUBRICA);
-    
+
         try {
             if (isEditMode && rubrica && rubrica.ID_RUBRICA) {
                 console.log("ID de la rúbrica:", rubrica.ID_RUBRICA);
@@ -131,7 +137,7 @@ const NewRubricaModal = ({
                     newRubrica
                 );
             }
-    
+
             onSave(newRubrica);
             onClose();
         } catch (error) {
@@ -141,7 +147,7 @@ const NewRubricaModal = ({
             );
         }
     };
-    
+
     const handleDelete = async () => {
         if (!isEditMode || !rubrica.id) return;
 
@@ -223,7 +229,9 @@ const NewRubricaModal = ({
     return (
         <div className="rubrica-modal-overlay">
             <div className="rubrica-modal-content">
-                <h3 className="etapa-modal-title">{isEditMode ? "Editar Rúbrica" : "Nueva Rúbrica"}</h3>
+                <h3 className="etapa-modal-title">
+                    {isEditMode ? "Editar Rúbrica" : "Nueva Rúbrica"}
+                </h3>
                 <label className="etapa-label">Título de la Rúbrica:</label>
                 <input
                     type="text"
@@ -232,7 +240,9 @@ const NewRubricaModal = ({
                     className="rubrica-modal-input"
                     placeholder="Ingrese el título de la rubrica"
                 />
-                <label className="etapa-label">Descripción de la Rúbrica:</label>
+                <label className="etapa-label">
+                    Descripción de la Rúbrica:
+                </label>
                 <textarea
                     value={descripcion}
                     onChange={(e) => setDescripcion(e.target.value)}

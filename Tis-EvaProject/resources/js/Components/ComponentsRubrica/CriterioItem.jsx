@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import NivelItem from "./NivelItem";
-import "../../../css/ComponentsRubrica/CriterioItem.css";
+import "../../../css/EstilosRubrica/CriterioItem.css";
 
 const CriterioItem = ({ criterio }) => {
     const [isExpanded, setIsExpanded] = useState(false);

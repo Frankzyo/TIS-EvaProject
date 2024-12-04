@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import HeaderProyecto from "../Components/HeaderProyecto";
-import ModalError from "../Components/ModalError";
-import ModalConfirmacion from "../Components/ModalConfirmacion";
-import ModalMensajeExito from "../Components/ModalMensajeExito";
+import HeaderProyecto from "../Components/ComponenteHeader/HeaderProyecto";
+import ModalError from "../Components/ComponenteModal/ModalError";
+import ModalConfirmacion from "../Components/ComponenteModal/ModalConfirmacion";
+import ModalMensajeExito from "../Components/ComponenteModal/ModalMensajeExito";
 import "../../css/Perfil.css";
 
 const Perfil = () => {

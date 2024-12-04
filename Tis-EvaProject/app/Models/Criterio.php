@@ -30,4 +30,8 @@ class Criterio extends Model
     {
         return $this->hasMany(Nivel::class, 'ID_CRITERIO', 'ID_CRITERIO');
     }
+    public function notasCriterios()
+    {
+        return $this->hasMany(NotaCriterio::class, 'ID_CRITERIO', 'ID_CRITERIO');
+    }
 }
