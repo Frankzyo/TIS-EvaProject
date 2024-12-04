@@ -56,7 +56,7 @@ const Grupos = () => {
     useEffect(() => {
         const obtenerGrupos = async () => {
             const response = await axios.get(
-                `http://localhost:8000/api/proyectos/${projectId}/grupos`,
+                `http://localhost:8000/api/proyectos/${projectId}/grupos-hora`,
                 { withCredentials: true }
             );
             setGroups(response.data.grupos);
@@ -298,6 +298,7 @@ const Grupos = () => {
                     </div>
                     <div className="defense-days-list">
                         {Array.isArray(defenseDays) &&
+                        defenseDays.length > 0 ? (
                             defenseDays.map((defense, index) => (
                                 <div key={index} className="defense-day-item">
                                     <div className="defense-day-info">
@@ -340,51 +341,53 @@ const Grupos = () => {
                                         </button>
                                     </div>
                                 </div>
-                            ))}
+                            ))
+                        ) : (
+                            <p className="no-data-message">
+                                No hay días de defensa registrados.
+                            </p>
+                        )}
                     </div>
-
                     <div className="projects-header">
                         <h2>Grupo Empresas</h2>
                     </div>
                     <div className="project-list">
-                        {groups.map((group, index) => (
-                            <div key={index} className="project-item">
-                                {group.PORTADA_GRUPO ? (
-                                    <img
-                                        src={`http://localhost:8000/storage/${group.PORTADA_GRUPO}`}
-                                        alt="Icono del grupo"
-                                        width="50"
-                                        height="50"
-                                    />
-                                ) : (
-                                    <div className="project-info requerimientos-list">
-                                        <div className="requirement-text-container">
-                                            <span
-                                                className="requirement-description"
-                                                dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        requirement.DESCRIPCION_REQ ||
-                                                        "Descripción del requerimiento",
-                                                }}
-                                            ></span>
-                                        </div>
+                        {groups.length > 0 ? (
+                            groups.map((group, index) => (
+                                <div key={index} className="project-item">
+                                    {group.PORTADA_GRUPO ? (
+                                        <img
+                                            src={`http://localhost:8000/storage/${group.PORTADA_GRUPO}`}
+                                            alt="Icono del grupo"
+                                            width="50"
+                                            height="50"
+                                        />
+                                    ) : (
+                                        <img
+                                            src="https://via.placeholder.com/50"
+                                            alt="Icono del grupo"
+                                        />
+                                    )}
+                                    <div className="project-info">
+                                        <h3
+                                            onClick={() =>
+                                                navigate(
+                                                    `/proyectos/${projectId}/grupos/${group.ID_GRUPO}/estudiantes`
+                                                )
+                                            }
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {group.NOMBRE_GRUPO}
+                                        </h3>
+                                        <p>{group.DESCRIP_GRUPO}</p>
                                     </div>
-                                )}
-                                <div className="project-info">
-                                    <h3
-                                        onClick={() =>
-                                            navigate(
-                                                `/proyectos/${projectId}/grupos/${group.ID_GRUPO}/estudiantes`
-                                            )
-                                        }
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {group.NOMBRE_GRUPO}
-                                    </h3>
-                                    <p>{group.DESCRIP_GRUPO}</p>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="no-data-message">
+                                No hay grupos registrados.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

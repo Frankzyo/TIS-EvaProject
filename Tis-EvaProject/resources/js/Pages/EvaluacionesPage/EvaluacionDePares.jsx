@@ -6,24 +6,24 @@ import "../../../css/EstilosHeader/HeaderProyecto.css";
 import "../../../css/EstilosSidebar/SidebarPrueba.css";
 import "../../../css/EstilosEvaluaciones/EvaluacionDePares.css";
 import axios from "axios";
+import ModalNuevaEvaluacion from "../../Components/ComponentsEvaluacionDePares/ModalNuevaEvaluacion";
 
 const EvaluacionDePares = () => {
     const { projectId } = useParams();
-    const navigate = useNavigate();
+
     const [projectDetails, setProjectDetails] = useState({});
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [grupos, setGrupos] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [nuevaEvaluacion, setNuevaEvaluacion] = useState({
-        grupoEvaluado: "",
-        fechaEvaluacion: "",
-    });
-    const [fechaDefensa, setFechaDefensa] = useState({ dia: "", hora: "" });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                setIsLoading(true);
+
                 const [projectResponse, gruposResponse, evaluacionesResponse] =
                     await Promise.all([
                         axios.get(
@@ -42,86 +42,68 @@ const EvaluacionDePares = () => {
 
                 setProjectDetails(projectResponse.data);
                 setGrupos(gruposResponse.data.grupos || []);
-                setEvaluaciones(evaluacionesResponse.data || []);
-
-                console.log(
-                    "Datos de grupos cargados:",
-                    gruposResponse.data.grupos
+                setEvaluaciones(
+                    Array.isArray(evaluacionesResponse.data.evaluaciones)
+                        ? evaluacionesResponse.data.evaluaciones
+                        : []
                 );
-                console.log(
-                    "Datos de evaluaciones cargadas:",
-                    evaluacionesResponse.data
-                );
-            } catch (error) {
-                console.error("Error al obtener los datos:", error);
+            } catch (err) {
+                if (err.response) {
+                    console.error("Error del servidor:", err.response.data);
+                    setError(
+                        err.response.data.message ||
+                            "Error desconocido en el servidor"
+                    );
+                } else {
+                    console.error("Error de red:", err);
+                    setError("Error de red. Por favor, verifica tu conexión.");
+                }
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        if (projectId) {
-            fetchData();
-        }
+        if (projectId) fetchData();
     }, [projectId]);
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
-    const handleNuevaEvaluacionChange = (e) => {
-        const { name, value } = e.target;
-        setNuevaEvaluacion((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
-
-        if (name === "grupoEvaluado") {
-            const grupoSeleccionado = grupos.find(
-                (grupo) => String(grupo.ID_GRUPO) === value
-            );
-
-            if (grupoSeleccionado && grupoSeleccionado.fechas_defensa) {
-                const defensa = grupoSeleccionado.fechas_defensa[0] || {};
-                setFechaDefensa({
-                    dia: defensa.day || "No asignado",
-                    hora: `${defensa.HR_INIDEF || "00:00"} - ${
-                        defensa.HR_FINDEF || "00:00"
-                    }`,
-                });
-            } else {
-                setFechaDefensa({ dia: "No asignado", hora: "No asignado" });
-            }
-        }
-    };
-
-    const handleCrearEvaluacion = async () => {
-        if (
-            !nuevaEvaluacion.grupoEvaluado ||
-            !nuevaEvaluacion.fechaEvaluacion
-        ) {
-            alert("Por favor, complete todos los campos.");
-            return;
-        }
-
+    const handleRegistrarEvaluacion = async (datosEvaluacion) => {
         try {
             const response = await axios.post(
                 `http://localhost:8000/api/evaluaciones-pares`,
                 {
-                    grupoEvaluado: nuevaEvaluacion.grupoEvaluado,
-                    fechaEvaluacion: nuevaEvaluacion.fechaEvaluacion,
-                    projectId: projectId,
+                    ...datosEvaluacion,
+                    grupos: grupos.map((grupo) => grupo.ID_GRUPO),
+                    id_proyecto: projectId,
                 },
                 { withCredentials: true }
             );
 
-            setEvaluaciones([...evaluaciones, response.data]);
+            setEvaluaciones((prev) => [...prev, response.data.evaluacion]);
             setShowModal(false);
-            setNuevaEvaluacion({ grupoEvaluado: "", fechaEvaluacion: "" });
-            setFechaDefensa({ dia: "", hora: "" });
-        } catch (error) {
-            if (error.response && error.response.status === 400) {
-                alert(error.response.data.error);
+        } catch (err) {
+            if (err.response && err.response.data.errors) {
+                alert(
+                    "Error al registrar la evaluación: " +
+                        JSON.stringify(err.response.data.errors, null, 2)
+                );
             } else {
-                console.error("Error al crear la evaluación:", error);
+                console.error(
+                    "Error inesperado al registrar la evaluación:",
+                    err
+                );
             }
         }
     };
+
+    if (isLoading) {
+        return <p>Cargando datos...</p>;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
 
     return (
         <div
@@ -152,114 +134,108 @@ const EvaluacionDePares = () => {
                     <div className="evaluaciones-list">
                         {Array.isArray(evaluaciones) &&
                         evaluaciones.length > 0 ? (
-                            evaluaciones.map((evaluacion) => (
+                            evaluaciones.map((evaluacion, index) => (
                                 <div
-                                    key={evaluacion.ID_EVALUACION}
-                                    className="evaluacion-item"
+                                    key={index}
+                                    className="card evaluacion-card"
                                 >
                                     <h3>
-                                        Grupo Evaluado: {evaluacion.grupoNombre}
+                                        Evaluación #{index + 1}{" "}
+                                        <small>
+                                            (ID: {evaluacion.id_evaluacion_par})
+                                        </small>
                                     </h3>
                                     <p>
-                                        <strong>Fecha de Evaluación:</strong>{" "}
-                                        {evaluacion.fechaEvaluacion}
+                                        <strong>Fecha:</strong>{" "}
+                                        {evaluacion.fecha_inicio ||
+                                            "No especificada"}{" "}
+                                        -{" "}
+                                        {evaluacion.fecha_fin ||
+                                            "No especificada"}
                                     </p>
-                                    <button
-                                        className="evaluar-btn"
-                                        onClick={() =>
-                                            navigate(
-                                                `/evaluacion-pares/${projectId}/${evaluacion.ID_EVALUACION}`
-                                            )
-                                        }
-                                    >
-                                        Ver Evaluación
-                                    </button>
+                                    <p>
+                                        <strong>Nota Máxima:</strong>{" "}
+                                        {evaluacion.nota_maxima ||
+                                            "No especificada"}
+                                    </p>
+                                    <div>
+                                        <p>
+                                            <strong>
+                                                Relación de Evaluadores y
+                                                Evaluados:
+                                            </strong>
+                                        </p>
+                                        <ul>
+                                            {evaluacion.grupos_evaluadores?.map(
+                                                (grupoEvaluador, i) => {
+                                                    const grupoEvaluado =
+                                                        evaluacion.grupos_evaluados.find(
+                                                            (g) =>
+                                                                g.id_asignacion_par ===
+                                                                grupoEvaluador.id_asignacion_par
+                                                        );
+
+                                                    return (
+                                                        <li key={i}>
+                                                            <p>
+                                                                <strong>
+                                                                    Evaluador:
+                                                                </strong>{" "}
+                                                                {grupoEvaluador
+                                                                    .grupo_evaluador
+                                                                    ?.NOMBRE_GRUPO ||
+                                                                    "Grupo sin nombre"}{" "}
+                                                                (ID:{" "}
+                                                                {grupoEvaluador
+                                                                    .grupo_evaluador
+                                                                    ?.ID_GRUPO ||
+                                                                    "N/A"}
+                                                                )
+                                                            </p>
+                                                            <p>
+                                                                <strong>
+                                                                    Evaluado:
+                                                                </strong>{" "}
+                                                                {grupoEvaluado
+                                                                    ?.grupo_evaluado
+                                                                    ?.NOMBRE_GRUPO ||
+                                                                    "Grupo sin nombre"}{" "}
+                                                                (ID:{" "}
+                                                                {grupoEvaluado
+                                                                    ?.grupo_evaluado
+                                                                    ?.ID_GRUPO ||
+                                                                    "N/A"}
+                                                                )
+                                                            </p>
+                                                        </li>
+                                                    );
+                                                }
+                                            )}
+                                        </ul>
+                                    </div>
                                 </div>
                             ))
                         ) : (
-                            <p>No hay evaluaciones registradas</p>
+                            <p className="no-data-message">
+                                {" "}
+                                No hay evaluaciones registradas
+                            </p>
                         )}
                     </div>
+
+                    {!Array.isArray(grupos) || grupos.length === 0 ? (
+                        <p className="no-data-message">
+                            No hay grupos disponibles para la evaluación.
+                        </p>
+                    ) : null}
                 </div>
             </div>
 
             {showModal && (
-                <div className="evaluacion-individual-modal-overlay">
-                    <div className="evaluacion-individual-modal-content">
-                        <h3 className="etapa-modal-title">
-                            Nueva Evaluación de Pares
-                        </h3>
-                        <label className="etapa-label">Grupo:</label>
-                        <select
-                            name="grupoEvaluado"
-                            value={nuevaEvaluacion.grupoEvaluado}
-                            onChange={handleNuevaEvaluacionChange}
-                        >
-                            <option value="">Seleccione un Grupo</option>
-                            {Array.isArray(grupos) &&
-                                grupos.map((grupo) => (
-                                    <option
-                                        key={grupo.ID_GRUPO}
-                                        value={String(grupo.ID_GRUPO)}
-                                    >
-                                        {grupo.NOMBRE_GRUPO}
-                                    </option>
-                                ))}
-                        </select>
-
-                        <div className="fecha-hora-container">
-                            <div>
-                                <label className="etapa-label">
-                                    Día de Defensa:
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Día de Defensa"
-                                    value={fechaDefensa.dia}
-                                    readOnly
-                                    className="fecha-hora-input"
-                                />
-                            </div>
-                            <div>
-                                <label className="etapa-label">
-                                    Hora de Defensa:
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Hora de Defensa"
-                                    value={fechaDefensa.hora}
-                                    readOnly
-                                    className="fecha-hora-input"
-                                />
-                            </div>
-                        </div>
-
-                        <label className="etapa-label">
-                            Fecha de Evaluación:
-                        </label>
-                        <input
-                            type="date"
-                            name="fechaEvaluacion"
-                            value={nuevaEvaluacion.fechaEvaluacion}
-                            onChange={handleNuevaEvaluacionChange}
-                        />
-
-                        <div className="modal-actions">
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="cancel-btn"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleCrearEvaluacion}
-                                className="create-btn"
-                            >
-                                Crear Evaluación
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ModalNuevaEvaluacion
+                    onClose={() => setShowModal(false)}
+                    onRegistrarEvaluacion={handleRegistrarEvaluacion}
+                />
             )}
         </div>
     );

@@ -1,7 +1,9 @@
+/* Contenedor principal */
 .planilla-seguimiento-container {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #f8f9fa; /* Fondo neutro para el contenedor */
 }
 
 /* Contenido de la barra lateral y del contenedor principal */
@@ -10,22 +12,147 @@
     height: 100%;
 }
 
-.seguimiento-table {
+/* Dropdown */
+.dropdown-container {
+    margin: 20px 20px;
+    padding: 0 10px;
+}
+
+.dropdown-container select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
     width: 100%;
-    border-collapse: collapse;
+    max-width: 300px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tabla personalizada */
+.custom-table {
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: 0 10px;
+}
+
+.custom-table .ant-table-thead > tr > th {
+    background-color: #002A4C;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid #e9ecef;
+    padding: 12px;
+}
+
+.custom-table .ant-table-grouped-column-title {
+    background-color: #0056b3;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+    text-align: center;
+    font-size: 13px;
+    padding: 10px;
+    color: #333;
+    border: 1px solid #e9ecef;
+}
+
+/* Filas alternadas */
+.custom-table .ant-table-tbody > tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Resaltar filas */
+.custom-table .ant-table-row.highlight-row {
+    background-color: #d4edda !important;
+}
+
+/* Filas resaltadas al pasar el mouse */
+.custom-table .ant-table-tbody > tr:hover > td {
+    background-color: #e9ecef !important;
+    cursor: pointer;
+}
+
+/* Encabezados agrupados (etapas) */
+.custom-table .ant-table-thead .ant-table-cell {
     text-align: center;
 }
 
-.seguimiento-table th, .seguimiento-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+/* Encabezado del grupo seleccionado */
+.group-details h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #004085;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
 }
 
-.seguimiento-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+/* Ajuste general para tamaños pequeños */
+@media (max-width: 768px) {
+    .projects-header h2 {
+        font-size: 20px;
+    }
+
+    .projects-header .export-button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .dropdown-container select {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .custom-table .ant-table-thead > tr > th {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .custom-table .ant-table-tbody > tr > td {
+        font-size: 12px;
+        padding: 8px;
+    }
 }
 
-.seguimiento-table td {
+.edit-notes-btn-container {
+    margin-top: 20px; /* Margen superior para separar el botón de la tabla */
+    text-align: left; /* Centra el botón horizontalmente */
+}/* Ajusta el ancho del input para que sea dinámico */
+.custom-table input[type="number"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    padding: 4px 6px; /* Espaciado interno más reducido */
+    text-align: center;
+    width: auto; /* Ancho dinámico */
+    min-width: 60px; /* Ancho mínimo */
+    max-width: 100px; /* Ancho máximo opcional */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Hover para los inputs */
+.custom-table input[type="number"]:hover {
+    background-color: #eef5ff;
+    border-color: #007bff;
+}
+
+/* Focus para los inputs */
+.custom-table input[type="number"]:focus {
     background-color: #ffffff;
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+.etapas-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 10px;
 }

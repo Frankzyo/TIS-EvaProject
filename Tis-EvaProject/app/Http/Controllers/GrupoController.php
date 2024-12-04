@@ -68,6 +68,17 @@ class GrupoController extends Controller
             'PORTADA_GRUPO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // Verificar si el nombre del grupo ya existe en el proyecto
+        $existingGroup = Grupo::where('NOMBRE_GRUPO', $request->NOMBRE_GRUPO)
+            ->where('ID_PROYECTO', $request->ID_PROYECTO)
+            ->first();
+
+        if ($existingGroup) {
+            return response()->json([
+                'message' => 'El nombre del grupo ya existe en este proyecto. Por favor, elija otro nombre.',
+            ], 422);
+        }
+
         // Manejar la imagen
         $imagePath = $request->hasFile('PORTADA_GRUPO')
             ? $request->file('PORTADA_GRUPO')->store('grupos', 'public')
@@ -85,16 +96,9 @@ class GrupoController extends Controller
         // Log para verificar que el grupo se creó
         Log::info('Grupo creado exitosamente:', $grupo->toArray());
 
-        // Verificar que el grupo fue creado y contiene el ID
-        if (!$grupo->ID_GRUPO) {
-            Log::error('Error: El grupo fue creado, pero no se generó el ID_GRUPO.');
-            return response()->json(['message' => 'Error al crear el grupo, ID no generado'], 500);
-        }
-
         // Retornar el grupo completo, incluyendo `ID_GRUPO`
         return response()->json($grupo, 201);
     }
-
 
     // Actualizar un grupo
     public function update(Request $request, $id)

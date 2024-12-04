@@ -6,6 +6,9 @@ use App\Models\EvaluacionIndividualEstudiante;
 use App\Models\NotaRubrica;
 use App\Models\NotaCriterio;
 use App\Models\Rubrica;
+use App\Models\Etapa;
+use App\Models\Grupo;
+use App\Models\Estudiante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -483,4 +486,158 @@ class EvaluacionIndividualEstudianteController extends Controller
             ], 500);
         }
     }
+
+    public function obtenerNotasPorGrupo($groupId)
+    {
+        try {
+            // Obtener estudiantes del grupo
+            $estudiantes = Estudiante::where('ID_GRUPO', $groupId)->get(['ID_EST', 'NOMBRE_EST', 'APELLIDO_EST']);
+
+            if ($estudiantes->isEmpty()) {
+                return response()->json(['message' => 'No se encontraron estudiantes para este grupo'], 404);
+            }
+
+            // Obtener las evaluaciones individuales asociadas a los estudiantes
+            $notas = EvaluacionIndividualEstudiante::whereIn('ID_ESTUDIANTE', $estudiantes->pluck('ID_EST'))
+                ->with('etapa') // Relación con la etapa
+                ->get(['ID_ESTUDIANTE', 'ID_ETAPA', 'FECHA_REVISION', 'PUNTUACION_TOTAL', 'FALTA', 'RETRASO']);
+
+            // Formatear la respuesta con estudiantes y sus notas
+            $resultado = $estudiantes->map(function ($estudiante) use ($notas) {
+                $notasEstudiante = $notas->where('ID_ESTUDIANTE', $estudiante->ID_EST);
+
+                return [
+                    'estudiante' => [
+                        'ID_ESTUDIANTE' => $estudiante->ID_EST,
+                        'NOMBRE' => $estudiante->NOMBRE_EST,
+                        'APELLIDO' => $estudiante->APELLIDO_EST,
+                    ],
+                    'notas' => $notasEstudiante->map(function ($nota) {
+                        return [
+                            'ID_ETAPA' => $nota->ID_ETAPA,
+                            'FECHA_REVISION' => $nota->FECHA_REVISION,
+                            'PUNTUACION_TOTAL' => $nota->PUNTUACION_TOTAL,
+                            'ETAPA_TITULO' => $nota->etapa->ETAPAS_TITULO ?? null, // Título de la etapa
+                            'ETAPA_PUNTUACION' => $nota->etapa->ETAPAS_PUNTUACION ?? null, // Puntuación de la etapa
+                            'FALTA' => $nota->FALTA ? true : false, // Indica si tiene falta
+                            'RETRASO' => $nota->RETRASO ? true : false, // Indica si tiene retraso
+                        ];
+                    })->values(), // Asegura que las notas sean un arreglo
+                ];
+            });
+
+            return response()->json($resultado, 200);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener las notas del grupo: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener las notas del grupo'], 500);
+        }
+    }
+    public function guardarNotas(Request $request, $groupId)
+{
+    try {
+        $notasData = $request->input('studentsData'); // Obtiene las notas del frontend
+
+        foreach ($notasData as $data) {
+            foreach ($data['notas'] as $nota) {
+                // Actualizar la nota si ya existe o crearla si no
+                EvaluacionIndividualEstudiante::updateOrCreate(
+                    [
+                        'ID_ESTUDIANTE' => $data['estudiante']['ID_ESTUDIANTE'],
+                        'ID_ETAPA' => $nota['ID_ETAPA'],
+                    ],
+                    [
+                        'FECHA_REVISION' => $nota['FECHA_REVISION'],
+                        'PUNTUACION_TOTAL' => $nota['PUNTUACION_TOTAL'],
+                        'FALTA' => $nota['FALTA'],
+                        'RETRASO' => $nota['RETRASO'],
+                    ]
+                );
+            }
+        }
+
+        return response()->json(['message' => 'Notas guardadas exitosamente'], 200);
+    } catch (\Exception $e) {
+        Log::error('Error al guardar las notas: ' . $e->getMessage());
+        return response()->json(['error' => 'Error al guardar las notas'], 500);
+    }
+}
+
+
+    public function obtenerEvaluaciones($etapaId, $grupoId)
+{
+    try {
+        // Obtener datos de la etapa
+        $etapa = Etapa::findOrFail($etapaId);
+
+        // Obtener el grupo con sus estudiantes
+        $grupo = Grupo::with(['estudiantes'])->findOrFail($grupoId);
+
+        if ($grupo->estudiantes->isEmpty()) {
+            return response()->json(['error' => 'El grupo no tiene estudiantes asociados.'], 404);
+        }
+
+        // Obtener todas las evaluaciones individuales para la etapa y grupo
+        $evaluaciones = EvaluacionIndividualEstudiante::where('ID_ETAPA', $etapaId)
+            ->where('ID_GRUPO', $grupoId)
+            ->with(['notasRubricas.rubrica'])
+            ->get();
+
+        // Preparar los datos para la respuesta
+        $data = [
+            'etapa' => [
+                'titulo' => $etapa->ETAPAS_TITULO,
+                'puntuacion' => $etapa->ETAPAS_PUNTUACION,
+            ],
+            'grupo' => [
+                'nombre' => $grupo->NOMBRE_GRUPO,
+            ],
+            'evaluaciones' => $grupo->estudiantes->map(function ($estudiante) use ($evaluaciones, $etapa) {
+                // Buscar evaluación del estudiante
+                $evaluacion = $evaluaciones->firstWhere('ID_ESTUDIANTE', $estudiante->ID_EST);
+
+                // Preparar datos de las rúbricas
+                $rubricas = $evaluacion
+                    ? $evaluacion->notasRubricas->map(function ($notaRubrica) use ($etapa) {
+                        $puntuacionAjustada = ($notaRubrica->PUNTUACION_NO_AJUSTADA / 100) * $etapa->ETAPAS_PUNTUACION;
+
+                        return [
+                            'rubrica_id' => $notaRubrica->ID_RUBRICA,
+                            'nombre_rubrica' => $notaRubrica->rubrica->NOMBRE_RUBRICA,
+                            'peso_rubrica' => $notaRubrica->rubrica->PESO_RUBRICA,
+                            'puntuacion_no_ajustada' => $notaRubrica->PUNTUACION_NO_AJUSTADA,
+                            'puntuacion_ajustada' => round($puntuacionAjustada, 2),
+                        ];
+                    })
+                    : [];
+
+                return [
+                    'estudiante' => [
+                        'id' => $estudiante->ID_EST,
+                        'nombre' => $estudiante->NOMBRE_EST,
+                        'apellido' => $estudiante->APELLIDO_EST,
+                    ],
+                    'evaluacion' => $evaluacion
+                        ? [
+                            'puntuacion_total' => $evaluacion->PUNTUACION_TOTAL,
+                            'puntuacion_no_ajustada' => $evaluacion->PUNTUACION_NO_AJUSTADA,
+                            'retraso' => $evaluacion->RETRASO,
+                            'falta' => $evaluacion->FALTA,
+                            'rubricas' => $rubricas,
+                            'fecha_revision' => $evaluacion->FECHA_REVISION, // Agregado
+                        ]
+                        : null, // Sin evaluación registrada
+                ];
+            })->values(), // Asegurar que los resultados sean un arreglo indexado
+        ];
+
+        return response()->json($data, 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al obtener los datos',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
 }

@@ -185,88 +185,106 @@ const EvaluacionIndividual = () => {
                         </button>
                     </div>
 
-                    {Object.keys(examenesPorEtapa).map((etapa) => (
-                        <div key={etapa} className="etapasd-container">
-                            <div className="etapas-header">
-                                <h3 className="etapas-titulo">{etapa}</h3>
-                                <hr className="etapas-divider" />
-                            </div>
-                            <div className="examenes-list">
-                                {examenesPorEtapa[etapa].map((examen) => (
-                                    <div
-                                        key={examen.ID_EVALUACION}
-                                        className="examen-item"
-                                    >
-                                        <div className="examen-item-content">
-                                            <div className="grupo-info">
-                                                <img
-                                                    src={examen.grupoFoto}
-                                                    alt={`Foto de ${examen.grupoNombre}`}
-                                                    className="grupo-foto"
-                                                />
-                                                <p className="examen-grupo">
-                                                    <strong>Grupo:</strong>{" "}
-                                                    {examen.grupoNombre}
-                                                </p>
-                                            </div>
-
-                                            <div className="defensa-info">
-                                                <p>
-                                                    <strong>Día:</strong>{" "}
-                                                    {examen.defensaDia ||
-                                                        "No asignado"}
-                                                </p>
-                                                <p>
-                                                    <strong>Hora:</strong>{" "}
-                                                    {examen.defensaHora ||
-                                                        "No asignado"}
-                                                </p>
-                                            </div>
-
-                                            {examen.representanteLegal && (
-                                                <div className="representante-info">
+                    {examenes.length > 0 ? (
+                        Object.keys(examenesPorEtapa).map((etapa) => (
+                            <div key={etapa} className="etapasd-container">
+                                <div className="etapas-header">
+                                    <h3 className="etapas-titulo">{etapa}</h3>
+                                    <hr className="etapas-divider" />
+                                </div>
+                                <div className="examenes-list">
+                                    {examenesPorEtapa[etapa].map((examen) => (
+                                        <div
+                                            key={examen.ID_EVALUACION}
+                                            className="examen-item"
+                                        >
+                                            <div className="examen-item-content">
+                                                <div className="grupo-info">
                                                     <img
-                                                        src={
-                                                            examen
-                                                                .representanteLegal
-                                                                .foto
-                                                        }
-                                                        alt={`${examen.representanteLegal.nombre} ${examen.representanteLegal.apellido}`}
-                                                        className="representante-foto"
+                                                        src={examen.grupoFoto}
+                                                        alt={`Foto de ${examen.grupoNombre}`}
+                                                        className="grupo-foto"
                                                     />
-                                                    <p>
-                                                        <strong>
-                                                            Representante:
-                                                        </strong>{" "}
-                                                        {
-                                                            examen
-                                                                .representanteLegal
-                                                                .nombre
-                                                        }{" "}
-                                                        {
-                                                            examen
-                                                                .representanteLegal
-                                                                .apellido
-                                                        }
+                                                    <p className="examen-grupo">
+                                                        <strong>Grupo:</strong>{" "}
+                                                        {examen.grupoNombre}
                                                     </p>
                                                 </div>
-                                            )}
-                                            <button
-                                                className="evaluar-btn"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/evaluacion-individual/${projectId}/${examen.ID_EVALUACION}`
-                                                    )
-                                                }
-                                            >
-                                                Evaluar Grupo
-                                            </button>
+
+                                                <div className="defensa-info">
+                                                    <p>
+                                                        <strong>Día:</strong>{" "}
+                                                        {examen.defensaDia ||
+                                                            "No asignado"}
+                                                    </p>
+                                                    <p>
+                                                        <strong>Hora:</strong>{" "}
+                                                        {examen.defensaHora ||
+                                                            "No asignado"}
+                                                    </p>
+                                                </div>
+
+                                                {examen.representanteLegal && (
+                                                    <div className="representante-info">
+                                                        <img
+                                                            src={
+                                                                examen
+                                                                    .representanteLegal
+                                                                    .foto
+                                                            }
+                                                            alt={`${examen.representanteLegal.nombre} ${examen.representanteLegal.apellido}`}
+                                                            className="representante-foto"
+                                                        />
+                                                        <p>
+                                                            <strong>
+                                                                Representante:
+                                                            </strong>{" "}
+                                                            {
+                                                                examen
+                                                                    .representanteLegal
+                                                                    .nombre
+                                                            }{" "}
+                                                            {
+                                                                examen
+                                                                    .representanteLegal
+                                                                    .apellido
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                <button
+                                                    className="evaluar-btn"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/evaluacion-individual/${projectId}/${examen.ID_EVALUACION}`
+                                                        )
+                                                    }
+                                                >
+                                                    Evaluar Grupo
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="no-data-message">
+                            No hay evaluaciones individuales registradas.
+                        </p>
+                    )}
+
+                    {grupos.length === 0 && (
+                        <p className="no-data-message">
+                            No hay grupos registrados.
+                        </p>
+                    )}
+
+                    {etapas.length === 0 && (
+                        <p className="no-data-message">
+                            No hay etapas registradas.
+                        </p>
+                    )}
                 </div>
             </div>
 

@@ -98,12 +98,21 @@ const EvaluacionGrupoIndividual = () => {
                             {examenDetails?.etapaNombre}{" "}
                         </h2>
                     </div>
-                    <DetallesExamen examenDetails={examenDetails} />
+                    <div className="detalles-contenedor">
+                        <DetallesExamen examenDetails={examenDetails} />
 
-                    <SeleccionarEstudianteAleatorio
-                        grupoId={examenDetails?.ID_GRUPO}
-                    />
+                        <SeleccionarEstudianteAleatorio
+                            grupoId={examenDetails?.ID_GRUPO}
+                        />
+                    </div>
 
+                    {/* Agregamos la Planilla de Evaluación */}
+                    {examenDetails?.ID_ETAPA && examenDetails?.ID_GRUPO && (
+                        <PlanillaEvaGrupoIndividual
+                            grupoId={examenDetails.ID_GRUPO}
+                            etapaId={examenDetails.ID_ETAPA}
+                        />
+                    )}
                     <ListaEstudiantes
                         estudiantes={estudiantesGrupo}
                         etapaId={examenDetails?.ID_ETAPA}

@@ -238,75 +238,81 @@ const RequerimientosDocente = () => {
                     </div>
 
                     <div className="project-list requerimientos-list">
-                        {requirements.map((requirement, index) => (
-                            <div
-                                key={requirement.ID_REQUERIMIENTO}
-                                className="project-item requerimientos-list"
-                            >
-                                {requirement.isEditing ? (
-                                    <ReactQuill
-                                        theme="snow"
-                                        value={
-                                            editedDescription ||
-                                            requirement.DESCRIPCION_REQ
-                                        }
-                                        onChange={(value) =>
-                                            setEditedDescription(value)
-                                        }
-                                        className="requirement-quill-editor"
-                                        placeholder="Descripción del requerimiento"
-                                        style={{ width: "100%" }}
-                                    />
-                                ) : (
-                                    <div className="project-info requerimientos-list">
-                                        <div className="requirement-text-container">
-                                            <span
-                                                className="requirement-description"
-                                                dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        requirement.DESCRIPCION_REQ ||
-                                                        "Descripción del requerimiento",
-                                                }}
-                                            ></span>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="project-actions requerimientos-list">
-                                    <button
-                                        className="action-btn"
-                                        onClick={() =>
-                                            requirement.isEditing
-                                                ? handleSaveRequirement(
-                                                      requirement
-                                                  )
-                                                : toggleEditRequirement(
-                                                      index,
-                                                      true,
-                                                      requirement.DESCRIPCION_REQ
-                                                  )
-                                        }
-                                    >
-                                        <i
-                                            className={
-                                                requirement.isEditing
-                                                    ? "fas fa-save"
-                                                    : "fas fa-pen"
+                        {requirements.length > 0 ? (
+                            requirements.map((requirement, index) => (
+                                <div
+                                    key={requirement.ID_REQUERIMIENTO}
+                                    className="project-item requerimientos-list"
+                                >
+                                    {requirement.isEditing ? (
+                                        <ReactQuill
+                                            theme="snow"
+                                            value={
+                                                editedDescription ||
+                                                requirement.DESCRIPCION_REQ
                                             }
-                                        ></i>
-                                    </button>
-                                    <button
-                                        className="action-btn"
-                                        onClick={() =>
-                                            openConfirmDeleteModal(
-                                                requirement.ID_REQUERIMIENTO
-                                            )
-                                        }
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
+                                            onChange={(value) =>
+                                                setEditedDescription(value)
+                                            }
+                                            className="requirement-quill-editor"
+                                            placeholder="Descripción del requerimiento"
+                                            style={{ width: "100%" }}
+                                        />
+                                    ) : (
+                                        <div className="project-info requerimientos-list">
+                                            <div className="requirement-text-container">
+                                                <span
+                                                    className="requirement-description"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html:
+                                                            requirement.DESCRIPCION_REQ ||
+                                                            "Descripción del requerimiento",
+                                                    }}
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="project-actions requerimientos-list">
+                                        <button
+                                            className="action-btn"
+                                            onClick={() =>
+                                                requirement.isEditing
+                                                    ? handleSaveRequirement(
+                                                          requirement
+                                                      )
+                                                    : toggleEditRequirement(
+                                                          index,
+                                                          true,
+                                                          requirement.DESCRIPCION_REQ
+                                                      )
+                                            }
+                                        >
+                                            <i
+                                                className={
+                                                    requirement.isEditing
+                                                        ? "fas fa-save"
+                                                        : "fas fa-pen"
+                                                }
+                                            ></i>
+                                        </button>
+                                        <button
+                                            className="action-btn"
+                                            onClick={() =>
+                                                openConfirmDeleteModal(
+                                                    requirement.ID_REQUERIMIENTO
+                                                )
+                                            }
+                                        >
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="no-data-message">
+                                No hay requerimientos registrados.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

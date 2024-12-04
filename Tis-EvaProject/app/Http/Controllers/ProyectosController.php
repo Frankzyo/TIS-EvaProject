@@ -15,7 +15,6 @@ class ProyectosController extends Controller
     // Mostrar todos los proyectos
     public function index()
     {
-        // Verificar si el usuario está autenticado
         $docenteId = Auth::guard('docente')->id();
         if (!$docenteId) {
             return response()->json(['message' => 'No autorizado'], 401)
@@ -26,30 +25,34 @@ class ProyectosController extends Controller
 
         $proyectos = Proyectos::where('ID_DOCENTE', $docenteId)->get();
 
+        // Formatear fechas
+        $proyectos = $proyectos->map(function ($proyecto) {
+            $proyecto->FECHA_INICIO_PROYECTO = \Carbon\Carbon::parse($proyecto->FECHA_INICIO_PROYECTO)->format('Y-m-d');
+            $proyecto->FECHA_FIN_PROYECTO = \Carbon\Carbon::parse($proyecto->FECHA_FIN_PROYECTO)->format('Y-m-d');
+            return $proyecto;
+        });
+
         return response()->json($proyectos)
             ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
     }
 
+
     // Crear un nuevo proyecto
     public function store(Request $request)
     {
-        // Verificar si el usuario está autenticado
         $docenteId = Auth::guard('docente')->id();
         if (!$docenteId) {
-            return response()->json(['message' => 'No autorizado'], 401)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+            return response()->json(['message' => 'No autorizado'], 401);
         }
 
         $request->validate([
             'NOMBRE_PROYECTO' => 'required|max:1000',
             'DESCRIP_PROYECTO' => 'nullable|max:1000',
-            'FECHA_INICIO_PROYECTO' => 'nullable|date',
-            'FECHA_FIN_PROYECTO' => 'nullable|date',
-            'PORTADA_PROYECTO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'FECHA_INICIO_PROYECTO' => 'required|date|before_or_equal:FECHA_FIN_PROYECTO',
+            'FECHA_FIN_PROYECTO' => 'required|date|after_or_equal:FECHA_INICIO_PROYECTO',
+            'PORTADA_PROYECTO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $imagePath = $request->hasFile('PORTADA_PROYECTO')
@@ -66,21 +69,20 @@ class ProyectosController extends Controller
             'ID_DOCENTE' => $docenteId,
         ]);
 
-        return response()->json($proyecto, 201)
-            ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        $proyecto->FECHA_INICIO_PROYECTO = \Carbon\Carbon::parse($proyecto->FECHA_INICIO_PROYECTO)->format('Y-m-d');
+        $proyecto->FECHA_FIN_PROYECTO = \Carbon\Carbon::parse($proyecto->FECHA_FIN_PROYECTO)->format('Y-m-d');
+
+        return response()->json($proyecto, 201);
     }
+
+
 
     // Actualizar un proyecto existente
     public function update(Request $request, $id)
     {
         $docenteId = Auth::guard('docente')->id();
         if (!$docenteId) {
-            return response()->json(['message' => 'No autorizado'], 401)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+            return response()->json(['message' => 'No autorizado'], 401);
         }
 
         $proyecto = Proyectos::where('ID_PROYECTO', $id)
@@ -88,18 +90,15 @@ class ProyectosController extends Controller
             ->first();
 
         if (!$proyecto) {
-            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404)
-                ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404);
         }
 
         $request->validate([
             'NOMBRE_PROYECTO' => 'required|max:1000',
             'DESCRIP_PROYECTO' => 'nullable|max:1000',
-            'FECHA_INICIO_PROYECTO' => 'nullable|date',
-            'FECHA_FIN_PROYECTO' => 'nullable|date',
-            'PORTADA_PROYECTO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'FECHA_INICIO_PROYECTO' => 'required|date|before_or_equal:FECHA_FIN_PROYECTO',
+            'FECHA_FIN_PROYECTO' => 'required|date|after_or_equal:FECHA_INICIO_PROYECTO',
+            'PORTADA_PROYECTO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('PORTADA_PROYECTO')) {
@@ -119,54 +118,48 @@ class ProyectosController extends Controller
             'PORTADA_PROYECTO' => $imagePath,
         ]);
 
-        return response()->json($proyecto)
-            ->header('Access-Control-Allow-Origin', 'http://localhost:3000')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, X-CSRF-TOKEN');
+        $proyecto->FECHA_INICIO_PROYECTO = \Carbon\Carbon::parse($proyecto->FECHA_INICIO_PROYECTO)->format('Y-m-d');
+        $proyecto->FECHA_FIN_PROYECTO = \Carbon\Carbon::parse($proyecto->FECHA_FIN_PROYECTO)->format('Y-m-d');
+
+        return response()->json($proyecto);
     }
 
     // Eliminar un proyecto
     public function destroy($id)
     {
-        Log::info("Intentando eliminar el grupo con ID: " . $id);
+        Log::info("Intentando eliminar el proyecto con ID: " . $id);
 
-        // Verificar si el usuario está autenticado como docente o estudiante
+        // Verificar si el usuario está autenticado como docente
         $docenteId = Auth::guard('docente')->id();
-        $estudianteId = Auth::guard('estudiante')->id();
 
-        // Si no hay un usuario autenticado, responder con un error de autorización
-        if (!$docenteId && !$estudianteId) {
+        if (!$docenteId) {
             return response()->json(['message' => 'No autorizado'], 401);
         }
 
-        // Construir la consulta para obtener el grupo
-        $query = Grupo::where('ID_GRUPO', $id);
+        // Buscar el proyecto correspondiente al docente
+        $proyecto = Proyectos::where('ID_PROYECTO', $id)
+            ->where('ID_DOCENTE', $docenteId)
+            ->first();
 
-        // Si el usuario es docente, filtrar por su ID_DOCENTE
-        if ($docenteId) {
-            $query->where('ID_DOCENTE', $docenteId);
-        }
-        // Nota: Si el usuario es un estudiante, no aplicamos el filtro de ID_DOCENTE.
-
-        $grupo = $query->first();
-
-        // Si no se encuentra el grupo, responder con un error
-        if (!$grupo) {
-            Log::info("Grupo no encontrado o no autorizado con ID: " . $id);
-            return response()->json(['message' => 'Grupo no encontrado o no autorizado'], 404);
+        // Si no se encuentra el proyecto, responder con un error
+        if (!$proyecto) {
+            Log::info("Proyecto no encontrado o no autorizado con ID: " . $id);
+            return response()->json(['message' => 'Proyecto no encontrado o no autorizado'], 404);
         }
 
-        // Eliminar la portada del grupo si existe en el almacenamiento
-        if ($grupo->PORTADA_GRUPO && Storage::disk('public')->exists($grupo->PORTADA_GRUPO)) {
-            Storage::disk('public')->delete($grupo->PORTADA_GRUPO);
+        // Eliminar la portada del proyecto si existe en el almacenamiento
+        if ($proyecto->PORTADA_PROYECTO && Storage::disk('public')->exists($proyecto->PORTADA_PROYECTO)) {
+            Storage::disk('public')->delete($proyecto->PORTADA_PROYECTO);
+            Log::info("Portada del proyecto eliminada correctamente.");
         }
 
-        // Eliminar el grupo
-        $grupo->delete();
-        Log::info("Grupo eliminado con éxito con ID: " . $id);
+        // Eliminar el proyecto
+        $proyecto->delete();
+        Log::info("Proyecto eliminado con éxito con ID: " . $id);
 
-        return response()->json(['message' => 'Grupo eliminado con éxito']);
+        return response()->json(['message' => 'Proyecto eliminado con éxito']);
     }
+
 
     // Obtener un proyecto específico
     public function show($id)
@@ -219,6 +212,42 @@ class ProyectosController extends Controller
             return response()->json(['error' => 'Error al obtener los proyectos'], 500);
         }
     }
+    public function getProjectGroups($projectId)
+    {
+        try {
+            // Obtener proyecto con sus grupos y fechas de defensa
+            $proyecto = Proyectos::with(['grupos.fechasDefensa'])
+                ->select('ID_PROYECTO', 'NOMBRE_PROYECTO', 'FECHA_INICIO_PROYECTO', 'FECHA_FIN_PROYECTO')
+                ->findOrFail($projectId);
+
+            return response()->json([
+                'project' => [
+                    'ID_PROYECTO' => $proyecto->ID_PROYECTO,
+                    'NOMBRE_PROYECTO' => $proyecto->NOMBRE_PROYECTO,
+                    'FECHA_INICIO' => $proyecto->FECHA_INICIO_PROYECTO,
+                    'FECHA_FIN' => $proyecto->FECHA_FIN_PROYECTO,
+                ],
+                'groups' => $proyecto->grupos->map(function ($grupo) {
+                    return [
+                        'ID_GRUPO' => $grupo->ID_GRUPO,
+                        'NOMBRE_GRUPO' => $grupo->NOMBRE_GRUPO,
+                        'DESCRIP_GRUPO' => $grupo->DESCRIP_GRUPO,
+                        'fechas_defensa' => $grupo->fechasDefensa->map(function ($fecha) {
+                            return [
+                                'ID_FECHADEF' => $fecha->ID_FECHADEF,
+                                'DIA' => $fecha->day,
+                                'HORA_INICIO' => $fecha->HR_INIDEF,
+                                'HORA_FIN' => $fecha->HR_FINDEF,
+                            ];
+                        }),
+                    ];
+                }),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener los grupos y fechas de defensa del proyecto'], 500);
+        }
+    }
+
     public function obtenerGruposYFechas($id_proyecto)
     {
         try {
@@ -233,8 +262,8 @@ class ProyectosController extends Controller
 
             return response()->json($proyecto, 200);
         } catch (\Exception $e) {
-            Log::error("Error al obtener grupos, fechas de defensa y etapas: " . $e->getMessage());
-            return response()->json(['error' => 'Error al obtener grupos, fechas de defensa y etapas'], 500);
+            Log::error("Error al obtener grupos y fechas de defensa: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener grupos y fechas de defensa'], 500);
         }
     }
 }

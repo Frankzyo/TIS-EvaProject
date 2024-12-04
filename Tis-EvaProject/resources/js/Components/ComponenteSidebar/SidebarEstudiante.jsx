@@ -71,12 +71,15 @@ const SidebarEstudiante = ({
                     <i className="fas fa-tasks icon-menu"></i>
                     <span className="menu-text">Tareas</span>
                 </li>
+                {/* Nueva opción para Seguimiento Semanal */}
                 <li
                     className="menu-item"
-                    onClick={() => navigate("/evaluaciones-estudiante")}
+                    onClick={() =>
+                        navigate(`/seguimiento-semanal-estudiante/${projectId}`)
+                    }
                 >
-                    <i className="fas fa-tasks icon-menu"></i>
-                    <span className="menu-text">Evaluaciónes</span>
+                    <i className="fas fa-calendar-check icon-menu"></i>
+                    <span className="menu-text">Seguimiento Semanal</span>
                 </li>
             </ul>
             <hr className="divisor-side" />

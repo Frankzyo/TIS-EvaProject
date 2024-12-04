@@ -195,58 +195,68 @@ const Etapas = () => {
                         {totalPuntos.toFixed(2)} / 100.00 puntos asignados
                     </div>
 
-                    <div className="etapas-list">
-                        {etapas.map((etapa, index) => (
-                            <div
-                                key={etapa.ID_ETAPA || index} // Usa ID_ETAPA en mayúsculas si es el nombre que devuelve el backend
-                                className="etapas-item"
-                            >
-                                <div className="etapas-info">
-                                    <h3 className="etapas-title">
-                                        {etapa.ETAPAS_TITULO}{" "}
-                                        <span className="etapas-score">
-                                            ({etapa.ETAPAS_PUNTUACION} pts)
-                                        </span>
-                                    </h3>
-                                    <p className="etapas-duration">
-                                        <strong>Duración:</strong>{" "}
-                                        {etapa.ETAPAS_DURACION} semanas
-                                    </p>
-                                    <p className="etapas-description">
-                                        {etapa.ETAPAS_DESCRIPCION}
-                                    </p>
-                                </div>
+                    {etapas.length > 0 ? (
+                        <div className="etapas-list">
+                            {etapas.map((etapa, index) => (
+                                <div
+                                    key={etapa.ID_ETAPA || index}
+                                    className="etapas-item"
+                                >
+                                    <div className="etapas-info">
+                                        <h3 className="etapas-title">
+                                            {etapa.ETAPAS_TITULO}{" "}
+                                            <span className="etapas-score">
+                                                ({etapa.ETAPAS_PUNTUACION} pts)
+                                            </span>
+                                        </h3>
+                                        <p className="etapas-duration">
+                                            <strong>Duración:</strong>{" "}
+                                            {etapa.ETAPAS_DURACION} semanas
+                                        </p>
+                                        <p className="etapas-description">
+                                            {etapa.ETAPAS_DESCRIPCION}
+                                        </p>
+                                    </div>
 
-                                <div className="etapas-actions">
-                                    <button
-                                        className="registered-button"
-                                        onClick={() =>
-                                            handleRubricaClick(etapa.ID_ETAPA)
-                                        }
-                                    >
-                                        Rubrica
-                                    </button>
+                                    <div className="etapas-actions">
+                                        <button
+                                            className="registered-button"
+                                            onClick={() =>
+                                                handleRubricaClick(
+                                                    etapa.ID_ETAPA
+                                                )
+                                            }
+                                        >
+                                            Rubrica
+                                        </button>
 
-                                    <button
-                                        className="action-btns edit-btn"
-                                        onClick={() =>
-                                            openEditEtapaModal(etapa)
-                                        }
-                                    >
-                                        <i className="fas fa-pen"></i>
-                                    </button>
-                                    <button
-                                        className="action-btns delete-btn"
-                                        onClick={() =>
-                                            handleDeleteEtapa(etapa.ID_ETAPA)
-                                        }
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
+                                        <button
+                                            className="action-btns edit-btn"
+                                            onClick={() =>
+                                                openEditEtapaModal(etapa)
+                                            }
+                                        >
+                                            <i className="fas fa-pen"></i>
+                                        </button>
+                                        <button
+                                            className="action-btns delete-btn"
+                                            onClick={() =>
+                                                handleDeleteEtapa(
+                                                    etapa.ID_ETAPA
+                                                )
+                                            }
+                                        >
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="no-data-message">
+                            No hay etapas registradas.
+                        </p>
+                    )}
                 </div>
             </div>
 

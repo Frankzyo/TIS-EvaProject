@@ -17,8 +17,10 @@ const Proyectos = () => {
     const [showEditSuccessMessage, setShowEditSuccessMessage] = useState(false);
     const [showDeleteSuccessMessage, setShowDeleteSuccessMessage] =
         useState(false);
+    const [startDate, setStartDate] = useState(""); // Estado para la fecha de inicio
+    const [endDate, setEndDate] = useState(""); // Estado para la fecha de fin
     const [showErrorMessage, setShowErrorMessage] = useState(false); // Estado para el mensaje de error
-    const [errorMessage, setErrorMessage] = useState(""); // Estado para el texto del mensaje de error
+    const [errorMessage, setErrorMessage] = useState(""); // Estado para el texto d el mensaje de error
     const [projectName, setProjectName] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
     const [projects, setProjects] = useState([]);
@@ -66,15 +68,27 @@ const Proyectos = () => {
                 return response.json();
             })
             .then((data) => {
-                console.log("Proyectos recibidos:", data); // Imprime los datos en la consola para verificar
-                setProjects(data);
+                console.log("Proyectos recibidos:", data);
+
+                // Formatear las fechas para asegurarse de que se muestren en formato correcto
+                const formattedProjects = data.map((project) => ({
+                    ...project,
+                    FECHA_INICIO_PROYECTO: project.FECHA_INICIO_PROYECTO
+                        ? project.FECHA_INICIO_PROYECTO.split("T")[0] // Si viene con "T", se elimina
+                        : "",
+                    FECHA_FIN_PROYECTO: project.FECHA_FIN_PROYECTO
+                        ? project.FECHA_FIN_PROYECTO.split("T")[0]
+                        : "",
+                }));
+
+                setProjects(formattedProjects);
             })
             .catch((error) => console.error("Error fetching projects:", error));
     }, []);
 
     // Función para guardar o editar un proyecto
     const handleSaveProject = () => {
-        if (!projectName || !projectDescription) {
+        if (!projectName || !projectDescription || !startDate || !endDate) {
             setErrorMessage(
                 "Por favor, complete todos los campos obligatorios."
             );
@@ -86,11 +100,14 @@ const Proyectos = () => {
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
 
+        const formattedStartDate = startDate; // Usa directamente el estado
+        const formattedEndDate = endDate; // Usa directamente el estado
+
         const formData = new FormData();
         formData.append("NOMBRE_PROYECTO", projectName);
         formData.append("DESCRIP_PROYECTO", projectDescription);
-        formData.append("FECHA_INICIO_PROYECTO", "2024-01-01");
-        formData.append("FECHA_FIN_PROYECTO", "2024-12-31");
+        formData.append("FECHA_INICIO_PROYECTO", formattedStartDate);
+        formData.append("FECHA_FIN_PROYECTO", formattedEndDate);
         formData.append("ID_DOCENTE", docenteId);
 
         if (image) {
@@ -98,7 +115,7 @@ const Proyectos = () => {
         }
 
         if (isEditing) {
-            formData.append("_method", "PUT"); // Forzar el método PUT mediante el campo _method
+            formData.append("_method", "PUT");
         }
 
         const url = isEditing
@@ -106,7 +123,7 @@ const Proyectos = () => {
             : "http://localhost:8000/api/proyectos";
 
         fetch(url, {
-            method: "POST", // Usamos POST en lugar de PUT
+            method: "POST",
             headers: {
                 "X-CSRF-TOKEN": csrfToken,
             },
@@ -121,13 +138,21 @@ const Proyectos = () => {
                 return response.json();
             })
             .then((data) => {
+                const formattedData = {
+                    ...data,
+                    FECHA_INICIO_PROYECTO:
+                        data.FECHA_INICIO_PROYECTO?.split("T")[0],
+                    FECHA_FIN_PROYECTO: data.FECHA_FIN_PROYECTO?.split("T")[0],
+                };
+
                 const updatedProjects = isEditing
                     ? projects.map((project) =>
                           project.ID_PROYECTO === projectToEdit.ID_PROYECTO
-                              ? data
+                              ? formattedData
                               : project
                       )
-                    : [...projects, data];
+                    : [...projects, formattedData];
+
                 setProjects(updatedProjects);
                 setShowModal(false);
                 setShowCreateSuccessMessage(!isEditing);
@@ -146,8 +171,13 @@ const Proyectos = () => {
         const project = projects[index];
         setProjectName(project.NOMBRE_PROYECTO);
         setProjectDescription(project.DESCRIP_PROYECTO);
-        setProjectToEdit(project); // Guarda todo el proyecto, no solo el ID
-        setImage(null); // Asegúrate de limpiar la imagen seleccionada previamente
+
+        // Asegúrate de que las fechas sean consistentes con el formato esperado (YYYY-MM-DD)
+        setStartDate(project.FECHA_INICIO_PROYECTO);
+        setEndDate(project.FECHA_FIN_PROYECTO);
+
+        setProjectToEdit(project);
+        setImage(null);
         setIsEditing(true);
         setShowModal(true);
     };
@@ -228,58 +258,101 @@ const Proyectos = () => {
                 </div>
 
                 <div className="project-list">
-                    {projects.map((project, index) => (
-                        <div key={index} className="project-item">
-                            {project.PORTADA_PROYECTO ? (
-                                <img
-                                    src={`http://localhost:8000/storage/${project.PORTADA_PROYECTO}`}
-                                    alt="Icono del proyecto"
-                                    width="50"
-                                    height="50"
-                                    onClick={() =>
-                                        hadleRedirectDocente(
-                                            project.ID_PROYECTO
-                                        )
-                                    }
-                                />
-                            ) : (
-                                <img
-                                    src="https://via.placeholder.com/50"
-                                    alt="Icono del proyecto"
-                                />
-                            )}
-                            <div className="project-info">
-                                <h3
-                                    onClick={() =>
-                                        navigate(
-                                            `/grupos/${project.ID_PROYECTO}`
-                                        )
-                                    }
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    {project.NOMBRE_PROYECTO}
-                                </h3>
+                    {projects.length > 0 ? (
+                        projects.map((project, index) => (
+                            <div key={index} className="project-item">
+                                {project.PORTADA_PROYECTO ? (
+                                    <img
+                                        src={`http://localhost:8000/storage/${project.PORTADA_PROYECTO}`}
+                                        alt="Icono del proyecto"
+                                        width="50"
+                                        height="50"
+                                    />
+                                ) : (
+                                    <img
+                                        src="https://via.placeholder.com/50"
+                                        alt="Icono del proyecto"
+                                    />
+                                )}
+                                <div className="project-info">
+                                    <h3
+                                        onClick={() =>
+                                            navigate(
+                                                `/grupos/${project.ID_PROYECTO}`
+                                            )
+                                        }
+                                        className="project-title"
+                                    >
+                                        {project.NOMBRE_PROYECTO}
+                                    </h3>
 
-                                <p>{project.DESCRIP_PROYECTO}</p>
+                                    <p className="project-description">
+                                        {project.DESCRIP_PROYECTO}
+                                    </p>
+
+                                    <div className="project-dates">
+                                        <p>
+                                            <strong>Fecha de inicio:</strong>{" "}
+                                            {project.FECHA_INICIO_PROYECTO
+                                                ? new Date(
+                                                      project.FECHA_INICIO_PROYECTO +
+                                                          "T00:00:00"
+                                                  ).toLocaleDateString(
+                                                      "es-ES",
+                                                      {
+                                                          weekday: "long",
+                                                          day: "2-digit",
+                                                          month: "long",
+                                                          year: "numeric",
+                                                      }
+                                                  )
+                                                : ""}
+                                        </p>
+                                        <p>
+                                            <strong>Fecha de fin:</strong>{" "}
+                                            {project.FECHA_FIN_PROYECTO
+                                                ? new Date(
+                                                      project.FECHA_FIN_PROYECTO +
+                                                          "T00:00:00"
+                                                  ).toLocaleDateString(
+                                                      "es-ES",
+                                                      {
+                                                          weekday: "long",
+                                                          day: "2-digit",
+                                                          month: "long",
+                                                          year: "numeric",
+                                                      }
+                                                  )
+                                                : ""}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="project-actions">
+                                    <button
+                                        className="action-btn"
+                                        onClick={() =>
+                                            handleOpenEditModal(index)
+                                        }
+                                    >
+                                        <i className="fas fa-pen"></i>
+                                    </button>
+                                    <button
+                                        className="action-btn"
+                                        onClick={() =>
+                                            handleOpenConfirmModal(index)
+                                        }
+                                    >
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div className="project-actions">
-                                <button
-                                    className="action-btn"
-                                    onClick={() => handleOpenEditModal(index)}
-                                >
-                                    <i className="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    className="action-btn"
-                                    onClick={() =>
-                                        handleOpenConfirmModal(index)
-                                    }
-                                >
-                                    <i className="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="no-data-message">
+                            No hay proyectos registrados.
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -287,62 +360,128 @@ const Proyectos = () => {
             {showModal && (
                 <div className="modal">
                     <div className="modal-content">
-                        <h3>
+                        <h3 className="etapa-modal-title">
                             {isEditing
                                 ? "Editar Proyecto"
                                 : "Detalles del Proyecto"}
                         </h3>
-                        <input
-                            type="text"
-                            value={projectName}
-                            onChange={(e) => setProjectName(e.target.value)}
-                            placeholder="Nombre del Proyecto*"
-                            className="input-field"
-                        />
-                        <div className="description-and-photo">
-                            <textarea
-                                value={projectDescription}
-                                onChange={(e) =>
-                                    setProjectDescription(e.target.value)
-                                }
-                                placeholder="Descripción del proyecto*"
-                                className="textarea-field"
-                            />
-                            <div className="upload-container">
-                                <p className="upload-title">Incluya una foto</p>
-                                <div
-                                    className="upload-box"
-                                    onClick={() =>
-                                        document
-                                            .getElementById("fileInput")
-                                            .click()
-                                    }
+                        <div className="form-fields">
+                            <div className="field">
+                                <label
+                                    htmlFor="projectName"
+                                    className="etapa-label"
                                 >
-                                    {getImagePreview() ? (
-                                        <img
-                                            src={getImagePreview()}
-                                            alt="Vista previa"
-                                            className="image-preview"
-                                        />
-                                    ) : (
-                                        <>
-                                            <i className="fas fa-cloud-upload-alt"></i>
-                                            <p>
-                                                Pulsa aquí para añadir archivos
-                                            </p>
-                                        </>
-                                    )}
-                                </div>
+                                    Nombre del Proyecto:
+                                </label>
                                 <input
-                                    id="fileInput"
-                                    type="file"
-                                    accept="image/jpeg, image/png, image/jpg"
-                                    style={{ display: "none" }}
-                                    onChange={handleImageChange}
+                                    id="projectName"
+                                    type="text"
+                                    value={projectName}
+                                    onChange={(e) =>
+                                        setProjectName(e.target.value)
+                                    }
+                                    placeholder="Ingrese el nombre del proyecto"
+                                    className="etapa-input"
                                 />
-                                {image && <p>{image.name}</p>}
+                            </div>
+
+                            <div className="date-fields">
+                                <div className="field">
+                                    <label
+                                        htmlFor="startDate"
+                                        className="etapa-label"
+                                    >
+                                        Fecha de inicio:
+                                    </label>
+                                    <input
+                                        id="startDate"
+                                        type="date"
+                                        value={startDate}
+                                        onChange={(e) =>
+                                            setStartDate(e.target.value)
+                                        }
+                                        className="etapa-input"
+                                    />
+                                </div>
+                                <div className="field">
+                                    <label
+                                        htmlFor="endDate"
+                                        className="etapa-label"
+                                    >
+                                        Fecha de fin:
+                                    </label>
+                                    <input
+                                        id="endDate"
+                                        type="date"
+                                        value={endDate}
+                                        onChange={(e) =>
+                                            setEndDate(e.target.value)
+                                        }
+                                        className="etapa-input"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="description-photo-container">
+                                <div className="field description-field">
+                                    <label
+                                        htmlFor="projectDescription"
+                                        className="etapa-label"
+                                    >
+                                        Descripción del Proyecto:
+                                    </label>
+                                    <textarea
+                                        id="projectDescription"
+                                        value={projectDescription}
+                                        onChange={(e) =>
+                                            setProjectDescription(
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Ingrese la descripción del proyecto"
+                                        className="etapa-textarea"
+                                    />
+                                </div>
+                                <div className="upload-container">
+                                    <label className="etapa-label">
+                                        Incluya una foto:
+                                    </label>
+                                    <div
+                                        className="upload-box"
+                                        onClick={() =>
+                                            document
+                                                .getElementById("fileInput")
+                                                .click()
+                                        }
+                                    >
+                                        {getImagePreview() ? (
+                                            <img
+                                                src={getImagePreview()}
+                                                alt="Vista previa"
+                                                className="image-preview"
+                                            />
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-cloud-upload-alt"></i>
+                                                <p>
+                                                    Pulsa aquí para añadir
+                                                    archivos
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <input
+                                        id="fileInput"
+                                        type="file"
+                                        accept="image/jpeg, image/png, image/jpg"
+                                        style={{ display: "none" }}
+                                        onChange={handleImageChange}
+                                    />
+                                    {image && <p>{image.name}</p>}
+                                </div>
                             </div>
                         </div>
+
                         <div className="modal-actions">
                             <button
                                 onClick={() => setShowModal(false)}

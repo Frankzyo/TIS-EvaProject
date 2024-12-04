@@ -1,107 +1,66 @@
-/* Contenedor principal */
-.seleccionar-estudiante-container {
+.seleccionar-estudiante-contenedor {
+    display: flex;
+    align-items: flex-start;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    width: 30%;
+    height: 170px;
+}
+
+.detalles-y-seleccion {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin: 20px;
-    font-family: Arial, sans-serif;
+    gap: 10px;
+    flex: 1;
 }
 
-/* Botón para seleccionar aleatorio */
 .seleccionar-estudiante-btn {
-    background-color: #4CAF50;
+    background-color: #0072CE;
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 10px 20px;
     font-size: 16px;
+    border-radius: 5px;
     font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
 }
 
-.seleccionar-estudiante-btn:hover:enabled {
-    background-color: #45a049;
-    transform: scale(1.05);
+.seleccionar-estudiante-btn:hover {
+    background-color: #004086;
 }
 
 .seleccionar-estudiante-btn:disabled {
-    opacity: 0.6;
+    background-color: #bdc3c7;
     cursor: not-allowed;
 }
 
-/* Contenedor de la ruleta */
-.ruleta-container {
-    margin-top: 20px;
-    width: 300px;
-    height: 300px;
-    position: relative;
-    border-radius: 50%;
-    overflow: hidden;
+.estudiante-seleccionado-contenedor {
+    background-color: #f9fbfd; /* Fondo claro para suavidad */
+    border: 1px solid #d1e3f8; /* Borde con tono azul suave */
+    border-radius: 12px; /* Bordes más redondeados */
+    padding: 15px; /* Espaciado interno cómodo */
+    text-align: left; /* Alineación del texto */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra más definida para profundidad */
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Transiciones suaves para hover */
 }
 
-/* Ruleta con la animación */
-.ruleta {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 10px solid #007bff;
-    display: flex;
-    position: absolute;
-    transition: transform 3s ease-out;
-    transform-origin: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.estudiante-seleccionado p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #34495e;
 }
 
-/* Secciones de la ruleta */
-.seccion-ruleta {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    transform-origin: center center;
-    padding: 10px;
+.seleccion-estudiante-title {
+    font-size: 1.2rem; /* Tamaño de fuente */
+    font-weight: bold; /* Texto en negrita */
+    color: #004085; /* Color azul destacado */
+    margin:15px 15px; /* Espaciado inferior */
+    text-align: left; /* Alineación a la izquierda */
+    border-left: 4px solid #3498db; /* Barra decorativa a la izquierda */
+    padding-left: 10px; /* Espaciado entre el texto y la barra */
 }
 
-.seccion-ruleta span {
-    font-size: 12px;
-    color: #333;
-}
-
-/* Animación de giro de la ruleta */
-.girando {
-    animation: girar 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
-}
-
-@keyframes girar {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Título de estudiante seleccionado */
-.seleccionar-estudiante-titulo {
-    margin-top: 30px;
-    font-size: 18px;
-    color: #333;
-}
-
-/* Datos del estudiante seleccionado */
-.seleccionar-estudiante-datos {
-    font-size: 16px;
-    color: #007bff;
-    margin-top: 10px;
-}
-
-/* Mensaje cuando no se ha seleccionado ningún estudiante */
-.seleccionar-estudiante-mensaje {
-    font-size: 16px;
-    color: #666;
-    margin-top: 10px;
-}

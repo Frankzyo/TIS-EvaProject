@@ -161,7 +161,7 @@ const SidebarPrueba = ({
                     <div className="submenu">
                         <ul
                             className="menu-item-prueba"
-                            onClick={() => navigate("/seguimiento-semanal")}
+                            onClick={() => navigate(`/seguimiento-semanal/${projectId}`)}
                         >
                             <span className="menu-text-prueba">
                                 Seguimientos semanal

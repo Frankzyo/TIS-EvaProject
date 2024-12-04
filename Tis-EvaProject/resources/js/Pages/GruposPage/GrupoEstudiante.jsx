@@ -202,7 +202,7 @@ const GrupoEstudiante = () => {
         const obtenerGrupos = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:8000/api/proyectos/${projectId}/grupos`,
+                    `http://localhost:8000/api/proyectos/${projectId}/grupos-hora`,
                     { withCredentials: true }
                 );
 
@@ -309,34 +309,44 @@ const GrupoEstudiante = () => {
             setShowErrorMessage(true);
             return;
         }
-
+    
+        // Verificar si el nombre del grupo ya existe
+        const isDuplicate = groups.some(
+            (group) => group.NOMBRE_GRUPO.toLowerCase() === groupName.toLowerCase()
+        );
+        if (isDuplicate) {
+            setErrorMessage("El nombre del grupo ya existe. Por favor, elija otro.");
+            setShowErrorMessage(true);
+            return;
+        }
+    
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
-
+    
         const formData = new FormData();
         formData.append("NOMBRE_GRUPO", groupName);
         formData.append("DESCRIP_GRUPO", groupDescription);
         formData.append("ID_PROYECTO", projectId);
-
+    
         // Añadir CREADO_POR solo si estamos creando un nuevo grupo
         if (!isEditing) {
             formData.append("CREADO_POR", localStorage.getItem("ID_EST"));
         }
-
+    
         if (image) {
             formData.append("PORTADA_GRUPO", image);
         }
-
+    
         // Si estamos en modo edición, añadimos _method para forzar PUT
         if (isEditing) {
             formData.append("_method", "PUT");
         }
-
+    
         const url = isEditing
             ? `http://localhost:8000/api/grupos/${groupToEdit.ID_GRUPO}`
             : "http://localhost:8000/api/grupos";
-
+    
         axios
             .post(url, formData, {
                 headers: {
@@ -346,10 +356,8 @@ const GrupoEstudiante = () => {
                 },
             })
             .then((response) => {
-                console.log("Respuesta completa del backend:", response.data);
-
                 const newGroup = response.data;
-
+    
                 if (isEditing) {
                     setGroups(
                         groups.map((group) =>
@@ -367,7 +375,7 @@ const GrupoEstudiante = () => {
                     localStorage.setItem("createdGroupId", newGroup.ID_GRUPO);
                     setShowCreateSuccessMessage(true);
                 }
-
+    
                 setShowModal(false);
                 setIsEditing(false);
                 setGroupToEdit(null);
@@ -375,18 +383,18 @@ const GrupoEstudiante = () => {
             .catch((error) => {
                 if (error.response && error.response.status === 422) {
                     setErrorMessage(
-                        "Datos inválidos. Verifica los campos e intenta nuevamente."
+                        error.response.data.message ||
+                            "Datos inválidos. Verifica los campos e intenta nuevamente."
                     );
-                    console.log("Detalles del error:", error.response.data);
                 } else {
                     setErrorMessage(
                         "Hubo un problema al guardar el grupo. Intente nuevamente."
                     );
                 }
                 setShowErrorMessage(true);
-                console.error("Error al guardar el grupo:", error);
             });
     };
+    
 
     const handleOpenEditModal = (index) => {
         const group = groups[index];
@@ -489,8 +497,8 @@ const GrupoEstudiante = () => {
                     </div>
                     <div className="defense-days-list">
                         {Array.isArray(defenseDays) &&
+                        defenseDays.length > 0 ? (
                             defenseDays.map((defense, index) => {
-                                // Verificar si el grupo del estudiante ya está registrado en alguna fecha
                                 const isAlreadyRegistered = Object.values(
                                     isRegisteredFech
                                 ).some((registered) => registered === true);
@@ -502,11 +510,15 @@ const GrupoEstudiante = () => {
                                     >
                                         <div className="defense-day-info">
                                             <h3 className="defense-day-title">
-                                                {defense.day}
+                                                {defense.day ||
+                                                    "Día no especificado"}
                                             </h3>
                                             <p className="defense-day-time">
-                                                {defense.HR_INIDEF} -{" "}
-                                                {defense.HR_FINDEF}
+                                                {defense.HR_INIDEF ||
+                                                    "Hora no especificada"}{" "}
+                                                -{" "}
+                                                {defense.HR_FINDEF ||
+                                                    "Hora no especificada"}
                                             </p>
                                         </div>
                                         {defense.ID_GRUPO ? (
@@ -542,7 +554,10 @@ const GrupoEstudiante = () => {
                                         )}
                                     </div>
                                 );
-                            })}
+                            })
+                        ) : (
+                            <p>No hay días de defensa disponibles.</p>
+                        )}
                     </div>
 
                     <div className="projects-header">
@@ -565,78 +580,85 @@ const GrupoEstudiante = () => {
                     </div>
 
                     <div className="project-list">
-                        {groups.map((group, index) => (
-                            <div key={index} className="project-item">
-                                {group.PORTADA_GRUPO ? (
+                        {Array.isArray(groups) && groups.length > 0 ? (
+                            groups.map((group, index) => (
+                                <div key={index} className="project-item">
                                     <img
-                                        src={`http://localhost:8000/storage/${group.PORTADA_GRUPO}`}
+                                        src={
+                                            group.PORTADA_GRUPO
+                                                ? `http://localhost:8000/storage/${group.PORTADA_GRUPO}`
+                                                : "https://via.placeholder.com/50"
+                                        }
                                         alt="Icono del grupo"
                                         width="50"
                                         height="50"
                                     />
-                                ) : (
-                                    <img
-                                        src="https://via.placeholder.com/50"
-                                        alt="Icono del grupo"
-                                    />
-                                )}
-                                <div className="project-info">
-                                    <h3
-                                        onClick={() =>
-                                            handleGroupClick(group.ID_GRUPO)
-                                        }
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {group.NOMBRE_GRUPO}
-                                    </h3>
-                                    <p>{group.DESCRIP_GRUPO}</p>
-                                </div>
-                                {isRL &&
-                                    group.CREADO_POR ===
+                                    <div className="project-info">
+                                        <h3
+                                            onClick={() =>
+                                                handleGroupClick(group.ID_GRUPO)
+                                            }
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {group.NOMBRE_GRUPO ||
+                                                "Nombre no disponible"}
+                                        </h3>
+                                        <p>
+                                            {group.DESCRIP_GRUPO ||
+                                                "Descripción no disponible"}
+                                        </p>
+                                    </div>
+                                    {isRL &&
+                                        group.CREADO_POR ===
+                                            parseInt(
+                                                localStorage.getItem("ID_EST")
+                                            ) &&
+                                        (isRegistered ? (
+                                            <span className="registered-text">
+                                                Registrado
+                                            </span>
+                                        ) : (
+                                            <button
+                                                onClick={() =>
+                                                    handleRegister(
+                                                        group.ID_GRUPO
+                                                    )
+                                                }
+                                                className="registered-button"
+                                            >
+                                                Registrarse
+                                            </button>
+                                        ))}
+                                    {group.CREADO_POR ===
                                         parseInt(
                                             localStorage.getItem("ID_EST")
-                                        ) &&
-                                    (isRegistered ? (
-                                        <span className="registered-text">
-                                            Registrado
-                                        </span>
-                                    ) : (
-                                        <button
-                                            onClick={() =>
-                                                handleRegister(group.ID_GRUPO)
-                                            }
-                                            className="registered-button"
-                                        >
-                                            Registrarse
-                                        </button>
-                                    ))}
-                                {group.CREADO_POR ===
-                                    parseInt(
-                                        localStorage.getItem("ID_EST")
-                                    ) && (
-                                    <div className="project-actions">
-                                        <button
-                                            className="action-btn"
-                                            onClick={() =>
-                                                handleOpenEditModal(index)
-                                            }
-                                        >
-                                            <i className="fas fa-pen"></i>
-                                        </button>
-                                        <button
-                                            className="action-btn"
-                                            onClick={() =>
-                                                handleOpenConfirmModal(
-                                                    group.ID_GRUPO
-                                                )
-                                            }
-                                        >
-                                            <i className="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                        ) && (
+                                        <div className="project-actions">
+                                            <button
+                                                className="action-btn"
+                                                onClick={() =>
+                                                    handleOpenEditModal(index)
+                                                }
+                                            >
+                                                <i className="fas fa-pen"></i>
+                                            </button>
+                                            <button
+                                                className="action-btn"
+                                                onClick={() =>
+                                                    handleOpenConfirmModal(
+                                                        group.ID_GRUPO
+                                                    )
+                                                }
+                                            >
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <p>No hay grupos disponibles.</p>
+                        )}
                     </div>
 
                     {successMessage && (

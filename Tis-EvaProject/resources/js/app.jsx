@@ -25,6 +25,7 @@ import HistoriaUsuario from "./Pages/PlanificacionPage/HistoriaUsuario";
 import PerfilEstudiante from "./Pages/EstudiantePage/PerfilEstudiante";
 import EquipoEstudiante from "./Pages/EstudiantePage/EquipoEstudiante";
 import TareasEstudiante from "./Pages/EstudiantePage/TareasEstudiante";
+import SeguimientoSemanalEstudiante from "./Pages/DocentePage/SeguimientoSemanalEstudiante";
 
 // Rutas docentes
 import RequerimientosDocente from "./Pages/DocentePage/RequerimientosDocente";
@@ -42,6 +43,9 @@ import ApproveEstudiante from "./Pages/Auth/ApproveEstudiante";
 // Rutas de grupos y gestión
 import GrupoEstudiante from "./Pages/GruposPage/GrupoEstudiante";
 import Etapas from "./Pages/EtapasPage/Etapas";
+
+import Perfil from "./Pages/Perfil";
+import SeguimientoSemanal from "./Pages/DocentePage/SeguimientoSemanal";
 
 // Componente para manejar rutas no encontradas
 function NotFound() {
@@ -68,16 +72,15 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-
-                {/* Proyectos */}
                 <Route path="/proyectos" element={<Proyectos />} />
                 <Route path="/grupos/:projectId" element={<Grupos />} />
                 <Route
                     path="/proyectos/:projectId/grupos-estudiante"
                     element={<GrupoEstudiante />}
+                />
+                <Route
+                    path="/requerimientos/:projectId"
+                    element={<RequerimientosDocente />}
                 />
                 <Route
                     path="/proyectos/:projectId/grupos/:groupId/estudiantes"
@@ -91,8 +94,8 @@ function App() {
                     path="/proyectos/:projectId/rubrica/:etapaId"
                     element={<Rubrica />}
                 />
-
-                {/* Estudiantes */}
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route
                     path="/proyecto-estudiante"
                     element={<ProyectoEstudiante />}
@@ -105,10 +108,17 @@ function App() {
                     path="/historia-usuario/:id"
                     element={<HistoriaUsuario />}
                 />
+                <Route path="/perfil" element={<Perfil />} />
                 <Route
                     path="/perfil-estudiante"
                     element={<PerfilEstudiante />}
                 />
+                <Route path="/approve-accounts" element={<ApproveAccounts />} />
+                <Route
+                    path="/approve-estudiante"
+                    element={<ApproveEstudiante />}
+                />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                     path="/equipo-estudiante"
                     element={<EquipoEstudiante />}
@@ -117,15 +127,13 @@ function App() {
                     path="/tareas-estudiante"
                     element={<TareasEstudiante />}
                 />
-
-                {/* Docentes */}
-                <Route
-                    path="/requerimientos/:projectId"
-                    element={<RequerimientosDocente />}
-                />
                 <Route
                     path="/planilla-seguimiento/:projectId"
                     element={<PlanillaDeSeguimiento />}
+                />
+                <Route
+                    path="/etapas-proyecto/:projectId"
+                    element={<Etapas />}
                 />
                 <Route
                     path="/evaluacion-individual/:projectId"
@@ -147,22 +155,14 @@ function App() {
                     path="/evaluacion-cruzada/:projectId"
                     element={<EvaluacionCruzada />}
                 />
-
-                {/* Aprobación */}
-                <Route path="/approve-accounts" element={<ApproveAccounts />} />
                 <Route
-                    path="/approve-estudiante"
-                    element={<ApproveEstudiante />}
+                    path="/seguimiento-semanal/:projectId"
+                    element={<SeguimientoSemanal />}
                 />
                 <Route
-                    path="/etapas-proyecto/:projectId"
-                    element={<Etapas />}
+                    path="/seguimiento-semanal-estudiante/:projectId"
+                    element={<SeguimientoSemanalEstudiante />}
                 />
-                <Route
-                    path="/proyectos/:projectId/rubrica/:etapaId"
-                    element={<Rubrica />}
-                />
-                {/* Ruta para páginas no encontradas */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>

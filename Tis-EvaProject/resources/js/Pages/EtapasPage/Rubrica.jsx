@@ -186,16 +186,22 @@ const Rubrica = () => {
                         </button>
                     </div>
                     <div className="rubrica-list">
-                        {rubricas.map((rubrica, index) => (
-                            <RubricaItem
-                                key={index}
-                                rubrica={rubrica}
-                                onEdit={() => handleEditRubrica(rubrica)}
-                                onDelete={() =>
-                                    handleDeleteRubrica(rubrica.ID_RUBRICA)
-                                }
-                            />
-                        ))}
+                        {rubricas.length > 0 ? (
+                            rubricas.map((rubrica, index) => (
+                                <RubricaItem
+                                    key={index}
+                                    rubrica={rubrica}
+                                    onEdit={() => handleEditRubrica(rubrica)}
+                                    onDelete={() =>
+                                        handleDeleteRubrica(rubrica.ID_RUBRICA)
+                                    }
+                                />
+                            ))
+                        ) : (
+                            <p className="no-data-message">
+                                No hay rúbricas registradas.
+                            </p>
+                        )}
                     </div>
                 </div>
                 {showModal && (
