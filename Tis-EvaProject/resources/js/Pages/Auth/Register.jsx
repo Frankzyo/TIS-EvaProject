@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../../css/auth/Register.css";
 import axios from "axios";
+import ModalErrorRegister from "../../Components/ComponenteModal/ModalErrorRegister";
 
 function Register() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
+    const [errorModal, setErrorModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+    });
 
     const [formData, setFormData] = useState({
         name: "",
@@ -41,9 +47,7 @@ function Register() {
                 photo: file,
             }));
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-            };
+            reader.onloadend = () => setPreviewImage(reader.result);
             reader.readAsDataURL(file);
         } else {
             alert(
@@ -69,44 +73,94 @@ function Register() {
             formData.confirmPassword
         );
         submissionData.append("role", formData.role);
-
-        if (formData.photo) {
-            submissionData.append("foto", formData.photo);
-        }
+        if (formData.photo) submissionData.append("foto", formData.photo);
 
         try {
             const response = await axios.post(
                 "http://localhost:8000/api/register",
                 submissionData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
+                { headers: { "Content-Type": "multipart/form-data" } }
             );
             alert(response.data.message);
             navigate("/login");
         } catch (error) {
-            if (error.response) {
-                console.error(error.response.data);
-                alert(
-                    "Error en el registro: " +
-                        (error.response.data.message || "Verifica tus datos.")
-                );
-            } else {
-                console.error(error);
-                alert("Error en el registro.");
-            }
+            const errorMessage =
+                error.response?.data?.message ||
+                "Error en el registro. Verifica tus datos.";
+            setErrorModal({
+                isOpen: true,
+                title: "Error de Registro",
+                message: errorMessage,
+            });
         }
     };
+    const InputField = ({
+        type,
+        name,
+        placeholder,
+        value,
+        onChange,
+        required,
+    }) => (
+        <div className="input-group">
+            <input
+                type={type}
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                required={required}
+            />
+        </div>
+    );
+
+    const PasswordField = ({
+        name,
+        placeholder,
+        value,
+        onChange,
+        toggleVisibility,
+        showPassword,
+    }) => (
+        <div className="input-group">
+            <input
+                type={showPassword ? "text" : "password"}
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                required
+            />
+            <span className="toggle-password" onClick={toggleVisibility}>
+                {showPassword ? (
+                    <i className="fas fa-eye-slash"></i>
+                ) : (
+                    <i className="fas fa-eye"></i>
+                )}
+            </span>
+        </div>
+    );
+
+    const CheckboxField = ({ name, label, checked, onChange, required }) => (
+        <label>
+            <input
+                type="checkbox"
+                name={name}
+                checked={checked}
+                onChange={onChange}
+                required={required}
+            />
+            {label}
+        </label>
+    );
 
     return (
         <div className="register-container">
             <div className="register-box">
                 <h2>Registrar Cuenta</h2>
-
                 <div className="divider"></div>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Campo de selección de rol */}
                     <div className="input-group">
                         <select
                             name="role"
@@ -119,80 +173,47 @@ function Register() {
                         </select>
                     </div>
 
-                    <div className="input-group">
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Nombre*"
-                            required
-                            value={formData.name}
-                            onChange={handleInputChange}
-                        />
-                    </div>
+                    <InputField
+                        type="text"
+                        name="name"
+                        placeholder="Nombre*"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <InputField
+                        type="text"
+                        name="lastName"
+                        placeholder="Apellidos*"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <InputField
+                        type="email"
+                        name="email"
+                        placeholder="Introduce tu correo electrónico*"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                    />
 
-                    <div className="input-group">
-                        <input
-                            type="text"
-                            name="lastName"
-                            placeholder="Apellidos*"
-                            required
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Introduce tu correo electrónico*"
-                            required
-                            value={formData.email}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            name="password"
-                            placeholder="Contraseña*"
-                            required
-                            value={formData.password}
-                            onChange={handleInputChange}
-                        />
-                        <span
-                            className="toggle-password"
-                            onClick={togglePasswordVisibility}
-                        >
-                            {showPassword ? (
-                                <i className="fas fa-eye-slash"></i>
-                            ) : (
-                                <i className="fas fa-eye"></i>
-                            )}
-                        </span>
-                    </div>
-
-                    <div className="input-group">
-                        <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            name="confirmPassword"
-                            placeholder="Repetir contraseña*"
-                            required
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                        />
-                        <span
-                            className="toggle-password"
-                            onClick={toggleConfirmPasswordVisibility}
-                        >
-                            {showConfirmPassword ? (
-                                <i className="fas fa-eye-slash"></i>
-                            ) : (
-                                <i className="fas fa-eye"></i>
-                            )}
-                        </span>
-                    </div>
+                    <PasswordField
+                        name="password"
+                        placeholder="Contraseña*"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        toggleVisibility={togglePasswordVisibility}
+                        showPassword={showPassword}
+                    />
+                    <PasswordField
+                        name="confirmPassword"
+                        placeholder="Repetir contraseña*"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        toggleVisibility={toggleConfirmPasswordVisibility}
+                        showPassword={showConfirmPassword}
+                    />
 
                     <div className="uploadr-title-container">
                         <p>Incluya una foto</p>
@@ -226,33 +247,19 @@ function Register() {
                     </div>
 
                     <div className="checkbox-group">
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="acceptPrivacyPolicy"
-                                checked={formData.acceptPrivacyPolicy}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            He leído y acepto la{" "}
-                            <a
-                                href="/privacy"
-                                target="_blank"
-                                className="privacy-link"
-                            >
-                                política de privacidad
-                            </a>
-                        </label>
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="receiveNotifications"
-                                checked={formData.receiveNotifications}
-                                onChange={handleInputChange}
-                            />
-                            Recibir notificaciones, novedades y tendencias por
-                            correo
-                        </label>
+                        <CheckboxField
+                            name="acceptPrivacyPolicy"
+                            label="He leído y acepto la política de privacidad"
+                            checked={formData.acceptPrivacyPolicy}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <CheckboxField
+                            name="receiveNotifications"
+                            label="Recibir notificaciones, novedades y tendencias por correo"
+                            checked={formData.receiveNotifications}
+                            onChange={handleInputChange}
+                        />
                     </div>
 
                     <button className="create-account-button" type="submit">
@@ -264,6 +271,13 @@ function Register() {
                     Volver al Inicio de Sesión
                 </Link>
             </div>
+
+            <ModalErrorRegister
+                isOpen={errorModal.isOpen}
+                onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+                title={errorModal.title}
+                message={errorModal.message}
+            />
         </div>
     );
 }

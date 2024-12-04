@@ -1,0 +1,24 @@
+.modal-contenido {
+    width: 30%;
+    height: 21%;
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 5px;
+}
+.cont-btn-cr {
+    display: flex;
+    justify-content: end;
+    padding: 0 20px;
+}
+.close-button {
+    width: 150px;
+    height: 26px;
+    border-radius: 8px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+}
