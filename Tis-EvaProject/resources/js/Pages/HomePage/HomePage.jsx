@@ -4,16 +4,23 @@ import { TbBrandX } from "react-icons/tb";
 import "../../../css/HomePage/HomePage.css";
 import axios from "axios";
 
-function HomePage() {
+const DEFAULT_PROFILE_PICTURE = "https://via.placeholder.com/50";
+
+const HomePage = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [foto, setFoto] = useState("https://via.placeholder.com/50"); // Foto por defecto
+    const [foto, setFoto] = useState(DEFAULT_PROFILE_PICTURE);
 
     useEffect(() => {
         const fetchUserFoto = async () => {
-            try {
-                const token = localStorage.getItem("authToken");
+            const token = localStorage.getItem("authToken");
 
-                const response = await axios.get(
+            if (!token) {
+                console.warn("No token found in localStorage");
+                return;
+            }
+
+            try {
+                const { data } = await axios.get(
                     "http://localhost:8000/api/getLoggedUser",
                     {
                         headers: {
@@ -23,15 +30,14 @@ function HomePage() {
                     }
                 );
 
-                const data = response.data;
                 const fotoUrl = data.foto
                     ? `http://localhost:8000/storage/${data.foto}`
-                    : "https://via.placeholder.com/50";
+                    : DEFAULT_PROFILE_PICTURE;
 
                 setFoto(fotoUrl);
                 setIsAuthenticated(true);
             } catch (error) {
-                console.error("Error al obtener la foto del usuario:", error);
+                console.error("Error fetching user photo:", error);
                 setIsAuthenticated(false);
             }
         };
@@ -42,25 +48,41 @@ function HomePage() {
     const handleLogout = () => {
         localStorage.removeItem("authToken");
         setIsAuthenticated(false);
-        setFoto("https://via.placeholder.com/50");
+        setFoto(DEFAULT_PROFILE_PICTURE);
     };
+
+    const renderUserIcon = () =>
+        isAuthenticated ? (
+            <img src={foto} alt="Foto de perfil" className="profile-pic" />
+        ) : (
+            <i className="fas fa-user-circle"></i>
+        );
+
+    const renderAuthButton = () =>
+        isAuthenticated ? (
+            <button onClick={handleLogout} className="btn-primary">
+                Cerrar sesión
+            </button>
+        ) : (
+            <a href="/login" className="btn-primary">
+                Iniciar sesión
+            </a>
+        );
+
+    const socialLinks = [
+        { href: "https://instagram.com", icon: <FaInstagram /> },
+        { href: "https://facebook.com", icon: <FaFacebook /> },
+        { href: "https://linkedin.com", icon: <FaLinkedin /> },
+        { href: "https://x.com", icon: <TbBrandX /> },
+        { href: "https://youtube.com", icon: <FaYoutube /> },
+    ];
 
     return (
         <div className="homepage-container">
             {/* Header */}
             <header className="header-homepage">
                 <h1 className="title">Sistema de Evaluación de Proyectos</h1>
-                <div className="homepage-user-icon">
-                    {isAuthenticated ? (
-                        <img
-                            src={foto}
-                            alt="Foto de perfil"
-                            className="profile-pic"
-                        />
-                    ) : (
-                        <i className="fas fa-user-circle"></i>
-                    )}
-                </div>
+                <div className="homepage-user-icon">{renderUserIcon()}</div>
             </header>
 
             {/* Navigation Menu */}
@@ -71,7 +93,7 @@ function HomePage() {
             </nav>
 
             {/* Main Content */}
-            <div className="main-content">
+            <main className="main-content">
                 <h2>
                     Optimiza la Evaluación y Gestión en Proyectos del Taller de
                     Ingeniería de Software.
@@ -81,22 +103,8 @@ function HomePage() {
                     evaluación de equipos en entornos colaborativos, basado en
                     la metodología SCRUM.
                 </p>
-                {isAuthenticated ? (
-                    <button onClick={handleLogout} className="btn-primary">
-                        Cerrar sesión
-                    </button>
-                ) : (
-                    <a
-                        href="/login"
-                        className={`btn-primary ${
-                            isAuthenticated ? "logout" : ""
-                        }`}
-                        onClick={isAuthenticated ? handleLogout : null}
-                    >
-                        {isAuthenticated ? "Cerrar sesión" : "Iniciar sesión"}
-                    </a>
-                )}
-            </div>
+                {renderAuthButton()}
+            </main>
 
             {/* Image */}
             <img
@@ -110,41 +118,16 @@ function HomePage() {
                 <div className="footer-left">
                     <p>Contáctanos en...</p>
                     <div className="social-icons">
-                        <a
-                            href="https://instagram.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <FaInstagram />
-                        </a>
-                        <a
-                            href="https://facebook.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <FaFacebook />
-                        </a>
-                        <a
-                            href="https://linkedin.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <FaLinkedin />
-                        </a>
-                        <a
-                            href="https://x.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <TbBrandX />
-                        </a>
-                        <a
-                            href="https://youtube.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <FaYoutube />
-                        </a>
+                        {socialLinks.map(({ href, icon }, index) => (
+                            <a
+                                key={index}
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {icon}
+                            </a>
+                        ))}
                     </div>
                 </div>
                 <div className="footer-right">
@@ -154,6 +137,6 @@ function HomePage() {
             </footer>
         </div>
     );
-}
+};
 
 export default HomePage;
