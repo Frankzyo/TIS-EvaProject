@@ -18,6 +18,7 @@ use App\Http\Controllers\EvaluacionIndividualController;
 use App\Http\Controllers\EvaluacionIndividualEstudianteController;
 use App\Http\Controllers\EvaluacionParController;
 use App\Http\Controllers\SeguimientoSemanalController;
+use App\Http\Controllers\AutoevaluacionProyectoController;
 
 // Ruta de login para cargar la aplicación React
 Route::get('/login', function () {
@@ -206,6 +207,15 @@ Route::prefix('api/evaluaciones-individuales')->group(function () {
     Route::get('/{examenId}', [EvaluacionIndividualController::class, 'show']);
     Route::put('/{id}', [EvaluacionIndividualController::class, 'update']); // Actualizar evaluación
     Route::delete('/{id}', [EvaluacionIndividualController::class, 'destroy']); // Eliminar evaluación
+});
+
+Route::prefix('api/proyectos/{projectId}/autoevaluaciones')->group(function () {
+    Route::post('/', [AutoevaluacionProyectoController::class, 'store']); // Crear autoevaluación
+    Route::get('/', [AutoevaluacionProyectoController::class, 'show']);  // Obtener autoevaluaciones
+    Route::put('/{autoevaluacionId}', [AutoevaluacionProyectoController::class, 'update']); // Actualizar autoevaluación
+    Route::delete('/{autoevaluacionId}', [AutoevaluacionProyectoController::class, 'destroy']); // Eliminar autoevaluación
+    Route::delete('/pregunta/{preguntaId}', [AutoevaluacionProyectoController::class, 'destroyPregunta']); // Eliminar pregunta
+    Route::delete('/opcion/{opcionId}', [AutoevaluacionProyectoController::class, 'destroyOpcion']); // Eliminar opción
 });
 
 // Ruta de prueba para verificar funcionamiento del backend

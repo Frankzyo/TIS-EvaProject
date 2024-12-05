@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import '../../css/forgotPassword.css';
+import '../../css/ForgotPassword.css';
 import "../../css/Login.css"
 
 function ForgotPassword() {

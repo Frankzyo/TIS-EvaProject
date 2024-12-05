@@ -63,69 +63,76 @@ const PlanillaDeSeguimiento = () => {
                 (group) => group.ID_GRUPO === parseInt(selectedGroup)
             )?.fechas_defensa || [];
 
-            studentsData.forEach((student) => {
-                student.notas.forEach((nota) => {
-                    const diaDefensa =
-                        Array.isArray(fechasDefensa) && fechasDefensa.length > 0
-                            ? fechasDefensa[0]?.DIA || "Sin día"
-                            : "Sin día";
-            
-                    const columnKey = `${nota.ETAPA_TITULO}_${nota.FECHA_REVISION}`;
-                    if (!etapasMap[columnKey]) {
-                        etapasMap[columnKey] = {
-                            title: (
-                                <div>
-                                    <div>{nota.FECHA_REVISION}</div>
-                                    <div>{diaDefensa}</div>
-                                </div>
-                            ),
-                            parent: `${nota.ETAPA_TITULO} (${nota.ETAPA_PUNTUACION})`,
-                            dataIndex: columnKey,
-                            key: columnKey,
-                            align: "center",
-                            render: (value, record) => {
-                                if (isEditing) {
-                                    return (
-                                        <input
-                                            type="number"
-                                            value={value || ""}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-            
-                                                // Validar que la nota no sea negativa
-                                                if (newValue < 0) {
-                                                    alert("La nota no puede ser negativa.");
-                                                    return;
-                                                }
-            
-                                                // Validar que la nota no exceda la puntuación máxima
-                                                const maxPuntuacion = studentsData
-                                                    .find(
-                                                        (stu) =>
-                                                            stu.estudiante.ID_ESTUDIANTE ===
-                                                            record.key
-                                                    )
-                                                    ?.notas.find(
-                                                        (n) =>
-                                                            `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
-                                                            columnKey
-                                                    )?.ETAPA_PUNTUACION;
-            
-                                                if (newValue > maxPuntuacion) {
-                                                    alert(
-                                                        `La nota no puede ser mayor a ${maxPuntuacion} puntos.`
-                                                    );
-                                                    return;
-                                                }
-            
-                                                // Actualizar los datos
-                                                const updatedData = studentsData.map(
-                                                    (stu) => {
-                                                        if (
-                                                            stu.estudiante.ID_ESTUDIANTE ===
-                                                            record.key
-                                                        ) {
-                                                            stu.notas = stu.notas.map((n) =>
+        studentsData.forEach((student) => {
+            student.notas.forEach((nota) => {
+                const diaDefensa =
+                    Array.isArray(fechasDefensa) && fechasDefensa.length > 0
+                        ? fechasDefensa[0]?.DIA || "Sin día"
+                        : "Sin día";
+
+                const columnKey = `${nota.ETAPA_TITULO}_${nota.FECHA_REVISION}`;
+                if (!etapasMap[columnKey]) {
+                    etapasMap[columnKey] = {
+                        title: (
+                            <div>
+                                <div>{nota.FECHA_REVISION}</div>
+                                <div>{diaDefensa}</div>
+                            </div>
+                        ),
+                        parent: `${nota.ETAPA_TITULO} (${nota.ETAPA_PUNTUACION})`,
+                        dataIndex: columnKey,
+                        key: columnKey,
+                        align: "center",
+                        render: (value, record) => {
+                            if (isEditing) {
+                                return (
+                                    <input
+                                        type="number"
+                                        value={value || ""}
+                                        onChange={(e) => {
+                                            const newValue = parseFloat(
+                                                e.target.value
+                                            );
+
+                                            // Validar que la nota no sea negativa
+                                            if (newValue < 0) {
+                                                alert(
+                                                    "La nota no puede ser negativa."
+                                                );
+                                                return;
+                                            }
+
+                                            // Validar que la nota no exceda la puntuación máxima
+                                            const maxPuntuacion = studentsData
+                                                .find(
+                                                    (stu) =>
+                                                        stu.estudiante
+                                                            .ID_ESTUDIANTE ===
+                                                        record.key
+                                                )
+                                                ?.notas.find(
+                                                    (n) =>
+                                                        `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
+                                                        columnKey
+                                                )?.ETAPA_PUNTUACION;
+
+                                            if (newValue > maxPuntuacion) {
+                                                alert(
+                                                    `La nota no puede ser mayor a ${maxPuntuacion} puntos.`
+                                                );
+                                                return;
+                                            }
+
+                                            // Actualizar los datos
+                                            const updatedData =
+                                                studentsData.map((stu) => {
+                                                    if (
+                                                        stu.estudiante
+                                                            .ID_ESTUDIANTE ===
+                                                        record.key
+                                                    ) {
+                                                        stu.notas =
+                                                            stu.notas.map((n) =>
                                                                 `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
                                                                 columnKey
                                                                     ? {
@@ -135,29 +142,27 @@ const PlanillaDeSeguimiento = () => {
                                                                       }
                                                                     : n
                                                             );
-                                                        }
-                                                        return stu;
                                                     }
-                                                );
-                                                setStudentsData(updatedData);
-                                            }}
-                                            style={{
-                                                textAlign: "center",
-                                                padding: "4px 6px",
-                                                width: "auto", // Ancho dinámico
-                                                minWidth: "60px", // Ancho mínimo
-                                                maxWidth: "100px", // Ancho máximo opcional
-                                            }}
-                                        />
-                                    );
-                                }
-                                return value || "-";
-                            },
-                        };
-                    }
-                });
+                                                    return stu;
+                                                });
+                                            setStudentsData(updatedData);
+                                        }}
+                                        style={{
+                                            textAlign: "center",
+                                            padding: "4px 6px",
+                                            width: "auto", // Ancho dinámico
+                                            minWidth: "60px", // Ancho mínimo
+                                            maxWidth: "100px", // Ancho máximo opcional
+                                        }}
+                                    />
+                                );
+                            }
+                            return value || "-";
+                        },
+                    };
+                }
             });
-            
+        });
 
         const dynamicColumns = Object.values(etapasMap).reduce(
             (acc, column) => {
@@ -199,14 +204,10 @@ const PlanillaDeSeguimiento = () => {
             render: (_, row) => {
                 const total = Object.keys(row)
                     .filter((key) => key.includes("_"))
-                    .reduce(
-                        (sum, key) => sum + (parseFloat(row[key]) || 0),
-                        0
-                    );
+                    .reduce((sum, key) => sum + (parseFloat(row[key]) || 0), 0);
                 return Math.round(total); // Redondear el total al número entero más cercano
             },
         };
-        
 
         const retrasoColumn = {
             title: "Retraso",
@@ -340,98 +341,109 @@ const PlanillaDeSeguimiento = () => {
                     projectId={projectId}
                 />
                 <div className="container">
-    <div className="projects-header">
-        <h2>Planilla de Seguimiento</h2>
-        <button className="new-project-btn">Exportar a Excel</button>
-    </div>
-
-    <div className="dropdown-container">
-        <label htmlFor="groupDropdown">Selecciona un grupo:</label>
-        <select
-            id="groupDropdown"
-            value={selectedGroup || ""}
-            onChange={handleGroupSelection}
-        >
-            <option value="" disabled>
-                Seleccionar grupo
-            </option>
-            {Array.isArray(projectData) && projectData.length > 0 ? (
-                projectData.map((group) => (
-                    <option key={group.ID_GRUPO} value={group.ID_GRUPO}>
-                        {group.NOMBRE_GRUPO}
-                    </option>
-                ))
-            ) : (
-                <option disabled>No hay grupos disponibles</option>
-            )}
-        </select>
-    </div>
-
-    {selectedGroup ? (
-        <div className="group-details">
-            <h3>Estudiantes y Notas</h3>
-            {dataForTable.length > 0 ? (
-                <>
-                    {/* Contenedor con scroll horizontal para etapas */}
-                    <div
-                        className="etapas-scroll-container"
-                        style={{
-                            overflowX: "auto",
-                            overflowY: "hidden",
-                            paddingBottom: "10px",
-                        }}
-                    >
-                        <Table
-                            className="custom-table"
-                            columns={columns}
-                            dataSource={dataForTable}
-                            pagination={false}
-                            bordered
-                            size="middle"
-                            rowClassName={(record) =>
-                                record.total >= 50 ? "highlight-row" : ""
-                            }
-                            onRow={(record) => ({
-                                style: { textAlign: "center" }, // Centra el contenido de todas las filas
-                            })}
-                        />
+                    <div className="projects-header">
+                        <h2>Planilla de Seguimiento</h2>
+                        <button className="new-project-btn">
+                            Exportar a Excel
+                        </button>
                     </div>
-                    {/* Botón debajo de la tabla */}
-                    <div className="edit-notes-btn-container">
-                        {!isEditing ? (
-                            <button
-                                className="new-project-btn"
-                                onClick={handleEdit}
-                            >
-                                Editar Notas
-                            </button>
-                        ) : (
-                            <button
-                                className="new-project-btn"
-                                onClick={handleSave}
-                            >
-                                Guardar
-                            </button>
-                        )}
-                    </div>
-                </>
-            ) : (
-                <p className="no-data-message">
-                    No hay estudiantes registrados o notas disponibles.
-                </p>
-            )}
-        </div>
-    ) : (
-        <p className="no-data-message">
-            Seleccione un grupo para ver detalles.
-        </p>
-    )}
-</div>
 
+                    <div className="dropdown-container">
+                        <label htmlFor="groupDropdown">
+                            Selecciona un grupo:
+                        </label>
+                        <select
+                            id="groupDropdown"
+                            value={selectedGroup || ""}
+                            onChange={handleGroupSelection}
+                        >
+                            <option value="" disabled>
+                                Seleccionar grupo
+                            </option>
+                            {Array.isArray(projectData) &&
+                            projectData.length > 0 ? (
+                                projectData.map((group) => (
+                                    <option
+                                        key={group.ID_GRUPO}
+                                        value={group.ID_GRUPO}
+                                    >
+                                        {group.NOMBRE_GRUPO}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>
+                                    No hay grupos disponibles
+                                </option>
+                            )}
+                        </select>
+                    </div>
+
+                    {selectedGroup ? (
+                        <div className="group-details">
+                            <h3>Estudiantes y Notas</h3>
+                            {dataForTable.length > 0 ? (
+                                <>
+                                    {/* Contenedor con scroll horizontal para etapas */}
+                                    <div
+                                        className="etapas-scroll-container"
+                                        style={{
+                                            overflowX: "auto",
+                                            overflowY: "hidden",
+                                            paddingBottom: "10px",
+                                        }}
+                                    >
+                                        <Table
+                                            className="custom-table"
+                                            columns={columns}
+                                            dataSource={dataForTable}
+                                            pagination={false}
+                                            bordered
+                                            size="middle"
+                                            rowClassName={(record) =>
+                                                record.total >= 50
+                                                    ? "highlight-row"
+                                                    : ""
+                                            }
+                                            onRow={(record) => ({
+                                                style: { textAlign: "center" }, // Centra el contenido de todas las filas
+                                            })}
+                                        />
+                                    </div>
+                                    {/* Botón debajo de la tabla */}
+                                    <div className="edit-notes-btn-container">
+                                        {!isEditing ? (
+                                            <button
+                                                className="new-project-btn"
+                                                onClick={handleEdit}
+                                            >
+                                                Editar Notas
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="new-project-btn"
+                                                onClick={handleSave}
+                                            >
+                                                Guardar
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="no-data-message">
+                                    No hay estudiantes registrados o notas
+                                    disponibles.
+                                </p>
+                            )}
+                        </div>
+                    ) : (
+                        <p className="no-data-message">
+                            Seleccione un grupo para ver detalles.
+                        </p>
+                    )}
+                </div>
             </div>
         </div>
     );
-    
 };
 
 export default PlanillaDeSeguimiento;

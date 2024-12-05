@@ -32,6 +32,7 @@ import EvaluacionDePares from './Pages/EvaluacionDePares';
 import EvaluacionCruzada from './Pages/EvaluacionCruzada';
 import SeguimientoSemanal from './Pages/SeguimientoSemanal';
 import SeguimientoSemanalEstudiante from './Pages/SeguimientoSemanalEstudiante';
+import Autoevaluacion from './Pages/Autoevaluacion';
 import '../css/NotFound.css'; 
 
 function NotFound() {
@@ -83,6 +84,7 @@ function App() {
         <Route path="/evaluacion-cruzada/:projectId" element={<EvaluacionCruzada />} />
         <Route path="/seguimiento-semanal/:projectId" element={<SeguimientoSemanal />} />
         <Route path="/seguimiento-semanal-estudiante/:projectId" element={<SeguimientoSemanalEstudiante />} />
+        <Route path="/autoevaluacion/:projectId" element={<Autoevaluacion />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

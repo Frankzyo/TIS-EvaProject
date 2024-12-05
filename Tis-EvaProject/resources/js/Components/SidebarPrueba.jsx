@@ -109,7 +109,7 @@ const SidebarPrueba = ({
                         >
                             <i className="fas fa-user icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Evaluación Individual
+                                Evaluaciónes Individuales
                             </span>
                         </ul>
                         <ul
@@ -120,7 +120,7 @@ const SidebarPrueba = ({
                         >
                             <i className="fas fa-users icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Evaluación de Pares
+                                Evaluaciónes de Pares
                             </span>
                         </ul>
                         <ul
@@ -131,7 +131,18 @@ const SidebarPrueba = ({
                         >
                             <i className="fas fa-random icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Evaluación Cruzada
+                                Evaluaciónes Cruzadas
+                            </span>
+                        </ul>
+                        <ul
+                            className="menu-item-prueba"
+                            onClick={() =>
+                                navigate(`/autoevaluacion/${projectId}`)
+                            }
+                        >
+                            <i className="fas fa-clipboard-check icon-menu-prueba"></i>
+                            <span className="menu-text-prueba">
+                                Autoevaluaciones
                             </span>
                         </ul>
                     </div>
@@ -161,12 +172,16 @@ const SidebarPrueba = ({
                     <div className="submenu">
                         <ul
                             className="menu-item-prueba"
-                            onClick={() => navigate(`/seguimiento-semanal/${projectId}`)}
+                            onClick={() =>
+                                navigate(`/seguimiento-semanal/${projectId}`)
+                            }
                         >
+                            <i className="fas fa-calendar-check icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Seguimientos semanal
+                                Seguimiento semanal
                             </span>
                         </ul>
+
                         <ul
                             className="menu-item-prueba"
                             onClick={() => navigate("/historial-evaluaciones")}

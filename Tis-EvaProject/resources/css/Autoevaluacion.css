@@ -1,0 +1,404 @@
+.autoevaluacion-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa; /* Fondo neutro para el contenedor */
+}
+
+/* Contenido de la barra lateral y del contenedor principal */
+.autoevaluacion-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+/*-----------------------*/
+.form-header {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-top: 8px solid #002a4c; /* Línea superior para destacar el encabezado */
+}
+
+.form-title {
+    width: 100%;
+    font-size: 24px;
+    font-weight: bold;
+    color: #202124;
+    border: none;
+    outline: none;
+    margin-bottom: 10px;
+    padding: 5px;
+    background: none;
+}
+
+.form-description {
+    width: 100%;
+    font-size: 14px;
+    color: #5f6368;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 5px;
+    background: none;
+    height: auto;
+}
+
+.form-dates {
+    display: flex;
+    gap: 20px;
+}
+
+.form-dates label {
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    color: #003366;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.form-dates input[type="date"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-top: 5px;
+    color: #202124;
+    background-color: #f9f9f9;
+}
+
+.form-dates input[type="date"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(103, 58, 183, 0.5);
+}
+/*-----------------------*/
+/*-------------------- Cuerpo del Formulario --------------------*/
+
+.autoevaluacion-contain {
+    padding: 40px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+    margin-bottom: -40px;
+}
+
+.autoevaluacion-contain h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #004085;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+
+.form-body {
+    padding: 15px;
+    border-left: 5px solid #002a4c;
+    background-color: #f7f9fc;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: "Arial", sans-serif;
+}
+
+/*-------------------- Pregunta del Formulario --------------------*/
+.form-question {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e4e7ed;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.form-question:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.question-input {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #343a40;
+    background-color: transparent; /* Sin fondo */
+    border: none; /* Sin bordes */
+    padding: 0; /* Sin padding */
+    margin: 0; /* Sin margen */
+    width: 100%;
+}
+
+/* Cambios al enfocar el input */
+.question-input:focus {
+    outline: none; /* Sin contorno al enfocar */
+}
+
+/* Alinear el contenedor con el botón */
+.question-header {
+    gap: 10px;
+}
+
+/* Botón para editar preguntas */
+.edit-question-btn {
+    padding: 8px 15px;
+    background-color: #6c63ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-question-btn:hover {
+    background-color: #5949e5;
+}
+
+/*-------------------- Lista de Opciones --------------------*/
+.option-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.option-item {
+    display: flex;
+    justify-content: space-between; /* Coloca el texto a la izquierda y la puntuación a la derecha */
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    font-size: 15px;
+    color: #495057;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.option-text {
+    font-weight: 500;
+    color: #343a40;
+    flex-grow: 1; /* Permite que el texto ocupe el espacio restante */
+    overflow-wrap: break-word; /* Evita que el texto se desborde */
+}
+
+.option-score {
+    font-size: 14px;
+    font-weight: bold;
+    color: #6c757d;
+    margin-left: 15px; /* Espacio entre el texto y la puntuación */
+}
+/* Destacar puntuación */
+
+.remove-option-btn {
+    background-color: #e63946;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.remove-option-btn:hover {
+    background-color: #c5303e;
+}
+
+/*-------------------- Nueva Pregunta --------------------*/
+.add-question {
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e4e7ed;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.new-question-input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border: 1px solid #dce1ea;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #343a40;
+    background-color: #ffffff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    font-weight: bold;
+}
+
+.new-question-input::placeholder {
+    color: #adb5bd; /* Color del placeholder más claro */
+    font-style: italic; /* Placeholder en cursiva */
+}
+
+.new-question-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Efecto de foco más visible */
+    outline: none; /* Sin contorno adicional */
+    background-color: #f8f9fc; /* Fondo más claro al enfocar */
+}
+
+
+/*-------------------- Contenedor de Opciones --------------------*/
+.options-container {
+    margin-bottom: 15px;
+}
+
+.add-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.new-option-input,
+.new-option-puntuacion-input {
+    padding: 12px;
+    border: 1px solid #dce1ea;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #343a40;
+    background-color: #ffffff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra interna sutil */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+/* Estilo específico para el input de la puntuación */
+.new-option-puntuacion-input {
+    flex: 1;
+    max-width: 50px;
+    text-align: center;
+    min-width: 60px; /* Asegura un tamaño mínimo */
+}
+
+/* Placeholder estilizado */
+.new-option-input::placeholder,
+.new-option-puntuacion-input::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* Efectos al enfocar */
+.new-option-input:focus,
+.new-option-puntuacion-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Resalta el borde al enfocar */
+    outline: none;
+    background-color: #f8f9fc; /* Fondo más claro al enfocar */
+}
+
+
+/* Botón para agregar opciones */
+.add-option-btn {
+    background-color: #28a745;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.add-option-btn:hover {
+    background-color: #218838;
+}
+
+/*-------------------- Botones de Guardar Pregunta y Editar --------------------*/
+.add-question-btn,
+.save-edit-btn {
+    background-color: #003366;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-question-btn:hover,
+.save-edit-btn:hover {
+    background-color: #0056b3;
+}
+
+/*-------------------- Pie del Formulario --------------------*/
+.form-footer {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.save-form-btn {
+    background-color: #003366;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.save-form-btn:hover {
+    background-color: #0056b3;
+}
+
+.score-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-top: 5px;
+    color: #202124;
+    background-color: #f9f9f9;
+    width: 155px;
+}
+
+/* Cambios al enfocar */
+.score-input:focus {
+    border-color: #007bff; /* Borde azul al enfocar */
+    outline: none; /* Sin contorno */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Resalte azul */
+    background-color: #f8f9fc; /* Fondo más claro al enfocar */
+}
+
+/* Placeholder estilizado */
+.score-input::placeholder {
+    color: #adb5bd; /* Color del placeholder */
+    font-style: italic; /* Texto en cursiva */
+}
+
+.delete-button {
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 14px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+.delete-button:hover {
+    background-color: #ff1a1a;
+}
