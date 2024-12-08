@@ -1,44 +1,46 @@
 /* Estilo general */
 
-  
-  /* Contenedor principal */
-  .register-container {
+/* Contenedor principal */
+.register-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     width: 100%;
-    background-image: url('/assets/Background.png');
+    margin: 0;
+    background-image: url("/assets/Background.png");
     background-size: cover;
     background-position: center;
-  }
-  
-  /* Caja del formulario */
-  .register-box {
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Caja del formulario */
+.register-box {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
-    padding: 40px;
-    height: 100%;
+    padding: 10px 40px;
+    height: 50%;
     max-width: 400px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     text-align: center;
     backdrop-filter: blur(8px);
-  }
-  
-  /* Estilo del título */
-  .register-box h2 {
+}
+
+/* Estilo del título */
+.register-box h2 {
     margin-bottom: 20px;
     font-size: 28px;
     color: white;
-  }
-  
-  /* Estilo de los inputs */
-  .input-group {
+}
+
+/* Estilo de los inputs */
+.input-group {
     position: relative;
     width: 100%;
-  }
-  
-  .input-groupr input {
+}
+
+.input-groupr input {
     width: calc(100% - 20px);
     padding: 12px;
     margin-bottom: 15px;
@@ -48,15 +50,15 @@
     color: white;
     font-size: 16px;
     outline: none;
-  }
+}
 
-  .input-group:hover {
+.input-group:hover {
     background-color: rgba(255, 255, 255, 0.2); /* Efecto hover */
     border-radius: 30px;
 }
-  
-  /* Toggle de contraseña */
-  .toggle-password {
+
+/* Toggle de contraseña */
+.toggle-password {
     position: absolute;
     right: 15px;
     top: 50%;
@@ -64,44 +66,44 @@
     cursor: pointer;
     font-size: 18px;
     color: white;
-  }
-  
-  /* Botón de Google */
-  .googler-login {
+}
+
+/* Botón de Google */
+.googler-login {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     border-radius: 30px;
     margin: 20px auto; /* Centrar horizontalmente el botón */
     cursor: pointer;
     width: auto;
     height: 42px;
-  }
+}
 
-  .googler-login:hover {
+.googler-login:hover {
     background-color: #005bb5;
-  }
-  
-  .googler-login img {
+}
+
+.googler-login img {
     width: 24px;
     height: 24px;
     margin-right: 10px; /* Espacio entre el logo y el texto */
-  }
-  
-  .googler-login span {
+}
+
+.googler-login span {
     font-size: 16px;
     color: #000000;
-  }
-  
-  /* Línea divisoria */
-  .divider {
+}
+
+/* Línea divisoria */
+.divider {
     height: 2px;
     background-color: rgba(255, 255, 255, 0.4);
     margin: 20px 0;
-  }
-  
- /* Contenedor del título */
+}
+
+/* Contenedor del título */
 .uploadr-title-container {
     width: 100%; /* Abarca todo el ancho del contenedor padre */
     text-align: left; /* Alineado a la izquierda */
@@ -153,47 +155,47 @@
     color: #ffffff;
     text-align: center;
 }
-  
-  /* Checkboxes */
-  .checkbox-group {
+
+/* Checkboxes */
+.checkbox-group {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 20px;
-  }
-  
-  .checkbox-group label {
+}
+
+.checkbox-group label {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
     font-size: 14px;
     color: white;
-  }
-  
-  .checkbox-group input {
+}
+
+.checkbox-group input {
     margin-right: 10px;
-  }
-  
-  /* Botón de crear cuenta */
-  .create-account-button {
+}
+
+/* Botón de crear cuenta */
+.create-account-button {
     width: 100%;
     height: 42px;
     padding: 15px;
     border-radius: 30px;
     border: none;
-    background-color: #0072CE;
+    background-color: #0072ce;
     color: white;
     font-size: 16px;
     cursor: pointer;
     justify-content: center;
-  }
-  
-  .create-account-button:hover {
+}
+
+.create-account-button:hover {
     background-color: #005bb5;
-  }
-  
-  /* Link al login */
-  .back-to-login {
+}
+
+/* Link al login */
+.back-to-login {
     margin-top: 15px;
     display: block;
     text-decoration: none;
@@ -207,19 +209,19 @@
 }
 /* Imagen de vista previa en el área de carga */
 .preview-image {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .privacy-link {
-  color: #a3c1f0; /* Color claro para el fondo azul */
-  text-decoration: underline;
-  margin-left: 4px; /* Espacio entre el texto y el enlace */
-  cursor: pointer;
+    color: #a3c1f0; /* Color claro para el fondo azul */
+    text-decoration: underline;
+    margin-left: 4px; /* Espacio entre el texto y el enlace */
+    cursor: pointer;
 }
 
 .privacy-link:hover {
-  color: #d1e7ff; /* Color aún más claro al pasar el cursor */
+    color: #d1e7ff; /* Color aún más claro al pasar el cursor */
 }

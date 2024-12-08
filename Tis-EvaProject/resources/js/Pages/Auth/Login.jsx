@@ -43,9 +43,9 @@ const InputField = ({
         {toggleVisibility && (
             <span className="toggle-password" onClick={toggleVisibility}>
                 {type === "password" ? (
-                    <i className="fas fa-eye"></i>
-                ) : (
                     <i className="fas fa-eye-slash"></i>
+                ) : (
+                    <i className="fas fa-eye"></i>
                 )}
             </span>
         )}

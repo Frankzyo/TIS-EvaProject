@@ -12,7 +12,7 @@ class Docente extends Authenticatable
     // El nombre de tu tabla en la base de datos
     protected $primaryKey = 'ID_DOCENTE'; // La clave primaria de tu tabla
 
-    public $timestamps = false; // Deshabilitar timestamps
+    public $timestamps = false;
 
     protected $fillable = [
         'NOMBRE_DOCENTE',
@@ -20,7 +20,7 @@ class Docente extends Authenticatable
         'EMAIL_DOCENTE',
         'PASSWORD_DOCENTE',
         'FOTO_DOCENTE',
-        'is_admin',  // Añade esta línea
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -40,8 +40,8 @@ class Docente extends Authenticatable
         $this->notify(new ResetPasswordNotification($token));
     }
     public function getEmailForPasswordReset()
-{
-    return $this->EMAIL_DOCENTE;
-}
+    {
+        return $this->EMAIL_DOCENTE;
+    }
 
 }
