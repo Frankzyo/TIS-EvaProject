@@ -108,9 +108,6 @@ const AutoevaluacionEstudiante = () => {
                 "Error al cargar el resultado de autoevaluación:",
                 error.response?.data || error.message
             );
-            setErrorMessage(
-                "Error al obtener el resultado de la autoevaluación."
-            );
         }
     };
 

@@ -22,7 +22,11 @@ const Reportes = ({
         }));
 
         const autoevaluaciones = safeAutoevalResults
-            .filter((result) => result.estudiante.ID_ESTUDIANTE === student.estudiante.ID_ESTUDIANTE)
+            .filter(
+                (result) =>
+                    result.estudiante.ID_ESTUDIANTE ===
+                    student.estudiante.ID_ESTUDIANTE
+            )
             .flatMap((result, index) =>
                 result.notas.map((nota, notaIndex) => ({
                     key: `auto-${index}-${notaIndex}`,
@@ -33,7 +37,11 @@ const Reportes = ({
             );
 
         const cruzadas = safeCruzadasResults
-            .filter((result) => result.estudiante.ID_ESTUDIANTE === student.estudiante.ID_ESTUDIANTE)
+            .filter(
+                (result) =>
+                    result.estudiante.ID_ESTUDIANTE ===
+                    student.estudiante.ID_ESTUDIANTE
+            )
             .flatMap((result, index) =>
                 result.notas.map((nota, notaIndex) => ({
                     key: `cruzada-${index}-${notaIndex}`,
@@ -44,7 +52,11 @@ const Reportes = ({
             );
 
         const pares = safeParesResults
-            .filter((result) => result.estudiante.ID_ESTUDIANTE === student.estudiante.ID_ESTUDIANTE)
+            .filter(
+                (result) =>
+                    result.estudiante.ID_ESTUDIANTE ===
+                    student.estudiante.ID_ESTUDIANTE
+            )
             .flatMap((result, index) =>
                 result.notas.map((nota, notaIndex) => ({
                     key: `par-${index}-${notaIndex}`,
@@ -54,10 +66,22 @@ const Reportes = ({
                 }))
             );
 
-        const totalCalificaciones = etapas.reduce((sum, etapa) => sum + etapa.calificacion, 0);
-        const totalAutoevaluaciones = autoevaluaciones.reduce((sum, auto) => sum + auto.calificacion, 0);
-        const totalCruzadas = cruzadas.reduce((sum, cruzada) => sum + cruzada.calificacion, 0);
-        const totalPares = pares.reduce((sum, par) => sum + par.calificacion, 0);
+        const totalCalificaciones = etapas.reduce(
+            (sum, etapa) => sum + etapa.calificacion,
+            0
+        );
+        const totalAutoevaluaciones = autoevaluaciones.reduce(
+            (sum, auto) => sum + auto.calificacion,
+            0
+        );
+        const totalCruzadas = cruzadas.reduce(
+            (sum, cruzada) => sum + cruzada.calificacion,
+            0
+        );
+        const totalPares = pares.reduce(
+            (sum, par) => sum + par.calificacion,
+            0
+        );
 
         return {
             key: student.estudiante.ID_ESTUDIANTE,
@@ -66,7 +90,11 @@ const Reportes = ({
             autoevaluaciones,
             cruzadas,
             pares,
-            total: totalCalificaciones + totalAutoevaluaciones + totalCruzadas + totalPares,
+            total:
+                totalCalificaciones +
+                totalAutoevaluaciones +
+                totalCruzadas +
+                totalPares,
         };
     });
 
@@ -153,7 +181,8 @@ const Reportes = ({
             render: (record) => {
                 return (
                     <span>
-                        {record.titulo || record.etapa || "Sin título"} {/* Mostrar titulo o etapa */}
+                        {record.titulo || record.etapa || "Sin título"}{" "}
+                        {/* Mostrar titulo o etapa */}
                     </span>
                 );
             },
@@ -230,8 +259,16 @@ const Reportes = ({
             <Table
                 className="custom-table"
                 columns={[
-                    { title: "Estudiante", dataIndex: "nombreCompleto", key: "nombreCompleto" },
-                    { title: "Total Calificaciones", dataIndex: "total", key: "total" },
+                    {
+                        title: "Estudiante",
+                        dataIndex: "nombreCompleto",
+                        key: "nombreCompleto",
+                    },
+                    {
+                        title: "Total Calificaciones",
+                        dataIndex: "total",
+                        key: "total",
+                    },
                 ]}
                 dataSource={calificacionesData}
                 pagination={false}
