@@ -13,6 +13,11 @@ function HomePage() {
             try {
                 const token = localStorage.getItem("authToken");
 
+                if (!token) {
+                    console.warn("No se encontró token de autenticación.");
+                    return;
+                }
+
                 const response = await axios.get(
                     "http://localhost:8000/api/getLoggedUser",
                     {
@@ -23,15 +28,15 @@ function HomePage() {
                     }
                 );
 
-                const data = response.data;
-                const fotoUrl = data.foto
-                    ? `http://localhost:8000/storage/${data.foto}`
+                const { foto } = response.data;
+                const fotoUrl = foto
+                    ? `http://localhost:8000/storage/${foto}`
                     : "https://via.placeholder.com/50";
 
                 setFoto(fotoUrl);
                 setIsAuthenticated(true);
             } catch (error) {
-                console.error("Error al obtener la foto del usuario:", error);
+                console.error("Error al obtener los datos del usuario:", error.message);
                 setIsAuthenticated(false);
             }
         };
@@ -54,7 +59,7 @@ function HomePage() {
                     {isAuthenticated ? (
                         <img
                             src={foto}
-                            alt="Foto de perfil"
+                            alt="Foto de perfil del usuario"
                             className="profile-pic"
                         />
                     ) : (
@@ -67,7 +72,7 @@ function HomePage() {
             <nav className="nav-menu">
                 <a href="/register">Registrarse</a>
                 <a href="/faq">Preguntas Frecuentes</a>
-                <a href="/about">Quienes Somos</a>
+                <a href="/about">Quiénes Somos</a>
             </nav>
 
             {/* Main Content */}
@@ -86,14 +91,8 @@ function HomePage() {
                         Cerrar sesión
                     </button>
                 ) : (
-                    <a
-                        href="/login"
-                        className={`btn-primary ${
-                            isAuthenticated ? "logout" : ""
-                        }`}
-                        onClick={isAuthenticated ? handleLogout : null}
-                    >
-                        {isAuthenticated ? "Cerrar sesión" : "Iniciar sesión"}
+                    <a href="/login" className="btn-primary">
+                        Iniciar sesión
                     </a>
                 )}
             </div>
@@ -101,7 +100,7 @@ function HomePage() {
             {/* Image */}
             <img
                 src="/assets/ImageHome.png"
-                alt="Imagen de gestión de proyectos"
+                alt="Gestión de proyectos"
                 className="main-image"
             />
 
