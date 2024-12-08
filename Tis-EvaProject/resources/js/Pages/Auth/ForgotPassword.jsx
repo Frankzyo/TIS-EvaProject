@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import "resources/css/auth/ForgotPassword.cssr";
-import "resources/css/auth/Login.css";
+import "../../../css/auth/ForgotPassword.css";
+import "../../../css/auth/Login.css";
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
