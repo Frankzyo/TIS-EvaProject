@@ -14,6 +14,7 @@ const Autoevaluacion = () => {
     const [autoevaluaciones, setAutoevaluaciones] = useState([]);
     const [newPregunta, setNewPregunta] = useState("");
     const [opciones, setOpciones] = useState([]);
+    const [editMode, setEditMode] = useState(false);
     const [nuevaOpcion, setNuevaOpcion] = useState({
         texto: "",
         puntuacion: 0,
@@ -26,151 +27,536 @@ const Autoevaluacion = () => {
     const [puntuacionFormulario, setPuntuacionFormulario] = useState(0);
 
     useEffect(() => {
-        const fetchProjectDetails = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(
-                    `http://localhost:8000/api/proyectos/${projectId}`,
-                    { withCredentials: true }
-                );
-                if (response.data) {
-                    setProjectDetails(response.data);
-                } else {
-                    console.error("No se encontraron detalles del proyecto.");
-                }
-            } catch (error) {
-                console.error("Error al cargar el proyecto:", error.message);
-            }
-        };
+                const [projectResponse, autoevaluacionesResponse] =
+                    await Promise.all([
+                        axios.get(
+                            `http://localhost:8000/api/proyectos/${projectId}`,
+                            { withCredentials: true }
+                        ),
+                        axios.get(
+                            `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones`,
+                            { withCredentials: true }
+                        ),
+                    ]);
 
-        fetchProjectDetails();
-    }, [projectId]);
+                setProjectDetails(projectResponse.data || {});
 
-    useEffect(() => {
-        const fetchAutoevaluaciones = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones`,
-                    { withCredentials: true }
-                );
-                if (Array.isArray(response.data)) {
-                    setAutoevaluaciones(response.data);
-                } else {
-                    console.error(
-                        "Error: No se recibieron autoevaluaciones válidas."
+                if (autoevaluacionesResponse.data.length > 0) {
+                    const autoevaluacion = autoevaluacionesResponse.data[0];
+                    setTituloFormulario(autoevaluacion.TITULO_AUTOEVAL || "");
+                    setDescripcionFormulario(
+                        autoevaluacion.DESCRIPCION_AUTOEVAL || ""
                     );
+                    setFechaInicio(autoevaluacion.FECHA_INICIO_AUTOEVAL || "");
+                    setFechaFin(autoevaluacion.FECHA_FIN_AUTOEVAL || "");
+                    setPuntuacionFormulario(
+                        autoevaluacion.PUNTUACION_TOTAL_AUTOEVAL || 0
+                    );
+                    setAutoevaluaciones(autoevaluacion.preguntas || []);
+                    setEditMode(true); // Activa modo edición
+                } else {
+                    setEditMode(false); // Modo creación
                 }
             } catch (error) {
-                console.error(
-                    "Error al cargar las autoevaluaciones:",
-                    error.message
-                );
+                console.error("Error al cargar los datos:", error.message);
             }
         };
 
-        fetchAutoevaluaciones();
+        fetchData();
     }, [projectId]);
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
     const handleAddOpcion = () => {
-        if (nuevaOpcion.texto.trim() && nuevaOpcion.puntuacion >= 0) {
-            setOpciones([...opciones, nuevaOpcion]);
-            setNuevaOpcion({ texto: "", puntuacion: 0 });
+        if (!nuevaOpcion.texto.trim()) {
+            alert("El texto de la opción no puede estar vacío.");
+            return;
+        }
+
+        if (
+            opciones.some(
+                (opcion) =>
+                    opcion.texto.trim().toLowerCase() ===
+                    nuevaOpcion.texto.trim().toLowerCase()
+            )
+        ) {
+            alert("La opción ya existe.");
+            return;
+        }
+
+        setOpciones((prevOpciones) => [
+            ...prevOpciones,
+            { ...nuevaOpcion, ID_OPCION_AUTOEVAL: Math.random() }, // Asignar ID único
+        ]);
+        setNuevaOpcion({ texto: "", puntuacion: 0 }); // Reiniciar el formulario
+    };
+
+    const handleEditAutoevaluacion = (idAutoevaluacion) => {
+        const autoevaluacionSeleccionada = autoevaluaciones.find(
+            (auto) => auto.ID_AUTOEVAL_PROYECTO === idAutoevaluacion
+        );
+
+        if (autoevaluacionSeleccionada) {
+            setTituloFormulario(
+                autoevaluacionSeleccionada.TITULO_AUTOEVAL || ""
+            );
+            setDescripcionFormulario(
+                autoevaluacionSeleccionada.DESCRIPCION_AUTOEVAL || ""
+            );
+            setFechaInicio(
+                autoevaluacionSeleccionada.FECHA_INICIO_AUTOEVAL || ""
+            );
+            setFechaFin(autoevaluacionSeleccionada.FECHA_FIN_AUTOEVAL || "");
         } else {
-            alert(
-                "Por favor, ingrese un texto y una puntuación válida para la opción."
+            console.error(
+                `No se encontró la autoevaluación con ID ${idAutoevaluacion}.`
+            );
+        }
+    };
+    const handleDeleteAutoevaluacion = (idAutoevaluacion) => {
+        setAutoevaluaciones((prev) =>
+            prev.filter(
+                (auto) => auto.ID_AUTOEVAL_PROYECTO !== idAutoevaluacion
+            )
+        );
+    };
+    const handleEditOption = (index) => {
+        const newText = prompt("Nuevo texto:", opciones[index].texto);
+        const newScore = parseInt(
+            prompt("Nueva puntuación:", opciones[index].puntuacion),
+            10
+        );
+
+        if (newText && !isNaN(newScore)) {
+            setOpciones((prevOpciones) =>
+                prevOpciones.map((opcion, i) =>
+                    i === index
+                        ? { ...opcion, texto: newText, puntuacion: newScore }
+                        : opcion
+                )
             );
         }
     };
 
-    const handleRemovePregunta = (index) => {
-        setAutoevaluaciones((prev) => prev.filter((_, i) => i !== index));
+    // Función para guardar las opciones editadas
+    const handleSaveOptions = async () => {
+        if (editIndex === null || opciones.length === 0) {
+            alert("Debe seleccionar una pregunta y agregar opciones válidas.");
+            return;
+        }
+
+        const payload = {
+            opciones: opciones.map((opcion) => ({
+                texto: opcion.texto.trim(),
+                puntuacion: opcion.puntuacion,
+            })),
+        };
+
+        try {
+            const response = await axios.put(
+                `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/pregunta/${editIndex}/opciones`,
+                payload,
+                { withCredentials: true }
+            );
+
+            // Actualizar las opciones en el estado local
+            setAutoevaluaciones((prev) => {
+                const updated = [...prev];
+                const preguntaIndex = updated[0]?.preguntas?.findIndex(
+                    (p) => p.ID_PREGUNTA_AUTOEVAL === editIndex
+                );
+
+                if (preguntaIndex !== -1) {
+                    updated[0].preguntas[preguntaIndex].opciones =
+                        response.data.opciones; // Opciones actualizadas desde el backend
+                }
+                return updated;
+            });
+
+            alert("Opciones actualizadas con éxito.");
+        } catch (error) {
+            console.error("Error al guardar las opciones:", error);
+            alert("Error al actualizar las opciones.");
+        }
+    };
+
+    const handleDeleteOption = async (idOpcion) => {
+        try {
+            // Eliminar opción en el backend
+            await axios.delete(
+                `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/opcion/${idOpcion}`,
+                { withCredentials: true }
+            );
+
+            // Filtrar opciones en el estado local
+            setOpciones((prevOpciones) =>
+                prevOpciones.filter(
+                    (opcion) => opcion.ID_OPCION_AUTOEVAL !== idOpcion
+                )
+            );
+
+            alert("Opción eliminada con éxito.");
+        } catch (error) {
+            console.error("Error al eliminar la opción:", error);
+            alert("Error al eliminar la opción. Inténtalo nuevamente.");
+        }
+    };
+
+    const handleDeletePregunta = (idPregunta) => {
+        // Eliminar del estado local
+        setAutoevaluaciones((prev) =>
+            prev.filter(
+                (pregunta) => pregunta.ID_PREGUNTA_AUTOEVAL !== idPregunta
+            )
+        );
+
+        // Si la pregunta tiene un ID real, también eliminar en el backend
+        if (typeof idPregunta === "number") {
+            axios
+                .delete(
+                    `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/pregunta/${idPregunta}`,
+                    { withCredentials: true }
+                )
+                .then(() => alert("Pregunta eliminada del backend."))
+                .catch((error) =>
+                    console.error(
+                        "Error al eliminar la pregunta en el backend:",
+                        error
+                    )
+                );
+        }
     };
 
     const handleRemoveOpcion = (index) => {
-        setOpciones((prev) => prev.filter((_, i) => i !== index));
+        setOpciones((prevOpciones) =>
+            prevOpciones.filter((_, i) => i !== index)
+        );
     };
 
-    const handleAddPregunta = () => {
-        if (newPregunta.trim() && opciones.length > 0) {
-            const nuevaPregunta = { pregunta: newPregunta, opciones };
-            setAutoevaluaciones((prev) => [...prev, nuevaPregunta]);
-            setNewPregunta("");
-            setOpciones([]);
-        } else {
-            alert(
-                "Por favor, ingrese una pregunta válida y al menos una opción."
+    const handleAddPregunta = async () => {
+        if (!newPregunta.trim()) {
+            alert("Por favor, ingrese una pregunta válida.");
+            return;
+        }
+
+        if (opciones.length === 0) {
+            alert("Debe agregar al menos una opción a la pregunta.");
+            return;
+        }
+
+        // Construir la pregunta
+        const nuevaPregunta = {
+            PREGUNTA_AUTOEVAL: newPregunta.trim(),
+            opciones: opciones.map((opcion) => ({
+                texto: opcion.texto,
+                puntuacion: opcion.puntuacion,
+            })),
+        };
+
+        try {
+            const response = await axios.post(
+                `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/pregunta`,
+                nuevaPregunta,
+                { withCredentials: true }
             );
+
+            if (response.status === 201) {
+                setAutoevaluaciones((prev) => [
+                    ...prev,
+                    {
+                        ...nuevaPregunta,
+                        ID_PREGUNTA_AUTOEVAL:
+                            response.data.pregunta.ID_PREGUNTA_AUTOEVAL,
+                    },
+                ]);
+                alert("Pregunta añadida con éxito.");
+            }
+        } catch (error) {
+            console.error(
+                "Error al guardar la pregunta:",
+                error.response?.data || error.message
+            );
+            alert("Hubo un error al guardar la pregunta.");
+        } finally {
+            setNewPregunta(""); // Resetea el campo de pregunta
+            setOpciones([]); // Limpia las opciones
         }
     };
 
-    const handleEditPregunta = (index) => {
-        const preguntaSeleccionada = autoevaluaciones[index];
-        setNewPregunta(preguntaSeleccionada.pregunta);
-        setOpciones(preguntaSeleccionada.opciones);
-        setEditIndex(index);
+    const handleEditPregunta = (idPregunta) => {
+        // Encuentra la pregunta seleccionada en el estado local
+        const preguntaSeleccionada = autoevaluaciones.find(
+            (pregunta) => pregunta.ID_PREGUNTA_AUTOEVAL === idPregunta
+        );
+
+        if (preguntaSeleccionada) {
+            setNewPregunta(preguntaSeleccionada.PREGUNTA_AUTOEVAL); // Cargar texto de la pregunta
+            setOpciones(
+                preguntaSeleccionada.opciones.map((opcion) => ({
+                    texto: opcion.TEXTO_OPCION_AUTOEVAL,
+                    puntuacion: opcion.PUNTUACION_OPCION_AUTOEVAL,
+                }))
+            ); // Cargar opciones
+            setEditIndex(idPregunta); // Guardar el índice para identificar qué pregunta se está editando
+        } else {
+            alert("No se encontró la pregunta seleccionada.");
+        }
     };
 
-    const handleSaveEditPregunta = () => {
-        if (newPregunta.trim() && opciones.length > 0) {
+    const handleSaveEditPregunta = async () => {
+        if (!editMode) {
+            // Modo local: actualiza solo el estado local
             setAutoevaluaciones((prev) => {
-                const updated = [...prev];
-                updated[editIndex] = { pregunta: newPregunta, opciones };
+                const updated = prev.map((pregunta) =>
+                    pregunta.ID_PREGUNTA_AUTOEVAL === editIndex
+                        ? {
+                              ...pregunta,
+                              PREGUNTA_AUTOEVAL: newPregunta.trim(),
+                              opciones: opciones.map((opcion) => ({
+                                  TEXTO_OPCION_AUTOEVAL: opcion.texto,
+                                  PUNTUACION_OPCION_AUTOEVAL: opcion.puntuacion,
+                              })),
+                          }
+                        : pregunta
+                );
                 return updated;
             });
+
             setNewPregunta("");
             setOpciones([]);
             setEditIndex(null);
-        } else {
-            alert(
-                "Por favor, ingrese una pregunta válida y al menos una opción."
+            return;
+        }
+
+        // Modo edición (con datos en el backend): realizar la solicitud PUT
+        if (!newPregunta.trim() || opciones.length === 0) {
+            alert("La pregunta y sus opciones no pueden estar vacías.");
+            return;
+        }
+
+        try {
+            const payload = {
+                PREGUNTA_AUTOEVAL: newPregunta.trim(),
+                opciones: opciones.map((opcion) => ({
+                    texto: opcion.texto.trim(),
+                    puntuacion: opcion.puntuacion,
+                })),
+            };
+
+            const response = await axios.put(
+                `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/pregunta/${editIndex}`,
+                payload,
+                { withCredentials: true }
             );
+
+            setAutoevaluaciones((prev) => {
+                const updated = prev.map((pregunta) =>
+                    pregunta.ID_PREGUNTA_AUTOEVAL === editIndex
+                        ? {
+                              ...pregunta,
+                              PREGUNTA_AUTOEVAL:
+                                  response.data.PREGUNTA_AUTOEVAL,
+                              opciones: response.data.opciones,
+                          }
+                        : pregunta
+                );
+                return updated;
+            });
+
+            alert("Pregunta y opciones actualizadas con éxito.");
+            setNewPregunta("");
+            setOpciones([]);
+            setEditIndex(null);
+        } catch (error) {
+            console.error("Error al actualizar la pregunta:", error);
+            alert("Error al actualizar la pregunta.");
         }
     };
 
     const handleSaveAutoevaluaciones = async () => {
+        // Validación de fechas
+        if (!fechaInicio || !fechaFin) {
+            alert("Ambas fechas deben estar presentes.");
+            return;
+        }
+
+        if (new Date(fechaInicio) > new Date(fechaFin)) {
+            alert(
+                "La fecha de inicio no puede ser posterior a la fecha de fin."
+            );
+            return;
+        }
+
+        // Validación de preguntas y opciones
+        if (autoevaluaciones.length === 0) {
+            alert(
+                "Debe agregar al menos una pregunta para guardar la autoevaluación."
+            );
+            return;
+        }
+
+        for (const autoeval of autoevaluaciones) {
+            if (!autoeval.PREGUNTA_AUTOEVAL || autoeval.opciones.length === 0) {
+                alert(
+                    "Todas las preguntas deben tener texto y al menos una opción."
+                );
+                return;
+            }
+
+            for (const opcion of autoeval.opciones) {
+                if (
+                    !opcion.TEXTO_OPCION_AUTOEVAL ||
+                    opcion.PUNTUACION_OPCION_AUTOEVAL <= 0
+                ) {
+                    alert(
+                        "Cada opción debe tener texto y una puntuación mayor a 0."
+                    );
+                    return;
+                }
+            }
+        }
+
+        // Crear el payload
         const payload = {
-            TITULO_AUTOEVAL: tituloFormulario,
-            DESCRIPCION_AUTOEVAL: descripcionFormulario,
+            TITULO_AUTOEVAL: tituloFormulario.trim(),
+            DESCRIPCION_AUTOEVAL: descripcionFormulario.trim(),
             FECHA_INICIO_AUTOEVAL: fechaInicio,
             FECHA_FIN_AUTOEVAL: fechaFin,
+            PUNTUACION_TOTAL_AUTOEVAL: puntuacionFormulario, // Campo añadido
             autoevaluaciones: autoevaluaciones.map((autoeval) => ({
-                pregunta: autoeval.pregunta,
+                pregunta: autoeval.PREGUNTA_AUTOEVAL.trim(),
                 opciones: autoeval.opciones.map((opcion) => ({
-                    texto: opcion.texto,
-                    puntuacion: opcion.puntuacion,
+                    texto: opcion.TEXTO_OPCION_AUTOEVAL.trim(),
+                    puntuacion: opcion.PUNTUACION_OPCION_AUTOEVAL,
                 })),
             })),
         };
-    
-        console.log("Payload enviado:", payload);
-    
+
         try {
             const response = await axios.post(
                 `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones`,
                 payload,
                 { withCredentials: true }
             );
-    
-            console.log("Respuesta del servidor:", response.data);
-    
+
             if (response.status === 201) {
                 alert("Autoevaluaciones guardadas con éxito.");
-                setTituloFormulario("");
-                setDescripcionFormulario("");
-                setFechaInicio("");
-                setFechaFin("");
-                setAutoevaluaciones([]);
+                resetFormulario();
             } else {
-                console.error("Error en la respuesta:", response.data);
-                alert("Hubo un error al guardar las autoevaluaciones.");
+                alert("Ocurrió un problema al guardar las autoevaluaciones.");
             }
         } catch (error) {
-            console.error("Error al guardar:", error.response || error.message);
-            alert("Hubo un error al guardar las autoevaluaciones.");
+            if (error.response) {
+                console.error(
+                    "Error de respuesta del servidor:",
+                    error.response.data
+                );
+                alert(
+                    error.response.data.message ||
+                        "Error en el servidor al guardar la autoevaluación."
+                );
+            } else if (error.request) {
+                console.error("Error en la solicitud:", error.request);
+                alert(
+                    "No se pudo conectar al servidor. Verifique su conexión."
+                );
+            } else {
+                console.error("Error desconocido:", error.message);
+                alert("Ocurrió un error inesperado. Inténtelo nuevamente.");
+            }
         }
     };
-    
+
+    const handleSaveAutoevaluacionDetails = async () => {
+        if (
+            !tituloFormulario.trim() ||
+            !fechaInicio ||
+            !fechaFin ||
+            puntuacionFormulario <= 0
+        ) {
+            alert(
+                "Todos los campos son obligatorios y deben tener valores válidos."
+            );
+            return;
+        }
+
+        if (new Date(fechaInicio) > new Date(fechaFin)) {
+            alert(
+                "La fecha de inicio no puede ser posterior a la fecha de fin."
+            );
+            return;
+        }
+
+        const payload = {
+            TITULO_AUTOEVAL: tituloFormulario.trim(),
+            DESCRIPCION_AUTOEVAL: descripcionFormulario.trim(),
+            FECHA_INICIO_AUTOEVAL: fechaInicio,
+            FECHA_FIN_AUTOEVAL: fechaFin,
+            PUNTUACION_TOTAL_AUTOEVAL: puntuacionFormulario,
+        };
+
+        try {
+            const response = await axios.put(
+                `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/${autoevaluaciones[0]?.ID_AUTOEVAL_PROYECTO}`,
+                payload,
+                { withCredentials: true }
+            );
+
+            if (response.status === 200) {
+                alert("Autoevaluación actualizada con éxito.");
+            } else {
+                alert("Error al actualizar la autoevaluación.");
+            }
+        } catch (error) {
+            console.error(
+                "Error al guardar los detalles de la autoevaluación:",
+                error
+            );
+            alert(
+                "Ocurrió un error al guardar los cambios. Inténtalo nuevamente."
+            );
+        }
+    };
+
+    const handleSaveDetails = async () => {
+        const payload = {
+            TITULO_AUTOEVAL: tituloFormulario.trim(),
+            DESCRIPCION_AUTOEVAL: descripcionFormulario.trim(),
+            FECHA_INICIO_AUTOEVAL: fechaInicio,
+            FECHA_FIN_AUTOEVAL: fechaFin,
+            PUNTUACION_TOTAL_AUTOEVAL: parseInt(puntuacionFormulario, 10),
+        };
+
+        try {
+            const response = await axios.put(
+                `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/${autoevaluaciones[0]?.ID_AUTOEVAL_PROYECTO}`,
+                payload,
+                { withCredentials: true }
+            );
+
+            alert("Autoevaluación actualizada con éxito.");
+        } catch (error) {
+            console.error(
+                "Error al guardar los detalles de la autoevaluación:",
+                error.response?.data || error
+            );
+            alert("Error al actualizar la autoevaluación.");
+        }
+    };
+    const resetFormulario = () => {
+        setTituloFormulario("");
+        setDescripcionFormulario("");
+        setFechaInicio("");
+        setFechaFin("");
+        setPuntuacionFormulario(0);
+        setAutoevaluaciones([]);
+        setNewPregunta("");
+        setOpciones([]);
+        setNuevaOpcion({ texto: "", puntuacion: 0 });
+        setEditIndex(null);
+    };
 
     return (
         <div
@@ -194,6 +580,9 @@ const Autoevaluacion = () => {
                     projectId={projectId}
                 />
                 <div className="autoevaluacion-contain">
+                    <div className="projects-header">
+                        <h2>Gestión de Preguntas de Autoevaluación</h2>
+                    </div>
                     {/* Encabezado del formulario */}
                     <div className="form-header">
                         <input
@@ -245,7 +634,9 @@ const Autoevaluacion = () => {
                                     min="0"
                                     value={puntuacionFormulario}
                                     onChange={(e) =>
-                                        setPuntuacionFormulario(e.target.value)
+                                        setPuntuacionFormulario(
+                                            Number(e.target.value)
+                                        )
                                     }
                                 />
                             </label>
@@ -256,70 +647,68 @@ const Autoevaluacion = () => {
                     <div className="form-body">
                         <h3>Preguntas</h3>
                         {autoevaluaciones.length === 0 ? (
-                            <p>No hay autoevaluaciones creadas.</p>
+                            <p className="no-data-message">
+                                {" "}
+                                No hay preguntas creadas.
+                            </p>
                         ) : (
-                            autoevaluaciones.map((item, index) => (
+                            autoevaluaciones.map((pregunta) => (
                                 <div
-                                    key={item.ID_AUTOEVAL_PROYECTO || index} // Clave única o índice
+                                    key={pregunta.ID_PREGUNTA_AUTOEVAL}
                                     className="form-question"
                                 >
                                     <div className="question-header">
-                                        <input
-                                            type="text"
-                                            value={item.TITULO_AUTOEVAL}
-                                            readOnly
-                                            className="question-input"
-                                        />
-                                        <button
-                                            onClick={() =>
-                                                handleEditAutoevaluacion(
-                                                    item.ID_AUTOEVAL_PROYECTO
-                                                )
-                                            }
-                                            className="edit-button"
-                                        >
-                                            Editar
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                handleDeleteAutoevaluacion(
-                                                    item.ID_AUTOEVAL_PROYECTO
-                                                )
-                                            }
-                                            className="delete-button"
-                                        >
-                                            Eliminar
-                                        </button>
+                                        <h4>{pregunta.PREGUNTA_AUTOEVAL}</h4>
+                                        <div className="button-group">
+                                            <button
+                                                onClick={() =>
+                                                    handleEditPregunta(
+                                                        pregunta.ID_PREGUNTA_AUTOEVAL
+                                                    )
+                                                }
+                                                className="edit-button"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleDeletePregunta(
+                                                        pregunta.ID_PREGUNTA_AUTOEVAL
+                                                    )
+                                                }
+                                                className="delete-button"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <ul className="option-list">
-                                        {Array.isArray(item.preguntas) &&
-                                            item.preguntas.map(
-                                                (pregunta, i) => (
-                                                    <li
-                                                        key={
-                                                            pregunta.ID_PREGUNTA_AUTOEVAL ||
-                                                            i
-                                                        } // Clave única o índice
-                                                        className="option-item"
-                                                    >
-                                                        <span className="option-text">
-                                                            {
-                                                                pregunta.PREGUNTA_AUTOEVAL
-                                                            }
-                                                        </span>
-                                                        <button
-                                                            onClick={() =>
-                                                                handleDeletePregunta(
-                                                                    pregunta.ID_PREGUNTA_AUTOEVAL
-                                                                )
-                                                            }
-                                                            className="remove-option-btn"
-                                                        >
-                                                            Eliminar
-                                                        </button>
-                                                    </li>
-                                                )
-                                            )}
+                                        {pregunta.opciones?.map((opcion) => (
+                                            <li
+                                                key={
+                                                    opcion.ID_OPCION_AUTOEVAL ||
+                                                    Math.random()
+                                                }
+                                                className="option-item enhanced"
+                                            >
+                                                <div className="option-text">
+                                                    <strong>
+                                                        {
+                                                            opcion.TEXTO_OPCION_AUTOEVAL
+                                                        }
+                                                    </strong>
+                                                </div>
+                                                <div className="option-score">
+                                                    <span>Puntuación: </span>
+                                                    <span className="score-value">
+                                                        {
+                                                            opcion.PUNTUACION_OPCION_AUTOEVAL
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             ))
@@ -327,7 +716,7 @@ const Autoevaluacion = () => {
 
                         {/* Formulario para agregar preguntas */}
                         <div className="add-question">
-                            <h4>Agregar Pregunta</h4>
+                            <h3>Agregar Pregunta</h3>
                             <input
                                 type="text"
                                 placeholder="Título de la nueva pregunta"
@@ -338,10 +727,40 @@ const Autoevaluacion = () => {
                             <div className="options-container">
                                 {opciones.map((opcion, index) => (
                                     <div key={index} className="option-item">
-                                        <span>
-                                            {opcion.texto} (Puntuación:{" "}
-                                            {opcion.puntuacion})
-                                        </span>
+                                        <input
+                                            type="text"
+                                            value={opcion.texto}
+                                            onChange={(e) => {
+                                                const updatedOpciones = [
+                                                    ...opciones,
+                                                ];
+                                                updatedOpciones[index].texto =
+                                                    e.target.value;
+                                                setOpciones(updatedOpciones);
+                                            }}
+                                            placeholder="Texto de la opción"
+                                            className="new-option-input"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={opcion.puntuacion}
+                                            onChange={(e) => {
+                                                const updatedOpciones = [
+                                                    ...opciones,
+                                                ];
+                                                updatedOpciones[
+                                                    index
+                                                ].puntuacion =
+                                                    parseInt(
+                                                        e.target.value,
+                                                        10
+                                                    ) || 0;
+                                                setOpciones(updatedOpciones);
+                                            }}
+                                            placeholder="Puntuación"
+                                            min="0"
+                                            className="new-option-puntuacion-input"
+                                        />
                                         <button
                                             onClick={() =>
                                                 handleRemoveOpcion(index)
@@ -390,6 +809,7 @@ const Autoevaluacion = () => {
                                     </button>
                                 </div>
                             </div>
+
                             {editIndex === null ? (
                                 <button
                                     onClick={handleAddPregunta}
@@ -411,10 +831,16 @@ const Autoevaluacion = () => {
                     {/* Pie del formulario */}
                     <div className="form-footer">
                         <button
-                            onClick={handleSaveAutoevaluaciones}
+                            onClick={
+                                editMode
+                                    ? handleSaveAutoevaluacionDetails
+                                    : handleSaveAutoevaluaciones
+                            }
                             className="save-form-btn"
                         >
-                            Guardar Autoevaluación
+                            {editMode
+                                ? "Guardar Cambios de la Autoevaluación"
+                                : "Crear Autoevaluación"}
                         </button>
                     </div>
                 </div>

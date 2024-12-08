@@ -17,7 +17,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-bottom: 20px;
+    margin: 20px 0;
     border-top: 8px solid #002a4c; /* Línea superior para destacar el encabezado */
 }
 
@@ -42,7 +42,6 @@
     resize: none;
     padding: 5px;
     background: none;
-    height: auto;
 }
 
 .form-dates {
@@ -205,18 +204,18 @@
 /* Destacar puntuación */
 
 .remove-option-btn {
-    background-color: #e63946;
-    color: #ffffff;
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 14px;
+    padding: 10px 15px;
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 12px;
     transition: background-color 0.3s ease;
 }
 
 .remove-option-btn:hover {
-    background-color: #c5303e;
+    background-color: #ff1a1a;
 }
 
 /*-------------------- Nueva Pregunta --------------------*/
@@ -340,7 +339,25 @@
 .save-edit-btn:hover {
     background-color: #0056b3;
 }
+.cancel-edit-btn {
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 14px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
+.cancel-edit-btn:hover {
+    background-color: #ff1a1a; /* Color más claro al pasar el cursor */
+}
+
+.edit-question-actions {
+    display: flex;
+    gap: 10px;
+}
 /*-------------------- Pie del Formulario --------------------*/
 .form-footer {
     margin-top: 15px;
@@ -401,4 +418,19 @@
 
 .delete-button:hover {
     background-color: #ff1a1a;
+}
+
+.button-group {
+    display: flex; /* Alinear los botones en una fila */
+    gap: 10px; /* Separación entre botones */
+}
+
+.autoevaluacion-contain h4 {
+    font-size: 1.2rem; /* Tamaño adecuado para subtítulos */
+    color: #333; /* Color neutral y profesional */
+    margin: 1rem 0; /* Espaciado uniforme */
+    text-align: left; /* Alineado a la izquierda */
+    position: relative; /* Para el efecto decorativo */
+    text-transform: capitalize; /* Capitalizar las palabras */
+    letter-spacing: 0.5px; /* Espaciado ligero entre letras */
 }

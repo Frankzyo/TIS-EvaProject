@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Table } from "antd";
 import HeaderProyecto from "../Components/HeaderProyecto";
 import SidebarPrueba from "../Components/SidebarPrueba";
+import Reportes from "../Components/Reportes"; // Asegúrate de usar la ruta correcta
 import "../../css/HeaderProyecto.css";
 import "../../css/SidebarPrueba.css";
 import "../../css/PlanillaDeSeguimiento.css";
@@ -63,14 +64,18 @@ const PlanillaDeSeguimiento = () => {
                 (group) => group.ID_GRUPO === parseInt(selectedGroup)
             )?.fechas_defensa || [];
 
+        // Generar columnas dinámicas para las etapas
         studentsData.forEach((student) => {
             student.notas.forEach((nota) => {
                 const diaDefensa =
                     Array.isArray(fechasDefensa) && fechasDefensa.length > 0
                         ? fechasDefensa[0]?.DIA || "Sin día"
                         : "Sin día";
-
+        
                 const columnKey = `${nota.ETAPA_TITULO}_${nota.FECHA_REVISION}`;
+                const isNonEditable =
+                    nota.ID_AUTOEVAL_PROYECTO || nota.ID_EVAL_CRUZADA; // Determina si es una columna no editable
+        
                 if (!etapasMap[columnKey]) {
                     etapasMap[columnKey] = {
                         title: (
@@ -84,30 +89,33 @@ const PlanillaDeSeguimiento = () => {
                         key: columnKey,
                         align: "center",
                         render: (value, record) => {
+                            // Si es una columna no editable, muestra el valor como texto
+                            if (isNonEditable) {
+                                return value ? Math.round(value) : "-"; // Redondear siempre los valores no editables
+                            }
+        
+                            // Si está en modo edición, habilita la edición solo para columnas editables
                             if (isEditing) {
                                 return (
                                     <input
                                         type="number"
-                                        value={value || ""}
+                                        value={Math.round(value) || ""} // Asegurar que los valores siempre estén redondeados
                                         onChange={(e) => {
-                                            const newValue = parseFloat(
-                                                e.target.value
-                                            );
-
+                                            const newValue = Math.floor(
+                                                parseFloat(e.target.value)
+                                            ); // Redondear al número entero más cercano hacia abajo
+        
                                             // Validar que la nota no sea negativa
                                             if (newValue < 0) {
-                                                alert(
-                                                    "La nota no puede ser negativa."
-                                                );
+                                                alert("La nota no puede ser negativa.");
                                                 return;
                                             }
-
+        
                                             // Validar que la nota no exceda la puntuación máxima
                                             const maxPuntuacion = studentsData
                                                 .find(
                                                     (stu) =>
-                                                        stu.estudiante
-                                                            .ID_ESTUDIANTE ===
+                                                        stu.estudiante.ID_ESTUDIANTE ===
                                                         record.key
                                                 )
                                                 ?.notas.find(
@@ -115,54 +123,55 @@ const PlanillaDeSeguimiento = () => {
                                                         `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
                                                         columnKey
                                                 )?.ETAPA_PUNTUACION;
-
+        
                                             if (newValue > maxPuntuacion) {
                                                 alert(
                                                     `La nota no puede ser mayor a ${maxPuntuacion} puntos.`
                                                 );
                                                 return;
                                             }
-
+        
                                             // Actualizar los datos
-                                            const updatedData =
-                                                studentsData.map((stu) => {
+                                            const updatedData = studentsData.map(
+                                                (stu) => {
                                                     if (
-                                                        stu.estudiante
-                                                            .ID_ESTUDIANTE ===
+                                                        stu.estudiante.ID_ESTUDIANTE ===
                                                         record.key
                                                     ) {
-                                                        stu.notas =
-                                                            stu.notas.map((n) =>
-                                                                `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
-                                                                columnKey
-                                                                    ? {
-                                                                          ...n,
-                                                                          PUNTUACION_TOTAL:
-                                                                              newValue,
-                                                                      }
-                                                                    : n
-                                                            );
+                                                        stu.notas = stu.notas.map((n) =>
+                                                            `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
+                                                            columnKey
+                                                                ? {
+                                                                      ...n,
+                                                                      PUNTUACION_TOTAL:
+                                                                          newValue,
+                                                                  }
+                                                                : n
+                                                        );
                                                     }
                                                     return stu;
-                                                });
+                                                }
+                                            );
                                             setStudentsData(updatedData);
                                         }}
                                         style={{
                                             textAlign: "center",
                                             padding: "4px 6px",
-                                            width: "auto", // Ancho dinámico
-                                            minWidth: "60px", // Ancho mínimo
-                                            maxWidth: "100px", // Ancho máximo opcional
+                                            width: "auto",
+                                            minWidth: "60px",
+                                            maxWidth: "100px",
                                         }}
                                     />
                                 );
                             }
-                            return value || "-";
+                            // Si no está en modo edición, muestra el valor redondeado
+                            return value ? Math.round(value) : "-";
                         },
                     };
                 }
             });
         });
+        
 
         const dynamicColumns = Object.values(etapasMap).reduce(
             (acc, column) => {
@@ -173,7 +182,6 @@ const PlanillaDeSeguimiento = () => {
                     acc.push({
                         title: column.parent,
                         align: "center",
-                        className: "ant-table-grouped-column-title",
                         children: [column],
                     });
                 } else {
@@ -205,7 +213,7 @@ const PlanillaDeSeguimiento = () => {
                 const total = Object.keys(row)
                     .filter((key) => key.includes("_"))
                     .reduce((sum, key) => sum + (parseFloat(row[key]) || 0), 0);
-                return Math.round(total); // Redondear el total al número entero más cercano
+                return Math.round(total);
             },
         };
 
@@ -261,23 +269,53 @@ const PlanillaDeSeguimiento = () => {
 
         if (groupId) {
             try {
-                const [notasResponse, gruposResponse] = await Promise.all([
+                const [
+                    notasResponse,
+                    evaluacionesCruzadasResponse,
+                    autoevaluacionesResponse,
+                ] = await Promise.all([
                     axios.get(
                         `http://localhost:8000/api/grupos/${groupId}/notas`,
                         { withCredentials: true }
                     ),
                     axios.get(
-                        `http://localhost:8000/api/proyectos/${projectId}/grupos`,
+                        `http://localhost:8000/api/evaluaciones-cruzadas/grupos/${groupId}/notas`,
+                        { withCredentials: true }
+                    ),
+                    axios.get(
+                        `http://localhost:8000/api/autoevaluaciones/grupos/${groupId}/notas`,
                         { withCredentials: true }
                     ),
                 ]);
 
-                setStudentsData(notasResponse.data || []);
+                const combinedData = notasResponse.data.map((estudiante) => {
+                    const evaluacionCruzadaNotas =
+                        evaluacionesCruzadasResponse.data.find(
+                            (evalData) =>
+                                evalData.estudiante.ID_ESTUDIANTE ===
+                                estudiante.estudiante.ID_ESTUDIANTE
+                        )?.notas || [];
+
+                    const autoevaluacionNotas =
+                        autoevaluacionesResponse.data.find(
+                            (autoEvalData) =>
+                                autoEvalData.estudiante.ID_ESTUDIANTE ===
+                                estudiante.estudiante.ID_ESTUDIANTE
+                        )?.notas || [];
+
+                    return {
+                        ...estudiante,
+                        notas: [
+                            ...estudiante.notas,
+                            ...evaluacionCruzadaNotas,
+                            ...autoevaluacionNotas,
+                        ],
+                    };
+                });
+
+                setStudentsData(combinedData || []);
             } catch (error) {
-                console.error(
-                    "Error al obtener datos de los estudiantes o del grupo:",
-                    error
-                );
+                console.error("Error al obtener datos del grupo:", error);
             }
         }
     };
@@ -288,12 +326,23 @@ const PlanillaDeSeguimiento = () => {
 
     const handleSave = async () => {
         try {
+            // Excluir autoevaluaciones y evaluaciones cruzadas
+            const payload = studentsData.map((student) => ({
+                ID_ESTUDIANTE: student.estudiante.ID_ESTUDIANTE,
+                notas: student.notas.filter(
+                    (nota) =>
+                        !nota.ID_AUTOEVAL_PROYECTO && !nota.ID_EVAL_CRUZADA
+                ),
+            }));
+
+            // Realiza el POST al backend
             await axios.post(
                 `http://localhost:8000/api/grupos/${selectedGroup}/notas`,
-                { studentsData },
+                { studentsData: payload },
                 { withCredentials: true }
             );
-            console.log("Notas guardadas exitosamente.");
+
+            console.log("Notas actualizadas exitosamente.");
             setIsEditing(false);
         } catch (error) {
             console.error("Error al guardar las notas:", error);

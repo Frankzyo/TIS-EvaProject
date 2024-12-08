@@ -156,3 +156,33 @@
     overflow-y: hidden;
     padding-bottom: 10px;
 }
+
+.reportes-section h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #004085;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* Estilo para h4 */
+.reportes-section h4 {
+    margin-top: 15px;
+    font-size: 18px; /* Más pequeño que h3 */
+    color: #0056b3; /* Un azul más claro */
+    border-bottom: 1px solid #d6d6d6; /* Línea más delgada */
+    padding-bottom: 8px;
+    font-weight: bold; /* Enfatiza el subtítulo */
+    text-align: left;
+}
+
+/* Estilo para h5 */
+.reportes-section h5 {
+    margin-top: 20px;
+    font-size: 16px; /* Más pequeño que h4 */
+    color: #002A4C; /* Gris para menor jerarquía */
+    border-bottom: 1px solid #d6d6d6; /* Línea más delgada */
+    padding-left: 10px; /* Sangría para destacar nivel inferior */
+    font-weight: bold; /* Menor peso que h4 */
+    text-align: left;
+}

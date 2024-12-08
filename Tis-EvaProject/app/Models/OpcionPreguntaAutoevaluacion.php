@@ -2,23 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OpcionPreguntaAutoevaluacion extends Model
 {
-    use HasFactory;
-
     protected $table = 'opciones_pregunta_autoevaluacion';
+
+    protected $primaryKey = 'ID_OPCION_AUTOEVAL'; // Especificar la clave primaria
+
+    public $incrementing = true; // Si es AUTO_INCREMENT
+    protected $keyType = 'int'; // Tipo de la clave primaria
 
     protected $fillable = [
         'ID_PREGUNTA_AUTOEVAL',
         'TEXTO_OPCION_AUTOEVAL',
         'PUNTUACION_OPCION_AUTOEVAL',
     ];
-
-    public function pregunta()
-    {
-        return $this->belongsTo(PreguntaAutoevaluacion::class, 'ID_PREGUNTA_AUTOEVAL');
-    }
 }

@@ -1,0 +1,250 @@
+/* Estilos específicos para la página de Tareas del Estudiante */
+.autoevaluacion-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.autoevaluacion-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+
+.autoevaluacion-main-contain {
+    padding: 0 40px;
+    box-sizing: border-box;
+    background-color: #76a9d9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+    margin-bottom: -40px;
+}
+/* Título */
+.autoevaluacion-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50; /* Tono oscuro para buen contraste */
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Sutil sombra en el texto */
+}
+/* Descripción */
+.autoevaluacion-main-content p {
+    font-size: 20px;
+    color: #7f8c8d;
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+/* Contenedor de preguntas */
+
+
+/* Título de cada pregunta */
+.pregunta-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de opciones */
+.opciones-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 100px;
+    flex-wrap: wrap;
+}
+
+/* Opciones (cada círculo con título y puntuación) */
+.opcion-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    min-width: 80px;
+    max-width: 120px;
+}
+
+/* Título encima del radio */
+.opcion-titulo {
+    font-size: 14px;
+    font-weight: 500;
+    color: #34495e;
+}
+
+/* Estilo del radio button */
+.opcion-radio input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #2980b9; /* Color del radio */
+    transition: transform 0.2s ease;
+}
+
+.opcion-radio input[type="radio"]:hover {
+    transform: scale(1.2);
+}
+
+/* Puntuación debajo */
+.opcion-puntos {
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+/* Botón de guardar */
+.save-button {
+    background-color: #003366;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+.save-button:hover {
+    background-color: #1a73e8;
+    transform: translateY(-2px);
+}
+
+.save-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .autoevaluacion-main-content {
+        padding: 20px;
+    }
+
+    .opciones-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .opcion-col {
+        max-width: 100%;
+    }
+
+    .save-button {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+.form {
+    background: #ffffff; /* Fondo blanco limpio para un diseño moderno */
+    border-radius: 10px; /* Bordes redondeados para un diseño suave */
+    padding: 20px; /* Espaciado interno */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera para dar profundidad */
+    max-width: 1500px; /* Ancho máximo para formularios centrados */
+    margin: 20px auto; /* Centrar el formulario horizontal y verticalmente */
+    font-family: 'Arial', sans-serif; /* Tipografía limpia y profesional */
+}
+
+.autoevaluacion-info {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #34495e;
+    text-align: center;
+}
+
+.autoevaluacion-info p {
+    margin: 5px 0;
+    font-weight: 500;
+}
+.autoevaluacion-fechas {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    gap: 40px; /* Espaciado entre las fechas */
+    margin-bottom: 20px;
+    font-family: "Arial", sans-serif; /* Fuente clara */
+    color: #2c3e50;
+}
+
+.autoevaluacion-fecha-item {
+    display: flex;
+    flex-direction: column; /* Alinear elementos verticalmente */
+    align-items: center; /* Centrar contenido */
+    text-align: center;
+    background: #ecf0f1; /* Fondo sutil */
+    padding: 10px 15px;
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+}
+
+.autoevaluacion-fecha-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #34495e;
+    margin-bottom: 5px; /* Separación del texto */
+}
+
+.autoevaluacion-fecha-value {
+    font-size: 14px;
+    color: #2980b9;
+    font-weight: 600;
+}
+
+
+.autoevaluacion-resultado {
+    background-color: #eaf6f7; /* Fondo suave para resaltar */
+    border: 1px solid #b8e0e5; /* Borde sutil */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 20px; /* Espaciado interno */
+    margin-top: 20px; /* Separación del formulario */
+    text-align: center; /* Centrar el contenido */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para profundidad */
+}
+
+.autoevaluacion-resultado h2 {
+    font-size: 24px; /* Tamaño del título */
+    font-weight: 700; /* Negrita */
+    color: #34495e; /* Color del texto */
+    margin-bottom: 15px; /* Espaciado inferior */
+    text-transform: uppercase; /* Mayúsculas */
+    letter-spacing: 1px; /* Espaciado entre letras */
+}
+
+.autoevaluacion-resultado p {
+    font-size: 16px; /* Tamaño del texto */
+    color: #2c3e50; /* Color del texto */
+    margin-bottom: 10px; /* Espaciado inferior */
+}
+
+.autoevaluacion-resultado strong {
+    color: #2980b9; /* Color destacado */
+    font-weight: 600; /* Peso del texto */
+}
+.descripcion-autoevaluacion {
+    background-color: #f9f9f9; /* Fondo claro */
+    border-left: 4px solid #2980b9; /* Borde de color para destacar */
+    padding: 15px 20px; /* Espaciado interno */
+    margin-bottom: 20px; /* Separación con el contenido siguiente */
+    font-size: 16px; /* Tamaño del texto */
+    color: #2c3e50; /* Color de texto */
+    line-height: 1.6; /* Altura de línea para mejorar la legibilidad */
+    border-radius: 6px; /* Bordes redondeados */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.descripcion-autoevaluacion strong {
+    font-weight: 600; /* Negrita para enfatizar texto importante */
+    color: #2980b9; /* Color destacado */
+}

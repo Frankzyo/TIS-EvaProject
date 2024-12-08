@@ -33,6 +33,11 @@ import EvaluacionCruzada from './Pages/EvaluacionCruzada';
 import SeguimientoSemanal from './Pages/SeguimientoSemanal';
 import SeguimientoSemanalEstudiante from './Pages/SeguimientoSemanalEstudiante';
 import Autoevaluacion from './Pages/Autoevaluacion';
+import AutoevaluacionEstudiante from './Pages/AutoevaluacionEstudiante';
+import ReportesPage from "./Pages/ReportesPage";
+import EvaluacionCruzadaEstudiante from './Pages/EvaluacionCruzadaEstudiante';
+import EvaluacionDeParesEstudiante from './Pages/EvaluacionDeParesEstudiante';
+
 import '../css/NotFound.css'; 
 
 function NotFound() {
@@ -85,6 +90,10 @@ function App() {
         <Route path="/seguimiento-semanal/:projectId" element={<SeguimientoSemanal />} />
         <Route path="/seguimiento-semanal-estudiante/:projectId" element={<SeguimientoSemanalEstudiante />} />
         <Route path="/autoevaluacion/:projectId" element={<Autoevaluacion />} />
+        <Route path="/autoevaluacion-estudiante/:projectId" element={<AutoevaluacionEstudiante />} />
+        <Route path="/proyectos/:projectId/reportes" element={<ReportesPage />} />
+        <Route path="/evaluacion-cruzada-estudiante/:projectId" element={<EvaluacionCruzadaEstudiante />} />
+        <Route path="/evaluacion-pares-estudiante/:projectId" element={<EvaluacionDeParesEstudiante />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

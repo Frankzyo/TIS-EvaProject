@@ -70,21 +70,63 @@ class EvaluacionParController extends Controller
         }
     }
     public function index($projectId)
-{
-    try {
-        $evaluaciones = EvaluacionPar::with(['gruposEvaluadores.grupoEvaluador', 'gruposEvaluados.grupoEvaluado'])
-            ->where('id_proyecto', $projectId)
-            ->get();
+    {
+        try {
+            $evaluaciones = EvaluacionPar::with([
+                'gruposEvaluadores.grupoEvaluador',
+                'gruposEvaluados.grupoEvaluado'
+            ])
+                ->where('id_proyecto', $projectId)
+                ->get();
 
-        return response()->json([
-            'evaluaciones' => $evaluaciones,
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Error al obtener las evaluaciones',
-            'error' => $e->getMessage(),
-        ], 500);
+            return response()->json([
+                'evaluaciones' => $evaluaciones,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener las evaluaciones',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
+    public function obtenerEvaluacionesDePares($projectId)
+    {
+        try {
+            $evaluaciones = EvaluacionParGrupo::with([
+                'grupoEvaluador',
+                'grupoEvaluado',
+            ])->whereHas('evaluacionPar', function ($query) use ($projectId) {
+                $query->where('id_proyecto', $projectId);
+            })->get();
+
+            return response()->json([
+                'evaluaciones' => $evaluaciones,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener las evaluaciones de pares',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $evaluacion = EvaluacionPar::with([
+                'gruposEvaluadores.grupoEvaluador',
+                'gruposEvaluados.grupoEvaluado',
+            ])->findOrFail($id);
+
+            return response()->json([
+                'evaluacion' => $evaluacion,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener la evaluación',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

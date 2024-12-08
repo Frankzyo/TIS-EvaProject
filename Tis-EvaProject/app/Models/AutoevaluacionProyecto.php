@@ -10,7 +10,7 @@ class AutoevaluacionProyecto extends Model
     use HasFactory;
 
     protected $table = 'autoevaluaciones_proyecto';
-
+    protected $primaryKey = 'ID_AUTOEVAL_PROYECTO';
     protected $fillable = [
         'ID_PROYECTO',
         'TITULO_AUTOEVAL',

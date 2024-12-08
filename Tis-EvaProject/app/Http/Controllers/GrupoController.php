@@ -101,6 +101,7 @@ class GrupoController extends Controller
     }
 
     // Actualizar un grupo
+    // Actualizar un grupo
     public function update(Request $request, $id)
     {
         Log::info('Datos recibidos para actualizar:', $request->all());
@@ -126,16 +127,28 @@ class GrupoController extends Controller
             return response()->json(['message' => 'Grupo no encontrado o no autorizado'], 404);
         }
 
-        // Validación con captura de errores
+        // Validar los datos de entrada
         try {
             $validatedData = $request->validate([
                 'NOMBRE_GRUPO' => 'required|max:255',
                 'DESCRIP_GRUPO' => 'nullable|max:1000',
-                'PORTADA_GRUPO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+                'PORTADA_GRUPO' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Error de validación:', $e->errors());
             return response()->json(['message' => 'Datos inválidos', 'errors' => $e->errors()], 422);
+        }
+
+        // Verificar si el nuevo nombre ya existe en otro grupo del mismo proyecto
+        $existingGroup = Grupo::where('NOMBRE_GRUPO', $validatedData['NOMBRE_GRUPO'])
+            ->where('ID_PROYECTO', $grupo->ID_PROYECTO)
+            ->where('ID_GRUPO', '!=', $id) // Excluir el grupo actual
+            ->first();
+
+        if ($existingGroup) {
+            return response()->json([
+                'message' => 'El nombre del grupo ya existe en este proyecto. Por favor, elija otro nombre.',
+            ], 422);
         }
 
         // Manejar la imagen si se proporciona una nueva
@@ -149,13 +162,14 @@ class GrupoController extends Controller
 
         // Actualizar el grupo con los nuevos datos
         $grupo->update([
-            'NOMBRE_GRUPO' => $request->NOMBRE_GRUPO,
-            'DESCRIP_GRUPO' => $request->DESCRIP_GRUPO,
+            'NOMBRE_GRUPO' => $validatedData['NOMBRE_GRUPO'],
+            'DESCRIP_GRUPO' => $validatedData['DESCRIP_GRUPO'],
             'PORTADA_GRUPO' => $imagePath,
         ]);
 
         return response()->json($grupo);
     }
+
 
     // Eliminar un grupo
     public function destroy($id)

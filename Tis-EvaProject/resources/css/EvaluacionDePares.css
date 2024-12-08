@@ -9,3 +9,157 @@
     display: flex;
     height: 100%;
 }
+
+/* Contenedor Principal */
+.evaluaciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 5px 0;
+}
+
+/* Tarjetas de Evaluaciones */
+.evaluacion-card {
+    background: #fff;
+    padding: 15px 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%; /* Ajuste de ancho del contenedor */
+    box-sizing: border-box;
+}
+
+.evaluacion-card small {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.evaluacion-card p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Contenedor de Evaluadores */
+.evaluadores-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+/* Pares Evaluador-Evaluado */
+.grupo-pair {
+    background: linear-gradient(135deg, #f9f9f9, #ffffff); /* Gradiente sutil para el fondo */
+    border: 1px solid #ccc; /* Color de borde más claro */
+    border-radius: 12px; /* Borde más redondeado */
+    padding: 1.5rem; /* Espaciado interno mayor */
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos se acomoden en varias líneas si es necesario */
+    align-items: center;
+    justify-content: space-between; /* Distribuye evaluador, evaluado y botón */
+    gap: 1.5rem; /* Espaciado entre elementos mayor */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Suaviza transformaciones */
+}
+
+/* Información del Grupo */
+.grupo-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+/* Fotos */
+.grupo-foto {
+    width: 60px; /* Ajusta el tamaño de la foto */
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+/* Contenedor del Botón */
+.details-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* Botón */
+.details-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.details-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.fecha-container {
+    display: flex;
+    flex-direction: column; /* Alinea las fechas en columna */
+    gap: 0.5rem; /* Espaciado entre las fechas */
+    margin-top: 1rem; /* Espaciado con los elementos superiores */
+    font-size: 1rem; /* Tamaño de texto base */
+    color: #333; /* Color del texto */
+}
+
+.fecha {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espaciado entre etiqueta y valor */
+}
+
+.fecha-label {
+    font-weight: bold; /* Resalta la etiqueta */
+    color: #555; /* Color de la etiqueta */
+    font-size: 1rem; /* Tamaño consistente */
+}
+
+.fecha-valor {
+    font-weight: normal; /* Contraste con la etiqueta */
+    color: #333; /* Color neutro para el texto */
+    font-size: 1rem; /* Tamaño consistente */
+    margin: 0; /* Elimina márgenes innecesarios */
+}
+
+/* Contenedor de Nota Máxima */
+.nota-maxima-container {
+    display: flex;
+    justify-content: flex-start; /* Alinea a la izquierda */
+    align-items: center;
+    max-width: fit-content; /* Se ajusta al contenido */
+    margin-bottom: 20px;
+}
+
+/* Etiqueta de Nota */
+.nota-label {
+    font-weight: bold; /* Resalta la etiqueta */
+    color: #555; /* Gris oscuro */
+    margin-right: 0.5rem; /* Espaciado entre etiqueta y valor */
+}
+
+/* Valor de la Nota */
+.nota-valor {
+    font-weight: 500; /* Destaca el valor */
+    color: #333; /* Color neutro */
+    font-size: 1.1rem; /* Tamaño ligeramente mayor */
+}
+
+.configuracion-grupos-titulo {
+    margin-top: 0;
+    font-size: 22px;
+    color: #004085;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
