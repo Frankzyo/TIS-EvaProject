@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EvaluacionPar extends Model
 {
@@ -16,6 +17,8 @@ class EvaluacionPar extends Model
 
     protected $fillable = [
         'id_proyecto',
+        'titulo',        // Campo agregado anteriormente
+        'descripcion',   // Nuevo campo agregado
         'fecha_inicio',
         'fecha_fin',
         'nota_maxima',
@@ -32,5 +35,9 @@ class EvaluacionPar extends Model
     {
         return $this->hasMany(EvaluacionParGrupo::class, 'id_evaluacion_par', 'id_evaluacion_par')
             ->with('grupoEvaluado');
+    }
+    public function asignaciones(): HasMany
+    {
+        return $this->hasMany(EvaluacionParGrupo::class, 'id_evaluacion_par', 'id_evaluacion_par');
     }
 }

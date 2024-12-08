@@ -21,7 +21,6 @@ const EvaluacionDePares = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-
                 const [projectResponse, gruposResponse, evaluacionesResponse] =
                     await Promise.all([
                         axios.get(
@@ -124,7 +123,6 @@ const EvaluacionDePares = () => {
         }
     };
 
-
     if (error) {
         return <p>{error}</p>;
     }
@@ -146,7 +144,7 @@ const EvaluacionDePares = () => {
                 />
                 <div className="container">
                     <div className="projects-header">
-                        <h2>Evaluaciones de Pares</h2>
+                        <h2>Configuracion de Evaluaciones de Pares</h2>
                         <button
                             className="new-project-btn"
                             onClick={() => setShowModal(true)}
@@ -162,11 +160,13 @@ const EvaluacionDePares = () => {
                                     key={index}
                                     className="card evaluacion-card"
                                 >
-                                    <h3 className="configuracion-grupos-titulo">
-                                        Configuración de Grupos para
-                                        Evaluaciones de Pares
+                                    <h3 className="evaluacion-titulo">
+                                        {evaluacion.titulo || "Sin Título"}
                                     </h3>
-
+                                    <p className="evaluacion-descripcion">
+                                        {evaluacion.descripcion ||
+                                            "Sin Descripción"}
+                                    </p>
                                     <div className="fecha-container">
                                         <p className="fecha">
                                             <span className="fecha-label">

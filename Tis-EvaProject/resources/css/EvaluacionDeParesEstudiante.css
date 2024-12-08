@@ -1,0 +1,401 @@
+/* Estilos específicos para la página de Tareas del Estudiante */
+.evaluacion-pares-estudiante-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.evaluacion-pares-estudiante-sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+.tareas-estudiante-main-content {
+    padding: 0 40px;
+    box-sizing: border-box;
+    background-color: #76a9d9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+    margin-bottom: -40px;
+}
+
+.evaluacion-pares-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50; /* Tono oscuro para buen contraste */
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Sutil sombra en el texto */
+}
+
+
+/* Detalles de la evaluación */
+.evaluacion-detalles {
+    margin: 20px 0;
+}
+
+
+.evaluacion-info strong {
+    color: #0056b3;
+}
+
+/* Tarjetas de asignaciones */
+.evaluacion-asignaciones {
+    margin-top: 20px;
+}
+
+.asignacion-card {
+    background-color: #ffffff;
+    margin: 15px 0;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.asignacion-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Acciones */
+.asignacion-actions {
+    margin-top: 15px;
+}
+
+
+
+.publicar-link-form button,
+.guardar-comentario-form button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.publicar-link-form button:hover,
+.guardar-comentario-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Link publicado */
+.link-publicado {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 4px;
+}
+
+.link-publicado a {
+    color: #388e3c;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-publicado a:hover {
+    text-decoration: underline;
+}
+
+/* Aviso de enlace no publicado */
+.no-link-aviso {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 4px;
+}
+
+/* Mensaje de error */
+.no-evaluacion-message {
+    text-align: center;
+    font-size: 18px;
+    color: #dc3545;
+    margin-top: 20px;
+}
+
+.form-pares{
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 1500px;
+    margin: 20px 20px;
+}
+.asignacion-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+.asignacion-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.asignacion-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.asignacion-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.asignacion-section {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.evaluador-section {
+    background-color: #e6f7ff; /* Azul claro */
+    border: 1px solid #91d5ff;
+}
+
+.evaluado-section {
+    background-color: #fff1f0; /* Rojo claro */
+    border: 1px solid #ffa39e;
+}
+
+
+.grupo-portada {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.grupo-nombre {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.asignacion-actions {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.publicar-link-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.form-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #0056b3;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    border-color: #007bff; /* Azul para enfoque */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.form-submit-btn {
+    background-color: #007bff; /* Azul */
+    color: white;
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.form-submit-btn:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
+
+.guardar-comentario-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.form-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.form-textarea {
+    flex: 1;
+    padding: 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.form-textarea:focus {
+    border-color: #007bff; /* Azul */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.form-input-number {
+    width: 80px;
+    padding: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.form-input-number:focus {
+    border-color: #28a745; /* Verde */
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+.form-submit-btn {
+    align-self: flex-end;
+    background-color: #007bff; /* Azul */
+    color: white;
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.form-submit-btn:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
+
+.form-footer-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+.form-footers {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.comentario-item.mejorado {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f0f4f8;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.2s ease;
+}
+
+.comentario-item.mejorado:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.comentario-header.mejorado {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.estudiante-foto.mejorado {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #3b82f6;
+}
+
+.estudiante-info.mejorado {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.estudiante-nombre.mejorado {
+    font-size: 16px;
+    font-weight: bold;
+    color: #374151;
+}
+
+.comentario-body.mejorado {
+    margin-top: 10px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.comentario-body.mejorado p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    color: #4b5563;
+    text-align: left;
+}
+
+.comentario-body.mejorado strong {
+    color: #1f2937;
+    font-weight: bold;
+}

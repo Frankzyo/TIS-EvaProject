@@ -44,6 +44,7 @@ Route::prefix('estudiante')->group(function () {
 
 Route::middleware(['auth:estudiante'])->prefix('estudiante')->group(function () {
     Route::get('/proyecto-grupo', [EstudianteController::class, 'obtenerProyectoYGrupo']);
+    
 });
 
 // Ruta para restablecer la contraseña
@@ -60,6 +61,12 @@ Route::prefix('api')->middleware(['auth:docente,estudiante'])->group(function ()
     Route::put('/proyectos/{id}', [ProyectosController::class, 'update']);
     Route::delete('/proyectos/{id}', [ProyectosController::class, 'destroy']);
     Route::get('/proyectos/{id}', [ProyectosController::class, 'show']);
+});
+
+Route::middleware(['auth:estudiante'])->group(function () {
+    // Rutas exclusivas para estudiantes
+    Route::post('/api/evaluacion-pares/publicar-link/{idAsignacionPar}', [EvaluacionParController::class, 'publicarEnlace']);
+    Route::post('/api/evaluacion-pares/agregar-comentario/{idAsignacionPar}', [EvaluacionParController::class, 'agregarComentario']);
 });
 
 Route::prefix('api')->middleware(['auth:docente,estudiante'])->group(function () {
@@ -191,7 +198,12 @@ Route::prefix('api')->group(function () {
     Route::get('/evaluacion-cruzada/promedio/{idEstudiante}', [ResultadoEvaluacionCruzadaController::class, 'obtenerPromedioEvaluaciones']);
     Route::get('/evaluaciones-cruzadas/grupos/{idGrupo}/notas', [ResultadoEvaluacionCruzadaController::class, 'obtenerResultadosEvaluacionesCruzadasPorGrupo']);
 
+    Route::get('/evaluacion-pares/{id_proyecto}/{id_grupo}', [EvaluacionParController::class, 'obtenerEvaluaciones']);
+
 });
+
+Route::get('/api/grupos/{groupId}/proyecto/{projectId}/promedio-notas', [EvaluacionParController::class, 'obtenerPromedioNotasPorGrupo']);
+
 
 Route::prefix('api/seguimiento-semanal')->group(function () {
     // Obtener seguimientos de un proyecto

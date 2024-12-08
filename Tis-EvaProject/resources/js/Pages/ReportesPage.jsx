@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import HeaderProyecto from "../Components/HeaderProyecto";
 import SidebarPrueba from "../Components/SidebarPrueba";
-import Reportes from "../Components/Reportes"; // Asegúrate de usar la ruta correcta
+import Reportes from "../Components/Reportes";
 import "../../css/HeaderProyecto.css";
 import "../../css/SidebarPrueba.css";
 import "../../css/PlanillaDeSeguimiento.css";
@@ -16,7 +16,10 @@ const ReportesPage = () => {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [studentsData, setStudentsData] = useState([]);
     const [autoevalResults, setAutoevalResults] = useState([]);
+    const [cruzadasResults, setCruzadasResults] = useState([]);
+    const [paresResults, setParesResults] = useState([]);
 
+    // Fetch project details and groups
     useEffect(() => {
         if (projectId) {
             const fetchProjectDetails = async () => {
@@ -39,60 +42,57 @@ const ReportesPage = () => {
                     );
                     setProjectData(response.data.groups || []);
                 } catch (error) {
-                    console.error(
-                        "Error al obtener los datos del proyecto:",
-                        error
-                    );
+                    console.error("Error al obtener los datos del proyecto:", error);
                 }
             };
 
             fetchProjectDetails();
             fetchProjectData();
-        } else {
-            console.error("No se pudo obtener el projectId");
         }
     }, [projectId]);
 
+    // Fetch group-specific data
     useEffect(() => {
         if (selectedGroup) {
-            const fetchAutoevalResults = async () => {
+            const fetchGroupData = async () => {
                 try {
-                    const response = await axios.get(
-                        `http://localhost:8000/autoevaluaciones/resultados?groupId=${selectedGroup}`,
-                        { withCredentials: true }
-                    );
-                    setAutoevalResults(response.data || []);
+                    const [
+                        notasResponse,
+                        cruzadasResponse,
+                        autoevaluacionesResponse,
+                        paresResponse,
+                    ] = await Promise.all([
+                        axios.get(`http://localhost:8000/api/grupos/${selectedGroup}/notas`, {
+                            withCredentials: true,
+                        }),
+                        axios.get(`http://localhost:8000/api/evaluaciones-cruzadas/grupos/${selectedGroup}/notas`, {
+                            withCredentials: true,
+                        }),
+                        axios.get(`http://localhost:8000/api/autoevaluaciones/grupos/${selectedGroup}/notas`, {
+                            withCredentials: true,
+                        }),
+                        axios.get(`http://localhost:8000/api/grupos/${selectedGroup}/proyecto/${projectId}/promedio-notas`, {
+                            withCredentials: true,
+                        }),
+                    ]);
+
+                    setStudentsData(notasResponse.data || []);
+                    setCruzadasResults(cruzadasResponse.data || []);
+                    setAutoevalResults(autoevaluacionesResponse.data || []);
+                    setParesResults(paresResponse.data || []);
                 } catch (error) {
-                    console.error(
-                        "Error al obtener los resultados de autoevaluaciones:",
-                        error
-                    );
+                    console.error("Error al obtener datos del grupo:", error);
                 }
             };
-            fetchAutoevalResults();
+
+            fetchGroupData();
         }
-    }, [selectedGroup]);
+    }, [selectedGroup, projectId]);
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
-    const handleGroupSelection = async (event) => {
-        const groupId = event.target.value;
-        setSelectedGroup(groupId);
-
-        if (groupId) {
-            try {
-                const notasResponse = await axios.get(
-                    `http://localhost:8000/api/grupos/${groupId}/notas`,
-                    { withCredentials: true }
-                );
-                setStudentsData(notasResponse.data || []);
-            } catch (error) {
-                console.error(
-                    "Error al obtener datos de los estudiantes o del grupo:",
-                    error
-                );
-            }
-        }
+    const handleGroupSelection = (event) => {
+        setSelectedGroup(event.target.value);
     };
 
     return (
@@ -127,10 +127,7 @@ const ReportesPage = () => {
                             </option>
                             {Array.isArray(projectData) && projectData.length > 0 ? (
                                 projectData.map((group) => (
-                                    <option
-                                        key={group.ID_GRUPO}
-                                        value={group.ID_GRUPO}
-                                    >
+                                    <option key={group.ID_GRUPO} value={group.ID_GRUPO}>
                                         {group.NOMBRE_GRUPO}
                                     </option>
                                 ))
@@ -145,6 +142,8 @@ const ReportesPage = () => {
                             <Reportes
                                 studentsData={studentsData}
                                 autoevalResults={autoevalResults}
+                                cruzadasResults={cruzadasResults}
+                                paresResults={paresResults}
                             />
                         </div>
                     ) : projectData.length === 0 ? (

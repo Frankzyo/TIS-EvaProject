@@ -71,11 +71,13 @@ const PlanillaDeSeguimiento = () => {
                     Array.isArray(fechasDefensa) && fechasDefensa.length > 0
                         ? fechasDefensa[0]?.DIA || "Sin día"
                         : "Sin día";
-        
+    
                 const columnKey = `${nota.ETAPA_TITULO}_${nota.FECHA_REVISION}`;
                 const isNonEditable =
-                    nota.ID_AUTOEVAL_PROYECTO || nota.ID_EVAL_CRUZADA; // Determina si es una columna no editable
-        
+                    nota.isEvaluacionPares ||
+                    nota.isEvaluacionCruzada ||
+                    nota.isAutoevaluacion;
+    
                 if (!etapasMap[columnKey]) {
                     etapasMap[columnKey] = {
                         title: (
@@ -89,33 +91,33 @@ const PlanillaDeSeguimiento = () => {
                         key: columnKey,
                         align: "center",
                         render: (value, record) => {
-                            // Si es una columna no editable, muestra el valor como texto
                             if (isNonEditable) {
-                                return value ? Math.round(value) : "-"; // Redondear siempre los valores no editables
+                                // Si es no editable, solo muestra el valor
+                                return value ? Math.round(value) : "-";
                             }
-        
-                            // Si está en modo edición, habilita la edición solo para columnas editables
+    
                             if (isEditing) {
                                 return (
                                     <input
                                         type="number"
-                                        value={Math.round(value) || ""} // Asegurar que los valores siempre estén redondeados
+                                        value={Math.round(value) || ""}
                                         onChange={(e) => {
                                             const newValue = Math.floor(
                                                 parseFloat(e.target.value)
-                                            ); // Redondear al número entero más cercano hacia abajo
-        
-                                            // Validar que la nota no sea negativa
+                                            );
+    
                                             if (newValue < 0) {
-                                                alert("La nota no puede ser negativa.");
+                                                alert(
+                                                    "La nota no puede ser negativa."
+                                                );
                                                 return;
                                             }
-        
-                                            // Validar que la nota no exceda la puntuación máxima
+    
                                             const maxPuntuacion = studentsData
                                                 .find(
                                                     (stu) =>
-                                                        stu.estudiante.ID_ESTUDIANTE ===
+                                                        stu.estudiante
+                                                            .ID_ESTUDIANTE ===
                                                         record.key
                                                 )
                                                 ?.notas.find(
@@ -123,30 +125,31 @@ const PlanillaDeSeguimiento = () => {
                                                         `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
                                                         columnKey
                                                 )?.ETAPA_PUNTUACION;
-        
+    
                                             if (newValue > maxPuntuacion) {
                                                 alert(
                                                     `La nota no puede ser mayor a ${maxPuntuacion} puntos.`
                                                 );
                                                 return;
                                             }
-        
-                                            // Actualizar los datos
+    
                                             const updatedData = studentsData.map(
                                                 (stu) => {
                                                     if (
-                                                        stu.estudiante.ID_ESTUDIANTE ===
+                                                        stu.estudiante
+                                                            .ID_ESTUDIANTE ===
                                                         record.key
                                                     ) {
-                                                        stu.notas = stu.notas.map((n) =>
-                                                            `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
-                                                            columnKey
-                                                                ? {
-                                                                      ...n,
-                                                                      PUNTUACION_TOTAL:
-                                                                          newValue,
-                                                                  }
-                                                                : n
+                                                        stu.notas = stu.notas.map(
+                                                            (n) =>
+                                                                `${n.ETAPA_TITULO}_${n.FECHA_REVISION}` ===
+                                                                columnKey
+                                                                    ? {
+                                                                          ...n,
+                                                                          PUNTUACION_TOTAL:
+                                                                              newValue,
+                                                                      }
+                                                                    : n
                                                         );
                                                     }
                                                     return stu;
@@ -164,14 +167,13 @@ const PlanillaDeSeguimiento = () => {
                                     />
                                 );
                             }
-                            // Si no está en modo edición, muestra el valor redondeado
+    
                             return value ? Math.round(value) : "-";
                         },
                     };
                 }
             });
         });
-        
 
         const dynamicColumns = Object.values(etapasMap).reduce(
             (acc, column) => {
@@ -266,13 +268,14 @@ const PlanillaDeSeguimiento = () => {
     const handleGroupSelection = async (event) => {
         const groupId = event.target.value;
         setSelectedGroup(groupId);
-
+    
         if (groupId) {
             try {
                 const [
                     notasResponse,
                     evaluacionesCruzadasResponse,
                     autoevaluacionesResponse,
+                    evaluacionParesResponse,
                 ] = await Promise.all([
                     axios.get(
                         `http://localhost:8000/api/grupos/${groupId}/notas`,
@@ -286,40 +289,61 @@ const PlanillaDeSeguimiento = () => {
                         `http://localhost:8000/api/autoevaluaciones/grupos/${groupId}/notas`,
                         { withCredentials: true }
                     ),
+                    axios.get(
+                        `http://localhost:8000/api/grupos/${groupId}/proyecto/${projectId}/promedio-notas`,
+                        { withCredentials: true }
+                    ),
                 ]);
-
+    
                 const combinedData = notasResponse.data.map((estudiante) => {
+                    const evaluacionParesNotas =
+                        evaluacionParesResponse.data.find(
+                            (paresData) =>
+                                paresData.estudiante.ID_ESTUDIANTE ===
+                                estudiante.estudiante.ID_ESTUDIANTE
+                        )?.notas.map((nota) => ({
+                            ...nota,
+                            isEvaluacionPares: true,
+                        })) || [];
+    
                     const evaluacionCruzadaNotas =
                         evaluacionesCruzadasResponse.data.find(
                             (evalData) =>
                                 evalData.estudiante.ID_ESTUDIANTE ===
                                 estudiante.estudiante.ID_ESTUDIANTE
-                        )?.notas || [];
-
+                        )?.notas.map((nota) => ({
+                            ...nota,
+                            isEvaluacionCruzada: true,
+                        })) || [];
+    
                     const autoevaluacionNotas =
                         autoevaluacionesResponse.data.find(
                             (autoEvalData) =>
                                 autoEvalData.estudiante.ID_ESTUDIANTE ===
                                 estudiante.estudiante.ID_ESTUDIANTE
-                        )?.notas || [];
-
+                        )?.notas.map((nota) => ({
+                            ...nota,
+                            isAutoevaluacion: true,
+                        })) || [];
+    
                     return {
                         ...estudiante,
                         notas: [
                             ...estudiante.notas,
+                            ...evaluacionParesNotas,
                             ...evaluacionCruzadaNotas,
                             ...autoevaluacionNotas,
                         ],
                     };
                 });
-
+    
                 setStudentsData(combinedData || []);
             } catch (error) {
                 console.error("Error al obtener datos del grupo:", error);
             }
         }
     };
-
+    
     const handleEdit = () => {
         setIsEditing(true);
     };
@@ -331,9 +355,12 @@ const PlanillaDeSeguimiento = () => {
                 ID_ESTUDIANTE: student.estudiante.ID_ESTUDIANTE,
                 notas: student.notas.filter(
                     (nota) =>
-                        !nota.ID_AUTOEVAL_PROYECTO && !nota.ID_EVAL_CRUZADA
+                        !nota.isEvaluacionPares &&
+                        !nota.isEvaluacionCruzada &&
+                        !nota.isAutoevaluacion
                 ),
             }));
+            
 
             // Realiza el POST al backend
             await axios.post(

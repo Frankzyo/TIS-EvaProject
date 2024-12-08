@@ -1,44 +1,72 @@
 import React from "react";
 import { Table } from "antd";
 
-const Reportes = ({ studentsData, autoevalResults }) => {
+const Reportes = ({
+    studentsData,
+    autoevalResults,
+    cruzadasResults,
+    paresResults,
+}) => {
     const safeStudentsData = studentsData || [];
     const safeAutoevalResults = autoevalResults || [];
+    const safeCruzadasResults = cruzadasResults || [];
+    const safeParesResults = paresResults || [];
 
     // Datos para la tabla principal
     const calificacionesData = safeStudentsData.map((student) => {
-        const etapas = (student.notas || []).map((nota) => ({
-            etapa: nota.ETAPA_TITULO,
+        const etapas = (student.notas || []).map((nota, index) => ({
+            key: `etapa-${index}`,
+            etapa: `${nota.ETAPA_TITULO || "Sin título"}`, // Prefijo para etapas
             calificacion: Math.round(nota.PUNTUACION_TOTAL) || 0,
             maxima: Math.round(nota.ETAPA_PUNTUACION) || 0,
         }));
 
-        const totalCalificaciones = etapas.reduce(
-            (sum, etapa) => sum + etapa.calificacion,
-            0
-        );
-
         const autoevaluaciones = safeAutoevalResults
-            .filter(
-                (result) => result.ID_EST === student.estudiante.ID_ESTUDIANTE
-            )
-            .map((auto) => ({
-                titulo: auto.TITULO_AUTOEVAL,
-                calificacion: Math.round(auto.PUNTUACION_OBTENIDA) || 0,
-                maxima: Math.round(auto.PUNTUACION_MAXIMA_AUTOEVAL) || 0,
-            }));
+            .filter((result) => result.estudiante.ID_ESTUDIANTE === student.estudiante.ID_ESTUDIANTE)
+            .flatMap((result, index) =>
+                result.notas.map((nota, notaIndex) => ({
+                    key: `auto-${index}-${notaIndex}`,
+                    titulo: `${nota.ETAPA_TITULO || "Sin título"}`, // Prefijo para autoevaluaciones
+                    calificacion: Math.round(nota.PUNTUACION_TOTAL) || 0,
+                    maxima: Math.round(nota.ETAPA_PUNTUACION) || 0,
+                }))
+            );
 
-        const totalAutoevaluaciones = autoevaluaciones.reduce(
-            (sum, auto) => sum + auto.calificacion,
-            0
-        );
+        const cruzadas = safeCruzadasResults
+            .filter((result) => result.estudiante.ID_ESTUDIANTE === student.estudiante.ID_ESTUDIANTE)
+            .flatMap((result, index) =>
+                result.notas.map((nota, notaIndex) => ({
+                    key: `cruzada-${index}-${notaIndex}`,
+                    titulo: `${nota.ETAPA_TITULO || "Sin título"}`, // Prefijo para cruzadas
+                    calificacion: Math.round(nota.PUNTUACION_TOTAL) || 0,
+                    maxima: Math.round(nota.ETAPA_PUNTUACION) || 0,
+                }))
+            );
+
+        const pares = safeParesResults
+            .filter((result) => result.estudiante.ID_ESTUDIANTE === student.estudiante.ID_ESTUDIANTE)
+            .flatMap((result, index) =>
+                result.notas.map((nota, notaIndex) => ({
+                    key: `par-${index}-${notaIndex}`,
+                    titulo: `${nota.ETAPA_TITULO || "Sin título"}`, // Prefijo para pares
+                    calificacion: Math.round(nota.PUNTUACION_TOTAL) || 0,
+                    maxima: Math.round(nota.ETAPA_PUNTUACION) || 0,
+                }))
+            );
+
+        const totalCalificaciones = etapas.reduce((sum, etapa) => sum + etapa.calificacion, 0);
+        const totalAutoevaluaciones = autoevaluaciones.reduce((sum, auto) => sum + auto.calificacion, 0);
+        const totalCruzadas = cruzadas.reduce((sum, cruzada) => sum + cruzada.calificacion, 0);
+        const totalPares = pares.reduce((sum, par) => sum + par.calificacion, 0);
 
         return {
             key: student.estudiante.ID_ESTUDIANTE,
             nombreCompleto: `${student.estudiante.NOMBRE} ${student.estudiante.APELLIDO}`,
             etapas,
             autoevaluaciones,
-            total: totalCalificaciones + totalAutoevaluaciones,
+            cruzadas,
+            pares,
+            total: totalCalificaciones + totalAutoevaluaciones + totalCruzadas + totalPares,
         };
     });
 
@@ -77,13 +105,11 @@ const Reportes = ({ studentsData, autoevalResults }) => {
             ((ausenciasJustificadas / totalEvaluaciones) * 100).toFixed(0) +
             "%";
 
-        // Calcular la calificación total del estudiante
         const totalCalificacion = calificacionesData.find(
             (calificacion) =>
                 calificacion.key === student.estudiante.ID_ESTUDIANTE
         )?.total;
 
-        // Determinar el estado del estudiante
         const estado =
             ausenciasInjustificadas < 3 && totalCalificacion > 51
                 ? "Aprobado"
@@ -100,11 +126,11 @@ const Reportes = ({ studentsData, autoevalResults }) => {
             porcentajeRetrasos,
             porcentajeAusenciasInjustificadas,
             porcentajeAusenciasJustificadas,
-            estado, // Estado del estudiante
+            estado,
         };
     });
 
-    // Columnas principales de la tabla
+    // Columnas principales
     const mainColumns = [
         {
             title: "Estudiante",
@@ -119,31 +145,18 @@ const Reportes = ({ studentsData, autoevalResults }) => {
         },
     ];
 
-    // Columnas de detalle de etapas
-    const etapasColumns = [
+    // Columnas de detalle
+    const detalleColumns = (titulo) => [
         {
-            title: "Etapa",
-            dataIndex: "etapa",
-            key: "etapa",
-        },
-        {
-            title: "Calificación Obtenida",
-            dataIndex: "calificacion",
-            key: "calificacion",
-        },
-        {
-            title: "Puntuación Máxima",
-            dataIndex: "maxima",
-            key: "maxima",
-        },
-    ];
-
-    // Columnas de detalle de autoevaluaciones
-    const autoevalColumns = [
-        {
-            title: "Autoevaluación",
-            dataIndex: "titulo",
-            key: "titulo",
+            title: titulo,
+            key: "titulo_etapa",
+            render: (record) => {
+                return (
+                    <span>
+                        {record.titulo || record.etapa || "Sin título"} {/* Mostrar titulo o etapa */}
+                    </span>
+                );
+            },
         },
         {
             title: "Calificación Obtenida",
@@ -216,7 +229,10 @@ const Reportes = ({ studentsData, autoevalResults }) => {
             <h3>Reporte de Calificaciones Detallado</h3>
             <Table
                 className="custom-table"
-                columns={mainColumns}
+                columns={[
+                    { title: "Estudiante", dataIndex: "nombreCompleto", key: "nombreCompleto" },
+                    { title: "Total Calificaciones", dataIndex: "total", key: "total" },
+                ]}
                 dataSource={calificacionesData}
                 pagination={false}
                 bordered
@@ -227,22 +243,38 @@ const Reportes = ({ studentsData, autoevalResults }) => {
                             <h4>Calificaciones por Etapas</h4>
                             <Table
                                 className="custom-table"
-                                columns={etapasColumns}
+                                columns={detalleColumns("Etapa")}
                                 dataSource={record.etapas}
                                 pagination={false}
                                 bordered
                                 size="small"
-                                rowKey={(row) => row.etapa}
                             />
-                            <h4>Calificaciones de Autoevaluaciones</h4>
+                            <h4>Autoevaluaciones</h4>
                             <Table
                                 className="custom-table"
-                                columns={autoevalColumns}
+                                columns={detalleColumns("Autoevaluación")}
                                 dataSource={record.autoevaluaciones}
                                 pagination={false}
                                 bordered
                                 size="small"
-                                rowKey={(row) => row.titulo}
+                            />
+                            <h4>Evaluaciones Cruzadas</h4>
+                            <Table
+                                className="custom-table"
+                                columns={detalleColumns("Evaluación Cruzada")}
+                                dataSource={record.cruzadas}
+                                pagination={false}
+                                bordered
+                                size="small"
+                            />
+                            <h4>Evaluaciones de Pares</h4>
+                            <Table
+                                className="custom-table"
+                                columns={detalleColumns("Evaluación de Pares")}
+                                dataSource={record.pares}
+                                pagination={false}
+                                bordered
+                                size="small"
                             />
                         </>
                     ),
