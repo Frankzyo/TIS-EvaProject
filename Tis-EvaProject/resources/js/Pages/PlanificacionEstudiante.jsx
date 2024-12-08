@@ -549,7 +549,7 @@ const PlanificacionEstudiante = () => {
                     isRepresentanteLegal={isRepresentanteLegal}
                 />
 
-                <div className="contenido-principal">
+                <div className="container-plani">
                     {grupo && (
                         <div className="planificacion-group-info">
                             <img
