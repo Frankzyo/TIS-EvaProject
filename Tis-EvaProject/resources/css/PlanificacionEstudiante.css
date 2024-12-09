@@ -728,3 +728,8 @@ textarea {
     overflow-y: auto; /* Permite el scroll dentro del contenedor */
     margin-bottom: -40px; /* Para extender el contenedor hasta el borde inferior */
 }
+
+.texto-item strong, .texto-item h2, .texto-item span{
+    color: white !important;
+}
+
