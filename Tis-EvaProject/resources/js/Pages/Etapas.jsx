@@ -59,7 +59,7 @@ const Etapas = () => {
 
     const calculateTotalPoints = (etapas) => {
         const total = etapas.reduce(
-            (sum, etapa) => sum + (etapa.ETAPAS_PUNTUACION || 0),
+            (sum, etapa) => sum + Number(etapa.ETAPAS_PUNTUACION || 0), // Usa Number para convertir
             0
         );
         setTotalPuntos(total);
@@ -67,10 +67,10 @@ const Etapas = () => {
 
     useEffect(() => {
         const total = etapas.reduce(
-            (sum, etapa) => sum + (etapa.ETAPAS_PUNTUACION || 0),
+            (sum, etapa) => sum + Number(etapa.ETAPAS_PUNTUACION || 0),
             0
         );
-        setTotalPuntos(total);
+        setTotalPuntos(Number.isFinite(total) ? total : 0); // Validar total
     }, [etapas]);
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
@@ -192,7 +192,11 @@ const Etapas = () => {
                             totalPuntos > 100 ? "excede" : "normal"
                         }`}
                     >
-                        {totalPuntos.toFixed(2)} / 100.00 puntos asignados
+                        {Number.isFinite(totalPuntos)
+                            ? `${totalPuntos.toFixed(
+                                  2
+                              )} / 100.00 puntos asignados`
+                            : "0.00 / 100.00 puntos asignados"}
                     </div>
 
                     {etapas.length > 0 ? (

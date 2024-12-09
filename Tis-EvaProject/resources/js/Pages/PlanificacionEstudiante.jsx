@@ -100,7 +100,28 @@ const PlanificacionEstudiante = () => {
                 setIsErrorModalOpen(true); // Muestra el modal si hay error
             }
         };
-
+        
+        const asignarHistoriaASprint = async (historiaId, sprintId) => {
+            try {
+                const response = await axios.post(
+                    `http://localhost:8000/api/sprints/${sprintId}/asignar-historia`,
+                    { ID_HU: historiaId }
+                );
+        
+                const sprintActualizado = response.data; // Supongamos que devuelve el sprint actualizado
+                setSprints((prevSprints) =>
+                    prevSprints.map((sprint) =>
+                        sprint.ID_SPRINT === sprintId ? sprintActualizado : sprint
+                    )
+                );
+        
+                alert("Historia asignada al Sprint correctamente.");
+            } catch (error) {
+                console.error("Error al asignar la historia al sprint:", error);
+                alert("Hubo un error al asignar la historia al sprint.");
+            }
+        };
+        
         const obtenerHistoriasUsuario = async () => {
             if (!groupId) return; // Evita hacer la solicitud si groupId no está definido
 

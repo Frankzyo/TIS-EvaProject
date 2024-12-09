@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sprint;
+use App\Models\HistoriaUsuario;
 use Illuminate\Support\Facades\Log;
 
 class SprintController extends Controller
@@ -66,5 +67,42 @@ class SprintController extends Controller
                 'message' => 'Error al obtener los sprints: ' . $e->getMessage()
             ], 500);
         }
+    }
+    public function assignHistoria(Request $request, $sprintId)
+    {
+        $request->validate([
+            'ID_HU' => 'required|exists:historias_usuario,ID_HU',
+        ]);
+
+        $sprint = Sprint::find($sprintId);
+
+        if (!$sprint) {
+            return response()->json(['error' => 'Sprint no encontrado'], 404);
+        }
+
+        $historia = HistoriaUsuario::find($request->ID_HU);
+        $historia->ID_SPRINT = $sprint->ID_SPRINT;
+        $historia->save();
+
+        return response()->json(['message' => 'Historia asignada al Sprint', 'historia' => $historia]);
+    }
+
+    /**
+     * Eliminar un sprint y desasociar las historias.
+     */
+    public function destroy($sprintId)
+    {
+        $sprint = Sprint::find($sprintId);
+
+        if (!$sprint) {
+            return response()->json(['error' => 'Sprint no encontrado'], 404);
+        }
+
+        // Desasociar las historias del sprint
+        HistoriaUsuario::where('ID_SPRINT', $sprint->ID_SPRINT)->update(['ID_SPRINT' => null]);
+
+        $sprint->delete();
+
+        return response()->json(['message' => 'Sprint eliminado exitosamente']);
     }
 }

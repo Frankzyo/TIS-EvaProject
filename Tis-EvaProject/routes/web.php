@@ -203,6 +203,8 @@ Route::prefix('api')->group(function () {
 
     Route::post('/sprints', [SprintController::class, 'store']);
     Route::get('/sprints/{groupId}', [SprintController::class, 'index']);
+    Route::post('/{sprintId}/asignar-historia', [SprintController::class, 'assignHistoria']); // Asignar historia a sprint
+    Route::delete('/{sprintId}', [SprintController::class, 'destroy']); // Eliminar un sprint
 });
 
 Route::get('/api/grupos/{groupId}/proyecto/{projectId}/promedio-notas', [EvaluacionParController::class, 'obtenerPromedioNotasPorGrupo']);

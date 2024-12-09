@@ -130,7 +130,7 @@
     justify-content: space-between; /* Asegura que el texto y los iconos estén en extremos opuestos */
     align-items: center;
     background-color: #1a355b;
-    color: white;
+    color: white !important; 
     padding: 10px;
     border-radius: 8px;
     width: 100%;
@@ -650,6 +650,7 @@ textarea {
 
 .texto-item {
     flex-grow: 1; /* Hace que el texto ocupe todo el espacio disponible */
+    color: white;
 }
 
 .confirm-modal-content h2 {

@@ -101,19 +101,19 @@ const EvaluacionCruzada = () => {
             alert("Todos los campos son obligatorios.");
             return;
         }
-
+    
         if (new Date(fechaInicio) > new Date(fechaFin)) {
             alert(
                 "La fecha de inicio no puede ser posterior a la fecha de fin."
             );
             return;
         }
-
+    
         if (evaluaciones.length === 0) {
             alert("Debe agregar al menos una pregunta.");
             return;
         }
-
+    
         for (const evaluacion of evaluaciones) {
             if (!evaluacion.PREGUNTA_EVAL || evaluacion.opciones.length === 0) {
                 alert(
@@ -121,7 +121,7 @@ const EvaluacionCruzada = () => {
                 );
                 return;
             }
-
+    
             for (const opcion of evaluacion.opciones) {
                 if (!opcion.texto || opcion.puntuacion <= 0) {
                     alert(
@@ -131,8 +131,8 @@ const EvaluacionCruzada = () => {
                 }
             }
         }
-
-        // Crear el payload
+    
+        // Crear el payload con nombres de campos correctos
         const payload = {
             TITULO_EVAL_CRUZADA: tituloFormulario.trim(),
             DESCRIPCION_EVAL_CRUZADA: descripcionFormulario.trim(),
@@ -140,16 +140,16 @@ const EvaluacionCruzada = () => {
             FECHA_FIN_EVAL: fechaFin,
             PUNTUACION_TOTAL_EVAL: puntuacionTotal,
             evaluaciones: evaluaciones.map((evaluacion) => ({
-                ID_PREGUNTA_EVAL: evaluacion.ID_PREGUNTA_EVAL || null, // Si es nuevo, será null
-                PREGUNTA_EVAL: evaluacion.PREGUNTA_EVAL.trim(),
+                PREGUNTA_EVAL: evaluacion.PREGUNTA_EVAL.trim(), // Cambiar a 'PREGUNTA_EVAL'
                 opciones: evaluacion.opciones.map((opcion) => ({
-                    ID_OPCION_EVAL: opcion.ID_OPCION_EVAL || null, // Si es nuevo, será null
-                    TEXTO_OPCION_EVAL: opcion.texto.trim(),
-                    PUNTUACION_OPCION_EVAL: opcion.puntuacion,
+                    TEXTO_OPCION_EVAL: opcion.texto.trim(), // Cambiar a 'TEXTO_OPCION_EVAL'
+                    PUNTUACION_OPCION_EVAL: opcion.puntuacion, // Cambiar a 'PUNTUACION_OPCION_EVAL'
                 })),
             })),
         };
-
+        
+        console.log("Payload enviado al backend:", JSON.stringify(payload, null, 2));
+    
         try {
             let response;
             if (isEditing) {
@@ -167,7 +167,7 @@ const EvaluacionCruzada = () => {
                     { withCredentials: true }
                 );
             }
-
+    
             if (response.status === 200 || response.status === 201) {
                 alert(
                     isEditing
@@ -183,9 +183,17 @@ const EvaluacionCruzada = () => {
             }
         } catch (error) {
             console.error("Error al procesar la evaluación cruzada:", error);
-            alert("Ocurrió un error al procesar la evaluación cruzada.");
+    
+            if (error.response && error.response.data) {
+                console.error("Detalles del error:", error.response.data);
+                alert(`Error: ${error.response.data.message || "Error desconocido."}`);
+            } else {
+                alert("Ocurrió un error al procesar la evaluación cruzada.");
+            }
         }
     };
+    
+    
 
     return (
         <div
