@@ -307,26 +307,74 @@ const PlanificacionEstudiante = () => {
             archivos: [...prevHU.archivos, ...filesWithPreview],
         }));
     };
+    useEffect(() => {
+        const cargarSprints = async () => {
+            if (!groupId) return;
 
-    const guardarSprint = () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:8000/api/sprints/${groupId}`,
+                    { withCredentials: true }
+                );
+
+                setSprints(response.data.sprints); // Actualiza el estado con los sprints obtenidos
+            } catch (error) {
+                console.error("Error al cargar los sprints:", error);
+            }
+        };
+
+        if (projectId && groupId) {
+            cargarSprints();
+        }
+    }, [projectId, groupId]);
+
+    const guardarSprint = async () => {
         if (
             nuevoSprint.nombre &&
             nuevoSprint.fechaInicio &&
             nuevoSprint.fechaFin
         ) {
-            if (isEditing) {
-                // Si es edición, actualiza el sprint correspondiente
-                const updatedSprints = [...sprints];
-                updatedSprints[sprintEditIndex] = { ...nuevoSprint };
-                setSprints(updatedSprints);
-            } else {
-                // Si no es edición, crea un nuevo sprint
-                setSprints([...sprints, { ...nuevoSprint, historias: [] }]);
+            const idGrupo = grupo?.ID_GRUPO?.toString(); // Asegúrate de convertir ID_GRUPO a string
+    
+            if (!idGrupo) {
+                alert("El ID del grupo no está definido.");
+                return;
             }
-            cerrarModal(); // Cierra el modal
+    
+            const data = {
+                ID_GRUPO: idGrupo, // Enviar el ID_GRUPO como string
+                NOMBRE_SPRINT: nuevoSprint.nombre,
+                FECHA_INICIO_SPRINT: nuevoSprint.fechaInicio,
+                FECHA_FIN_SPRINT: nuevoSprint.fechaFin,
+            };
+    
+            try {
+                const response = await axios.post(
+                    "http://localhost:8000/api/sprints", // Ruta al método store en Laravel
+                    data,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+    
+                // Si el sprint se crea con éxito, actualiza la lista de sprints
+                setSprints([...sprints, response.data.sprint]);
+                cerrarModal(); // Cierra el modal
+                alert("Sprint creado exitosamente.");
+            } catch (error) {
+                console.error(
+                    "Error al crear el sprint:",
+                    error.response?.data || error
+                );
+                alert("Hubo un error al crear el sprint.");
+            }
+        } else {
+            alert("Por favor, completa todos los campos del sprint.");
         }
     };
-
+    
     const abrirModalEliminarRequerimiento = (requerimiento) => {
         setRequerimientoAEliminar(requerimiento);
         setConfirmDeleteReqModalOpen(true);
@@ -712,155 +760,122 @@ const PlanificacionEstudiante = () => {
                         </div>
 
                         <div className="contenedor-sprints">
-                            <h2 className="titulo-sprints">Sprints</h2>
-                            {sprints.length === 0 ? (
-                                <p className="sprint-mensaje-vacio">
-                                    No hay sprints. Añade uno para empezar.
-                                </p>
-                            ) : (
-                                <div className="lista-sprints">
-                                    {sprints.map((sprint, index) => (
-                                        <div
-                                            key={sprint.ID || `sprint-${index}`}
-                                            className="sprint"
-                                            onDrop={(e) => {
-                                                e.preventDefault(); // Evita el comportamiento por defecto
-                                                const historiaIndex =
-                                                    e.dataTransfer.getData(
-                                                        "index"
-                                                    );
-                                                if (historiaIndex !== null) {
-                                                    const historiaArrastrada =
-                                                        historiasUsuario[
-                                                            historiaIndex
-                                                        ];
+    <h2 className="titulo-sprints">Sprints</h2>
+    {/* Verifica si sprints es un arreglo y si contiene elementos */}
+    {Array.isArray(sprints) && sprints.length === 0 ? (
+        <p className="sprint-mensaje-vacio">
+            No hay sprints. Añade uno para empezar.
+        </p>
+    ) : (
+        <div className="lista-sprints">
+            {sprints.map((sprint, index) => (
+                <div
+                    key={sprint.ID_SPRINT || `sprint-${index}`}
+                    className="sprint"
+                    onDrop={(e) => {
+                        e.preventDefault(); // Evita el comportamiento por defecto
+                        const historiaIndex = e.dataTransfer.getData("index");
+                        if (historiaIndex !== null) {
+                            const historiaArrastrada =
+                                historiasUsuario[historiaIndex];
 
-                                                    // Verifica si la historia ya existe en el sprint
-                                                    const yaExiste =
-                                                        sprint.historias.some(
-                                                            (historia) =>
-                                                                historia.titulo ===
-                                                                historiaArrastrada.titulo
-                                                        );
+                            // Verifica si la propiedad historias existe y si la historia ya está en el sprint
+                            const yaExiste =
+                                sprint.historias?.some(
+                                    (historia) =>
+                                        historia.TITULO_HU ===
+                                        historiaArrastrada.TITULO_HU
+                                ) || false;
 
-                                                    if (!yaExiste) {
-                                                        // Si no existe, la agregamos al sprint
-                                                        const sprintActualizado =
-                                                            {
-                                                                ...sprint,
-                                                                historias: [
-                                                                    ...sprint.historias,
-                                                                    historiaArrastrada,
-                                                                ],
-                                                            };
-                                                        const sprintsActualizados =
-                                                            [...sprints];
-                                                        sprintsActualizados[
-                                                            index
-                                                        ] = sprintActualizado;
-                                                        setSprints(
-                                                            sprintsActualizados
-                                                        );
-                                                    } else {
-                                                        alert(
-                                                            "Esta historia ya está en el sprint."
-                                                        ); // Evita duplicados
-                                                    }
-                                                }
-                                            }}
-                                            onDragOver={(e) =>
-                                                e.preventDefault()
-                                            } // Permitir arrastrar elementos sobre el contenedor
-                                        >
-                                            <div className="sprint-header">
-                                                <h3 className="sprint-titulo">
-                                                    {sprint.nombre}
-                                                </h3>
-                                                <div className="iconos-acciones">
-                                                    <i
-                                                        className="fas fa-edit icono-editar"
-                                                        onClick={() =>
-                                                            editarSprint(index)
-                                                        }
-                                                    ></i>
-                                                    <i
-                                                        className="fas fa-trash-alt icono-eliminar"
-                                                        onClick={() =>
-                                                            abrirModalConfirmacion(
-                                                                "sprint",
-                                                                index
-                                                            )
-                                                        }
-                                                    ></i>
-                                                </div>
-                                            </div>
-
-                                            <p className="sprint-fecha">
-                                                {sprint.fechaInicio} -{" "}
-                                                {sprint.fechaFin}
-                                            </p>
-                                            <hr className="divisor-titulo-sprints" />
-                                            <div className="sprint-contenido">
-                                                {sprint.historias.length > 0 ? (
-                                                    sprint.historias.map(
-                                                        (
-                                                            historia,
-                                                            historiaIndex
-                                                        ) => (
-                                                            <div
-                                                                key={
-                                                                    historia.ID_HU ||
-                                                                    `historia-${historiaIndex}`
-                                                                }
-                                                                className="item-historia-sprint"
-                                                            >
-                                                                <span>
-                                                                    #
-                                                                    {historiasUsuario.findIndex(
-                                                                        (h) =>
-                                                                            h.titulo ===
-                                                                            historia.titulo
-                                                                    ) + 1}{" "}
-                                                                    {
-                                                                        historia.titulo
-                                                                    }
-                                                                </span>
-                                                                <div className="iconos-acciones">
-                                                                    <i
-                                                                        className="fas fa-trash-alt icono-eliminar"
-                                                                        onClick={() =>
-                                                                            removeHistoriaFromSprint(
-                                                                                index,
-                                                                                historia.ID_HU
-                                                                            )
-                                                                        }
-                                                                    ></i>
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    )
-                                                ) : (
-                                                    <p>
-                                                        Arrastra aquí las
-                                                        historias de usuario
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <button className="boton-panel">
-                                                Panel de tareas
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            <button
-                                className="boton-anadir-sprint"
-                                onClick={abrirModal}
-                            >
-                                + Sprint
-                            </button>
+                            if (!yaExiste) {
+                                // Si no existe, la agregamos al sprint
+                                const sprintActualizado = {
+                                    ...sprint,
+                                    historias: [
+                                        ...(sprint.historias || []),
+                                        historiaArrastrada,
+                                    ],
+                                };
+                                const sprintsActualizados = [...sprints];
+                                sprintsActualizados[index] = sprintActualizado;
+                                setSprints(sprintsActualizados);
+                            } else {
+                                alert(
+                                    "Esta historia ya está en el sprint."
+                                ); // Evita duplicados
+                            }
+                        }
+                    }}
+                    onDragOver={(e) => e.preventDefault()} // Permitir arrastrar elementos sobre el contenedor
+                >
+                    <div className="sprint-header">
+                        <h3 className="sprint-titulo">{sprint.NOMBRE_SPRINT}</h3>
+                        <div className="iconos-acciones">
+                            <i
+                                className="fas fa-edit icono-editar"
+                                onClick={() => editarSprint(index)}
+                            ></i>
+                            <i
+                                className="fas fa-trash-alt icono-eliminar"
+                                onClick={() =>
+                                    abrirModalConfirmacion("sprint", index)
+                                }
+                            ></i>
                         </div>
+                    </div>
+
+                    <p className="sprint-fecha">
+                        {sprint.FECHA_INICIO_SPRINT} - {sprint.FECHA_FIN_SPRINT}
+                    </p>
+                    <hr className="divisor-titulo-sprints" />
+                    <div className="sprint-contenido">
+                        {/* Verifica si hay historias en el sprint */}
+                        {sprint.historias?.length > 0 ? (
+                            sprint.historias.map((historia, historiaIndex) => (
+                                <div
+                                    key={
+                                        historia.ID_HU ||
+                                        `historia-${historiaIndex}`
+                                    }
+                                    className="item-historia-sprint"
+                                >
+                                    <span>
+                                        #
+                                        {historiasUsuario.findIndex(
+                                            (h) =>
+                                                h.TITULO_HU ===
+                                                historia.TITULO_HU
+                                        ) + 1}{" "}
+                                        {historia.TITULO_HU}
+                                    </span>
+                                    <div className="iconos-acciones">
+                                        <i
+                                            className="fas fa-trash-alt icono-eliminar"
+                                            onClick={() =>
+                                                removeHistoriaFromSprint(
+                                                    index,
+                                                    historia.ID_HU
+                                                )
+                                            }
+                                        ></i>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p>Arrastra aquí las historias de usuario</p>
+                        )}
+                    </div>
+
+                    <button className="boton-panel">Panel de tareas</button>
+                </div>
+            ))}
+        </div>
+    )}
+    <button className="boton-anadir-sprint" onClick={abrirModal}>
+        + Sprint
+    </button>
+</div>
+
                     </div>
                 </div>
             </div>
@@ -1096,8 +1111,11 @@ const PlanificacionEstudiante = () => {
                 </div>
             )}
             {isErrorModalOpen && (
-            <RegistroModal mensaje={errorMessage} redirectTo="/proyecto-estudiante" />
-        )}
+                <RegistroModal
+                    mensaje={errorMessage}
+                    redirectTo="/proyecto-estudiante"
+                />
+            )}
             {isConfirmModalOpen && (
                 <div className="confirm-modal">
                     <div className="confirm-modal-content">
@@ -1155,9 +1173,7 @@ const PlanificacionEstudiante = () => {
                             </button>
                         </div>
                     </div>
-                    
                 </div>
-            
             )}
         </div>
     );

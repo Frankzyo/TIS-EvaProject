@@ -22,6 +22,7 @@ use App\Http\Controllers\AutoevaluacionProyectoController;
 use App\Http\Controllers\ResultadoAutoevaluacionController;
 use App\Http\Controllers\EvaluacionCruzadaController;
 use App\Http\Controllers\ResultadoEvaluacionCruzadaController;
+use App\Http\Controllers\SprintController;
 
 // Ruta de login para cargar la aplicación React
 Route::get('/login', function () {
@@ -200,6 +201,8 @@ Route::prefix('api')->group(function () {
 
     Route::get('/evaluacion-pares/{id_proyecto}/{id_grupo}', [EvaluacionParController::class, 'obtenerEvaluaciones']);
 
+    Route::post('/sprints', [SprintController::class, 'store']);
+    Route::get('/sprints/{groupId}', [SprintController::class, 'index']);
 });
 
 Route::get('/api/grupos/{groupId}/proyecto/{projectId}/promedio-notas', [EvaluacionParController::class, 'obtenerPromedioNotasPorGrupo']);
