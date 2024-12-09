@@ -658,7 +658,7 @@ const PlanificacionEstudiante = () => {
                                 Requerimientos
                             </h2>
                             <div className="lista-requerimientos">
-                                {requerimientos.map((req, index) => (
+                            {Array.isArray(requerimientos) && requerimientos.map((req, index) => (
                                     <div
                                         key={
                                             req.ID_REQUERIMIENTO ||
