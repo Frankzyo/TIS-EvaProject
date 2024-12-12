@@ -1,5 +1,3 @@
-/* This PHP code snippet is configuring an application using the Illuminate Foundation components.
-Here's a breakdown of what it does: */
 <?php
 
 use Illuminate\Foundation\Application;
