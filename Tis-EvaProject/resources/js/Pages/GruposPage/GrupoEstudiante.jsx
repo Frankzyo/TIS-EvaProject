@@ -303,16 +303,16 @@ const GrupoEstudiante = () => {
     };
     const handleSaveGroup = () => {
         if (!groupName || !groupDescription) {
-            setErrorMessage(
-                "Por favor, complete todos los campos obligatorios."
-            );
+            setErrorMessage("Por favor, complete todos los campos obligatorios.");
             setShowErrorMessage(true);
             return;
         }
     
-        // Verificar si el nombre del grupo ya existe
+        // Verificar si el nombre del grupo ya existe, excluyendo el grupo que se está editando
         const isDuplicate = groups.some(
-            (group) => group.NOMBRE_GRUPO.toLowerCase() === groupName.toLowerCase()
+            (group) =>
+                group.NOMBRE_GRUPO.toLowerCase() === groupName.toLowerCase() &&
+                (!isEditing || group.ID_GRUPO !== groupToEdit.ID_GRUPO)
         );
         if (isDuplicate) {
             setErrorMessage("El nombre del grupo ya existe. Por favor, elija otro.");
@@ -361,9 +361,7 @@ const GrupoEstudiante = () => {
                 if (isEditing) {
                     setGroups(
                         groups.map((group) =>
-                            group.ID_GRUPO === newGroup.ID_GRUPO
-                                ? newGroup
-                                : group
+                            group.ID_GRUPO === newGroup.ID_GRUPO ? newGroup : group
                         )
                     );
                     setShowEditSuccessMessage(true);
@@ -395,7 +393,6 @@ const GrupoEstudiante = () => {
             });
     };
     
-
     const handleOpenEditModal = (index) => {
         const group = groups[index];
         setGroupName(group.NOMBRE_GRUPO || "");

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import HeaderProyecto from "../../Components/ComponenteHeader/HeaderProyecto";
 import SidebarPrueba from "../../Components/ComponenteSidebar/SidebarPrueba";
 import "../../../css/EstilosProyecto/Proyectos.css";
@@ -14,7 +14,6 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 const RequerimientosDocente = () => {
-    const navigate = useNavigate();
     const { projectId } = useParams();
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showCreateSuccessMessage, setShowCreateSuccessMessage] =

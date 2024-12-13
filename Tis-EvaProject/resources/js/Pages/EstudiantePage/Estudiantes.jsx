@@ -5,7 +5,7 @@ import SidebarPrueba from "../../Components/ComponenteSidebar/SidebarPrueba";
 import "../../../css/EstilosProyecto/Proyectos.css";
 import "../../../css/EstilosEstudiante/Estudiantes.css";
 import "../../../css/EstilosHeader/HeaderProyecto.css";
-import "../../../css/Loader.css";
+import "../../../css/EstilosLoader/Loader.css";
 import "../../../css/EstilosSidebar/SidebarPrueba.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ModalError from "../../Components/ComponenteModal/ModalError";

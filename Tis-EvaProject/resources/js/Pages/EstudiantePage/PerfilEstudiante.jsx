@@ -4,7 +4,7 @@ import HeaderProyecto from "../../Components/ComponenteHeader/HeaderEstudiante";
 import ModalError from "../../Components/ComponenteModal/ModalError";
 import ModalConfirmacion from "../../Components/ComponenteModal/ModalConfirmacion";
 import ModalMensajeExito from "../../Components/ComponenteModal/ModalMensajeExito";
-import "../../../css/Perfil.css";
+import "../../../css/EstilosDocente/Perfil.css";
 
 const PerfilEstudiante = () => {
     const navigate = useNavigate();

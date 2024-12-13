@@ -42,7 +42,7 @@ const SidebarEstudiante = ({
                             className="menu-item"
                             onClick={() => navigate("/proyecto-estudiante")}
                         >
-                            <i className="fas fa-cog icon-menu"></i>
+                            <i className="fas fa-cogs icon-menu"></i>
                             <span className="menu-text">
                                 Administrar Proyecto
                             </span>
@@ -61,7 +61,7 @@ const SidebarEstudiante = ({
                     className="menu-item"
                     onClick={() => navigate("/equipo-estudiante")}
                 >
-                    <i className="fas fa-users-cog icon-menu"></i>
+                    <i className="fas fa-user-friends icon-menu"></i>
                     <span className="menu-text">Equipo</span>
                 </li>
                 <li
@@ -78,8 +78,35 @@ const SidebarEstudiante = ({
                         navigate(`/seguimiento-semanal-estudiante/${projectId}`)
                     }
                 >
-                    <i className="fas fa-calendar-check icon-menu"></i>
+                    <i className="fas fa-calendar-alt icon-menu"></i>
                     <span className="menu-text">Seguimiento Semanal</span>
+                </li>
+                <li
+                    className="menu-item"
+                    onClick={() =>
+                        navigate(`/autoevaluacion-estudiante/${projectId}`)
+                    }
+                >
+                    <i className="fas fa-user-check icon-menu"></i>
+                    <span className="menu-text">Autoevaluación</span>
+                </li>
+                <li
+                    className="menu-item"
+                    onClick={() =>
+                        navigate(`/evaluacion-cruzada-estudiante/${projectId}`)
+                    }
+                >
+                    <i className="fas fa-exchange-alt icon-menu"></i>
+                    <span className="menu-text">Evaluación Cruzada</span>
+                </li>
+                <li
+                    className="menu-item"
+                    onClick={() =>
+                        navigate(`/evaluacion-pares-estudiante/${projectId}`)
+                    }
+                >
+                    <i className="fas fa-handshake icon-menu"></i>
+                    <span className="menu-text">Evaluación a Pares</span>
                 </li>
             </ul>
             <hr className="divisor-side" />

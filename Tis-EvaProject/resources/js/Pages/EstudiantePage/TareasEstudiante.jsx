@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SidebarEstudiante from "../../Components/ComponenteSidebar/SidebarEstudiante";
 import Header from "../../Components/ComponenteHeader/HeaderEstudiante";
-import useProjectAndGroupId from "../../Components/useProjectAndGroupId";
+import useProjectAndGroupId from "../../Components/ComponenteId/useProjectAndGroupId";
 import axios from "axios";
 import "../../../css/EstilosPlanificacion/PlanificacionEstudiante.css";
 import "../../../css/EstilosSidebar/SidebarEstudiante.css";

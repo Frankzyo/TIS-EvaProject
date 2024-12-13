@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HeaderProyecto from "../../Components/ComponenteHeader/HeaderProyecto";
-import "../../../css/Perfil.css";
+import "../../../css/EstilosDocente/Perfil.css";
 import "../../../css/auth/ApproveAccounts.css";
 import axios from "axios";
 

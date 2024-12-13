@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import HeaderProyecto from "../Components/ComponenteHeader/HeaderProyecto";
-import ModalError from "../Components/ComponenteModal/ModalError";
-import ModalConfirmacion from "../Components/ComponenteModal/ModalConfirmacion";
-import ModalMensajeExito from "../Components/ComponenteModal/ModalMensajeExito";
-import "../../css/Perfil.css";
+import HeaderProyecto from "../../Components/ComponenteHeader/HeaderProyecto";
+import ModalError from "../../Components/ComponenteModal/ModalError";
+import ModalConfirmacion from "../../Components/ComponenteModal/ModalConfirmacion";
+import ModalMensajeExito from "../../Components/ComponenteModal/ModalMensajeExito";
+import "../../../css/EstilosDocente/Perfil.css";
 
 const Perfil = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

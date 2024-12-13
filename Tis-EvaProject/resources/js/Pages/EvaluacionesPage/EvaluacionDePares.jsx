@@ -15,15 +15,12 @@ const EvaluacionDePares = () => {
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [grupos, setGrupos] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true);
-
                 const [projectResponse, gruposResponse, evaluacionesResponse] =
                     await Promise.all([
                         axios.get(
@@ -40,8 +37,26 @@ const EvaluacionDePares = () => {
                         ),
                     ]);
 
+                // Añadir lógica para obtener representantes legales
+                const gruposConRepresentantes = await Promise.all(
+                    gruposResponse.data.grupos.map(async (grupo) => {
+                        try {
+                            const representante = await axios.get(
+                                `http://localhost:8000/api/estudiantes/${grupo.CREADO_POR}`,
+                                { withCredentials: true }
+                            );
+                            return {
+                                ...grupo,
+                                representanteLegal: representante.data,
+                            };
+                        } catch {
+                            return { ...grupo, representanteLegal: null };
+                        }
+                    })
+                );
+
                 setProjectDetails(projectResponse.data);
-                setGrupos(gruposResponse.data.grupos || []);
+                setGrupos(gruposConRepresentantes || []);
                 setEvaluaciones(
                     Array.isArray(evaluacionesResponse.data.evaluaciones)
                         ? evaluacionesResponse.data.evaluaciones
@@ -58,13 +73,24 @@ const EvaluacionDePares = () => {
                     console.error("Error de red:", err);
                     setError("Error de red. Por favor, verifica tu conexión.");
                 }
-            } finally {
-                setIsLoading(false);
             }
         };
 
         if (projectId) fetchData();
     }, [projectId]);
+
+    const formatFechaLarga = (fechaString) => {
+        const opciones = {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            timeZone: "America/La_Paz",
+        };
+
+        const fecha = new Date(`${fechaString}T00:00:00-04:00`);
+        return fecha.toLocaleDateString("es-ES", opciones);
+    };
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
@@ -97,10 +123,6 @@ const EvaluacionDePares = () => {
         }
     };
 
-    if (isLoading) {
-        return <p>Cargando datos...</p>;
-    }
-
     if (error) {
         return <p>{error}</p>;
     }
@@ -122,7 +144,7 @@ const EvaluacionDePares = () => {
                 />
                 <div className="container">
                     <div className="projects-header">
-                        <h2>Evaluaciones de Pares</h2>
+                        <h2>Configuracion de Evaluaciones de Pares</h2>
                         <button
                             className="new-project-btn"
                             onClick={() => setShowModal(true)}
@@ -132,40 +154,63 @@ const EvaluacionDePares = () => {
                     </div>
 
                     <div className="evaluaciones-list">
-                        {Array.isArray(evaluaciones) &&
-                        evaluaciones.length > 0 ? (
+                        {evaluaciones?.length > 0 ? (
                             evaluaciones.map((evaluacion, index) => (
                                 <div
                                     key={index}
                                     className="card evaluacion-card"
                                 >
-                                    <h3>
-                                        Evaluación #{index + 1}{" "}
-                                        <small>
-                                            (ID: {evaluacion.id_evaluacion_par})
-                                        </small>
+                                    <h3 className="evaluacion-titulo">
+                                        {evaluacion.titulo || "Sin Título"}
                                     </h3>
-                                    <p>
-                                        <strong>Fecha:</strong>{" "}
-                                        {evaluacion.fecha_inicio ||
-                                            "No especificada"}{" "}
-                                        -{" "}
-                                        {evaluacion.fecha_fin ||
-                                            "No especificada"}
+                                    <p className="evaluacion-descripcion">
+                                        {evaluacion.descripcion ||
+                                            "Sin Descripción"}
                                     </p>
-                                    <p>
-                                        <strong>Nota Máxima:</strong>{" "}
-                                        {evaluacion.nota_maxima ||
-                                            "No especificada"}
-                                    </p>
-                                    <div>
-                                        <p>
-                                            <strong>
-                                                Relación de Evaluadores y
-                                                Evaluados:
-                                            </strong>
+                                    <div className="fecha-container">
+                                        <p className="fecha">
+                                            <span className="fecha-label">
+                                                Fecha de Inicio:
+                                            </span>{" "}
+                                            <span className="fecha-valor">
+                                                {evaluacion.fecha_inicio
+                                                    ? formatFechaLarga(
+                                                          evaluacion.fecha_inicio
+                                                      )
+                                                    : "N/A"}
+                                            </span>
                                         </p>
-                                        <ul>
+                                        <p className="fecha">
+                                            <span className="fecha-label">
+                                                Fecha de Fin:
+                                            </span>{" "}
+                                            <span className="fecha-valor">
+                                                {evaluacion.fecha_fin
+                                                    ? formatFechaLarga(
+                                                          evaluacion.fecha_fin
+                                                      )
+                                                    : "N/A"}
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <div className="nota-maxima-container">
+                                        <p className="nota-maxima">
+                                            <span className="nota-label">
+                                                Nota Máxima:
+                                            </span>{" "}
+                                            <span className="nota-valor">
+                                                {evaluacion.nota_maxima ||
+                                                    "N/A"}
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="configuracion-grupos-titulo">
+                                            Evaluadores y Evaluados
+                                        </h3>
+                                        <div className="evaluadores-container">
                                             {evaluacion.grupos_evaluadores?.map(
                                                 (grupoEvaluador, i) => {
                                                     const grupoEvaluado =
@@ -176,48 +221,78 @@ const EvaluacionDePares = () => {
                                                         );
 
                                                     return (
-                                                        <li key={i}>
-                                                            <p>
-                                                                <strong>
-                                                                    Evaluador:
-                                                                </strong>{" "}
-                                                                {grupoEvaluador
-                                                                    .grupo_evaluador
-                                                                    ?.NOMBRE_GRUPO ||
-                                                                    "Grupo sin nombre"}{" "}
-                                                                (ID:{" "}
-                                                                {grupoEvaluador
-                                                                    .grupo_evaluador
-                                                                    ?.ID_GRUPO ||
-                                                                    "N/A"}
-                                                                )
-                                                            </p>
-                                                            <p>
-                                                                <strong>
-                                                                    Evaluado:
-                                                                </strong>{" "}
-                                                                {grupoEvaluado
-                                                                    ?.grupo_evaluado
-                                                                    ?.NOMBRE_GRUPO ||
-                                                                    "Grupo sin nombre"}{" "}
-                                                                (ID:{" "}
-                                                                {grupoEvaluado
-                                                                    ?.grupo_evaluado
-                                                                    ?.ID_GRUPO ||
-                                                                    "N/A"}
-                                                                )
-                                                            </p>
-                                                        </li>
+                                                        <div
+                                                            key={i}
+                                                            className="grupo-pair"
+                                                        >
+                                                            <div className="grupo-info">
+                                                                <img
+                                                                    src={`http://localhost:8000/storage/${
+                                                                        grupoEvaluador
+                                                                            .grupo_evaluador
+                                                                            ?.PORTADA_GRUPO ||
+                                                                        "default-image.jpg"
+                                                                    }`}
+                                                                    alt="Evaluador"
+                                                                    className="grupo-foto"
+                                                                />
+                                                                <p>
+                                                                    <strong>
+                                                                        Evaluador:
+                                                                    </strong>{" "}
+                                                                    {grupoEvaluador
+                                                                        .grupo_evaluador
+                                                                        ?.NOMBRE_GRUPO ||
+                                                                        "N/A"}
+                                                                </p>
+
+                                                                <img
+                                                                    src={`http://localhost:8000/storage/${
+                                                                        grupoEvaluado
+                                                                            ?.grupo_evaluado
+                                                                            ?.PORTADA_GRUPO ||
+                                                                        "default-image.jpg"
+                                                                    }`}
+                                                                    alt="Evaluado"
+                                                                    className="grupo-foto"
+                                                                />
+                                                                <p>
+                                                                    <strong>
+                                                                        Evaluado:
+                                                                    </strong>{" "}
+                                                                    {grupoEvaluado
+                                                                        ?.grupo_evaluado
+                                                                        ?.NOMBRE_GRUPO ||
+                                                                        "N/A"}
+                                                                </p>
+                                                            </div>
+                                                            <div className="details-button-container">
+                                                                <button
+                                                                    className="details-button"
+                                                                    onClick={() =>
+                                                                        handleViewGroupDetails(
+                                                                            grupoEvaluador
+                                                                                .grupo_evaluador
+                                                                                ?.ID_GRUPO,
+                                                                            grupoEvaluado
+                                                                                ?.grupo_evaluado
+                                                                                ?.ID_GRUPO
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Ver detalles
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     );
                                                 }
                                             )}
-                                        </ul>
+                                        </div>
                                     </div>
                                 </div>
                             ))
                         ) : (
                             <p className="no-data-message">
-                                {" "}
                                 No hay evaluaciones registradas
                             </p>
                         )}

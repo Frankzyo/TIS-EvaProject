@@ -101,6 +101,7 @@
     overflow: hidden;
     height: auto;
     max-height: 600px;
+    box-sizing: border-box;
 }
 
 /* Títulos */
@@ -713,4 +714,16 @@ textarea {
     font-size: 25px; /* Ajusta el tamaño de la descripción según necesites */
     color: rgb(78, 78, 78); /* Color para la descripción */
     margin-top: 5px;
+}
+
+.container-plani {
+    box-sizing: border-box;
+    background-color: #76a9d9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: calc(100vh - 50px); /* Ajusta según la altura de tu header */
+    overflow-y: auto; /* Permite el scroll dentro del contenedor */
+    margin-bottom: -40px; /* Para extender el contenedor hasta el borde inferior */
 }

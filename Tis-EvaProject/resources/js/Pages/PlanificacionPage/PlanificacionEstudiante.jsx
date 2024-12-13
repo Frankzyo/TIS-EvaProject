@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom"; // Importación de useNavigate
 import SidebarEstudiante from "../../Components/ComponenteSidebar/SidebarEstudiante";
 import Header from "../../Components/ComponenteHeader/HeaderEstudiante";
-import useProjectAndGroupId from "../../Components/useProjectAndGroupId";
+import useProjectAndGroupId from "../../Components/ComponenteId/useProjectAndGroupId";
 import RegistroModal from "../../Components/ComponenteModal/RegistroModal";
 import axios from "axios";
 import "../../../css/EstilosPlanificacion/PlanificacionEstudiante.css";
@@ -549,7 +549,7 @@ const PlanificacionEstudiante = () => {
                     isRepresentanteLegal={isRepresentanteLegal}
                 />
 
-                <div className="contenido-principal">
+                <div className="container-plani">
                     {grupo && (
                         <div className="planificacion-group-info">
                             <img

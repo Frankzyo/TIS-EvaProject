@@ -2,7 +2,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import "../css/NotFound.css";
+import "../css/EstilosDocente/NotFound.css";
 
 // Importación de componentes
 import HomePage from "./Pages/HomePage/HomePage";
@@ -44,8 +44,13 @@ import ApproveEstudiante from "./Pages/Auth/ApproveEstudiante";
 import GrupoEstudiante from "./Pages/GruposPage/GrupoEstudiante";
 import Etapas from "./Pages/EtapasPage/Etapas";
 
-import Perfil from "./Pages/Perfil";
+import Perfil from "./Pages/DocentePage/Perfil";
 import SeguimientoSemanal from "./Pages/DocentePage/SeguimientoSemanal";
+import Autoevaluacion from "./Pages/EvaluacionesPage/Autoevaluacion";
+import AutoevaluacionEstudiante from "./Pages/EvaluacionesPage/AutoevaluacionEstudiante";
+import ReportesPage from "./Pages/DocentePage/ReportesPage";
+import EvaluacionCruzadaEstudiante from "./Pages/EvaluacionesPage/EvaluacionCruzadaEstudiante";
+import EvaluacionDeParesEstudiante from "./Pages/EvaluacionesPage/EvaluacionDeParesEstudiante";
 
 // Componente para manejar rutas no encontradas
 function NotFound() {
@@ -162,6 +167,26 @@ function App() {
                 <Route
                     path="/seguimiento-semanal-estudiante/:projectId"
                     element={<SeguimientoSemanalEstudiante />}
+                />
+                <Route
+                    path="/autoevaluacion/:projectId"
+                    element={<Autoevaluacion />}
+                />
+                <Route
+                    path="/autoevaluacion-estudiante/:projectId"
+                    element={<AutoevaluacionEstudiante />}
+                />
+                <Route
+                    path="/proyectos/:projectId/reportes"
+                    element={<ReportesPage />}
+                />
+                <Route
+                    path="/evaluacion-cruzada-estudiante/:projectId"
+                    element={<EvaluacionCruzadaEstudiante />}
+                />
+                <Route
+                    path="/evaluacion-pares-estudiante/:projectId"
+                    element={<EvaluacionDeParesEstudiante />}
                 />
                 <Route path="*" element={<NotFound />} />
             </Routes>

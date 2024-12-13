@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../css/Dropdown.css";
+import "../../../css/EstiloDropdown/Dropdown.css";
 
 const Dropdown = () => {
     const [isOpen, setIsOpen] = useState(false);

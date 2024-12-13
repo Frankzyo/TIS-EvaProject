@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EvaluacionParGrupo extends Model
 {
@@ -23,14 +24,36 @@ class EvaluacionParGrupo extends Model
     ];
 
     // Relación con el grupo evaluador
+    public function evaluacionPar()
+    {
+        return $this->belongsTo(EvaluacionPar::class, 'id_evaluacion_par', 'id_evaluacion_par');
+    }
+
     public function grupoEvaluador()
     {
         return $this->belongsTo(Grupo::class, 'id_grupo_evaluador', 'ID_GRUPO');
     }
 
-    // Relación con el grupo evaluado
     public function grupoEvaluado()
     {
         return $this->belongsTo(Grupo::class, 'id_grupo_evaluado', 'ID_GRUPO');
+    }
+
+    public function estudiantesEvaluacion()
+    {
+        return $this->hasMany(EvaluacionParEstudiante::class, 'id_asignacion_par', 'id_asignacion_par');
+    }
+
+    public function enlaceProyecto()
+    {
+        return $this->hasOne(EnlaceProyecto::class, 'id_asignacion_par', 'id_asignacion_par');
+    }
+    public function evaluacion()
+    {
+        return $this->belongsTo(EvaluacionPar::class, 'id_evaluacion_par', 'id_evaluacion_par');
+    }
+    public function comentarios_y_notas(): HasMany
+    {
+        return $this->hasMany(EvaluacionParEstudiante::class, 'id_asignacion_par', 'id_asignacion_par');
     }
 }

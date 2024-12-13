@@ -109,7 +109,7 @@ const SidebarPrueba = ({
                         >
                             <i className="fas fa-user icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Evaluación Individual
+                                Evaluaciónes Individuales
                             </span>
                         </ul>
                         <ul
@@ -120,7 +120,7 @@ const SidebarPrueba = ({
                         >
                             <i className="fas fa-users icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Evaluación de Pares
+                                Evaluaciónes de Pares
                             </span>
                         </ul>
                         <ul
@@ -131,7 +131,18 @@ const SidebarPrueba = ({
                         >
                             <i className="fas fa-random icon-menu-prueba"></i>
                             <span className="menu-text-prueba">
-                                Evaluación Cruzada
+                                Evaluaciónes Cruzadas
+                            </span>
+                        </ul>
+                        <ul
+                            className="menu-item-prueba"
+                            onClick={() =>
+                                navigate(`/autoevaluacion/${projectId}`)
+                            }
+                        >
+                            <i className="fas fa-clipboard-check icon-menu-prueba"></i>
+                            <span className="menu-text-prueba">
+                                Autoevaluaciones
                             </span>
                         </ul>
                     </div>
@@ -159,63 +170,25 @@ const SidebarPrueba = ({
                 </li>
                 {isDropdownOpen2 && !isSidebarCollapsed && (
                     <div className="submenu">
-                        <ul
-                            className="menu-item-prueba"
-                            onClick={() => navigate(`/seguimiento-semanal/${projectId}`)}
-                        >
-                            <span className="menu-text-prueba">
-                                Seguimientos semanal
-                            </span>
-                        </ul>
-                        <ul
-                            className="menu-item-prueba"
-                            onClick={() => navigate("/historial-evaluaciones")}
-                        >
-                            <span className="menu-text-prueba">
-                                Historial de evaluaciones
-                            </span>
-                        </ul>
-                        <ul
-                            className="menu-item-prueba"
-                            onClick={() => navigate("/generar-reportes")}
-                        >
-                            <span className="menu-text-prueba">
-                                Generar reportes
-                            </span>
-                        </ul>
-                    </div>
+                    <ul
+                        className="menu-item-prueba"
+                        onClick={() => navigate(`/seguimiento-semanal/${projectId}`)}
+                    >
+                        <i className="fas fa-calendar-check icon-menu-prueba"></i>
+                        <span className="menu-text-prueba">Seguimiento semanal</span>
+                    </ul>
+                
+                    <ul
+                        className="menu-item-prueba"
+                        onClick={() => navigate(`/proyectos/${projectId}/reportes`)}
+                    >
+                        <i className="fas fa-file-alt icon-menu-prueba"></i>
+                        <span className="menu-text-prueba">Reportes</span>
+                    </ul>
+                </div>
+                
                 )}
 
-                {/* Asistencia con Dropdown */}
-                <li className="menu-item-prueba" onClick={toggleDropdown3}>
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                        }}
-                    >
-                        <i className="fas fa-users-rectangle icon-menu-prueba"></i>
-                        <span className="menu-text-prueba">Asistencia</span>
-                    </div>
-                    <i
-                        className={`fas ${
-                            isDropdownOpen3 ? "fa-angle-up" : "fa-angle-down"
-                        } ${isSidebarCollapsed ? "hidden-icon" : ""}`}
-                    ></i>
-                </li>
-                {isDropdownOpen3 && !isSidebarCollapsed && (
-                    <div className="submenu">
-                        <ul
-                            className="menu-item-prueba"
-                            onClick={() => navigate("/registro-asistencia")}
-                        >
-                            <span className="menu-text-prueba">
-                                Registro de asistencia
-                            </span>
-                        </ul>
-                    </div>
-                )}
             </ul>
             <hr className="divisor-side-prueba" />
             <button className="sidebar-prueba-collapse" onClick={toggleSidebar}>

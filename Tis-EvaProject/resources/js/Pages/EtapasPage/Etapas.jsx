@@ -1,64 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+// Components
 import HeaderProyecto from "../../Components/ComponenteHeader/HeaderProyecto";
 import SidebarPrueba from "../../Components/ComponenteSidebar/SidebarPrueba";
+
+// Styles
 import "../../../css/EstilosHeader/HeaderProyecto.css";
 import "../../../css/EstilosSidebar/SidebarPrueba.css";
 import "../../../css/EstilosEtapa/Etapas.css";
-import axios from "axios";
 
-const Etapas = () => {
-    const { projectId } = useParams();
-    const navigate = useNavigate();
+// Custom Hooks
+const useProjectData = (projectId) => {
     const [projectDetails, setProjectDetails] = useState({});
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [etapas, setEtapas] = useState([]);
-    const [showEtapaModal, setShowEtapaModal] = useState(false);
-    const [titulo, setTitulo] = useState("");
-    const [descripcion, setDescripcion] = useState("");
-    const [puntuacion, setPuntuacion] = useState("");
-    const [duracion, setDuracion] = useState("");
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [editEtapaId, setEditEtapaId] = useState(null);
     const [totalPuntos, setTotalPuntos] = useState(0);
 
-    const handleRubricaClick = (etapaId) => {
-        navigate(`/proyectos/${projectId}/rubrica/${etapaId}`);
-    };
-
-    // Cargar detalles del proyecto y etapas
-    useEffect(() => {
-        const fetchProjectDetails = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:8000/api/proyectos/${projectId}`,
-                    { withCredentials: true }
-                );
-                setProjectDetails(response.data);
-            } catch (error) {
-                console.error("Error al cargar el proyecto:", error);
-            }
-        };
-
-        const fetchEtapas = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:8000/api/proyectos/${projectId}/etapas`,
-                    { withCredentials: true }
-                );
-                setEtapas(response.data);
-                calculateTotalPoints(response.data);
-            } catch (error) {
-                console.error("Error al cargar las etapas:", error);
-            }
-        };
-
-        fetchProjectDetails();
-        fetchEtapas();
+    const fetchProjectDetails = useCallback(async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8000/api/proyectos/${projectId}`,
+                { withCredentials: true }
+            );
+            setProjectDetails(response.data);
+        } catch (error) {
+            console.error("Error al cargar el proyecto:", error);
+        }
     }, [projectId]);
 
-    const calculateTotalPoints = (etapas) => {
-        const total = etapas.reduce(
+    const fetchEtapas = useCallback(async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8000/api/proyectos/${projectId}/etapas`,
+                { withCredentials: true }
+            );
+            setEtapas(response.data);
+            calculateTotalPoints(response.data);
+        } catch (error) {
+            console.error("Error al cargar las etapas:", error);
+        }
+    }, [projectId]);
+
+    const calculateTotalPoints = (etapasData) => {
+        const total = etapasData.reduce(
             (sum, etapa) => sum + (etapa.ETAPAS_PUNTUACION || 0),
             0
         );
@@ -66,88 +51,200 @@ const Etapas = () => {
     };
 
     useEffect(() => {
-        const total = etapas.reduce(
-            (sum, etapa) => sum + (etapa.ETAPAS_PUNTUACION || 0),
-            0
-        );
-        setTotalPuntos(total);
-    }, [etapas]);
+        fetchProjectDetails();
+        fetchEtapas();
+    }, [fetchProjectDetails, fetchEtapas]);
 
-    const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
-
-    const openEtapaModal = () => {
-        setShowEtapaModal(true);
-        setIsEditMode(false);
-        setTitulo("");
-        setDescripcion("");
-        setPuntuacion("");
-        setDuracion("");
+    return {
+        projectDetails,
+        etapas,
+        totalPuntos,
+        setEtapas,
+        setTotalPuntos,
+        fetchEtapas,
     };
+};
 
-    const openEditEtapaModal = (etapa) => {
-        setShowEtapaModal(true);
-        setIsEditMode(true);
-        setEditEtapaId(etapa.ID_ETAPA); // Usar el nombre exacto del backend
-        setTitulo(etapa.ETAPAS_TITULO);
-        setDescripcion(etapa.ETAPAS_DESCRIPCION);
-        setPuntuacion(etapa.ETAPAS_PUNTUACION);
-        setDuracion(etapa.ETAPAS_DURACION);
-    };
+// Modal Component
+const EtapaModal = ({
+    isOpen,
+    isEditMode,
+    onClose,
+    onSave,
+    initialData = {},
+}) => {
+    const [titulo, setTitulo] = useState(initialData.ETAPAS_TITULO || "");
+    const [descripcion, setDescripcion] = useState(
+        initialData.ETAPAS_DESCRIPCION || ""
+    );
+    const [puntuacion, setPuntuacion] = useState(
+        initialData.ETAPAS_PUNTUACION || ""
+    );
+    const [duracion, setDuracion] = useState(initialData.ETAPAS_DURACION || "");
 
-    const closeEtapaModal = () => {
-        setShowEtapaModal(false);
-        setIsEditMode(false);
-        setEditEtapaId(null);
-    };
+    // Reset form when initial data changes
+    useEffect(() => {
+        setTitulo(initialData.ETAPAS_TITULO || "");
+        setDescripcion(initialData.ETAPAS_DESCRIPCION || "");
+        setPuntuacion(initialData.ETAPAS_PUNTUACION || "");
+        setDuracion(initialData.ETAPAS_DURACION || "");
+    }, [initialData]);
 
-    const handleSaveEtapa = async () => {
+    const handleSave = () => {
         if (!titulo || !puntuacion || !duracion) {
             alert("Por favor, completa todos los campos.");
             return;
         }
 
-        const etapaData = {
+        onSave({
+            ID_ETAPA: initialData.ID_ETAPA, // Include ID for editing
             etapas_titulo: titulo,
             etapas_descripcion: descripcion,
             etapas_puntuacion: puntuacion,
             etapas_duracion: duracion,
-        };
+        });
+    };
 
+    if (!isOpen) return null;
+
+    return (
+        <div className="etapa-modal-overlay">
+            <div className="etapa-modal-content">
+                <h3 className="etapa-modal-title">
+                    {isEditMode ? "Editar Etapa" : "Crear Nueva Etapa"}
+                </h3>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSave();
+                    }}
+                >
+                    <label className="etapa-label">Título:</label>
+                    <input
+                        type="text"
+                        value={titulo}
+                        onChange={(e) => setTitulo(e.target.value)}
+                        className="etapa-input"
+                        placeholder="Ingrese el título de la etapa"
+                        required
+                    />
+                    <label className="etapa-label">Descripción:</label>
+                    <textarea
+                        value={descripcion}
+                        onChange={(e) => setDescripcion(e.target.value)}
+                        className="etapa-textarea"
+                        placeholder="Descripción de la etapa"
+                    ></textarea>
+                    <label className="etapa-label">Puntuación (0-100):</label>
+                    <input
+                        type="number"
+                        value={puntuacion}
+                        onChange={(e) => setPuntuacion(e.target.value)}
+                        className="etapa-input"
+                        min="0"
+                        max="100"
+                        placeholder="Puntuación de la etapa"
+                        required
+                    />
+                    <label className="etapa-label">Duración (semanas):</label>
+                    <input
+                        type="number"
+                        value={duracion}
+                        onChange={(e) => setDuracion(e.target.value)}
+                        className="etapa-input"
+                        min="1"
+                        placeholder="Duración en semanas"
+                        required
+                    />
+                    <div className="modal-actions">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="cancel-btn"
+                        >
+                            Cancelar
+                        </button>
+                        <button type="submit" className="create-btn">
+                            {isEditMode ? "Guardar" : "Agregar"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// Main Component
+const Etapas = () => {
+    const { projectId } = useParams();
+    const navigate = useNavigate();
+    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [showEtapaModal, setShowEtapaModal] = useState(false);
+    const [editingEtapa, setEditingEtapa] = useState(null);
+
+    const { projectDetails, etapas, totalPuntos, setEtapas, fetchEtapas } =
+        useProjectData(projectId);
+
+    const handleRubricaClick = (etapaId) => {
+        navigate(`/proyectos/${projectId}/rubrica/${etapaId}`);
+    };
+
+    const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
+
+    const openNewEtapaModal = () => {
+        setEditingEtapa(null);
+        setShowEtapaModal(true);
+    };
+
+    const openEditEtapaModal = (etapa) => {
+        setEditingEtapa(etapa);
+        setShowEtapaModal(true);
+    };
+
+    const closeEtapaModal = () => {
+        setShowEtapaModal(false);
+        setEditingEtapa(null);
+    };
+
+    const handleSaveEtapa = async (etapaData) => {
         try {
-            if (isEditMode) {
-                // Actualizar etapa existente
+            if (editingEtapa) {
+                // Update existing stage
                 await axios.put(
-                    `http://localhost:8000/api/etapas/${editEtapaId}`,
-                    etapaData,
+                    `http://localhost:8000/api/etapas/${etapaData.ID_ETAPA}`,
                     {
-                        withCredentials: true,
-                    }
+                        etapas_titulo: etapaData.etapas_titulo,
+                        etapas_descripcion: etapaData.etapas_descripcion,
+                        etapas_puntuacion: etapaData.etapas_puntuacion,
+                        etapas_duracion: etapaData.etapas_duracion,
+                    },
+                    { withCredentials: true }
                 );
-                setEtapas(
-                    etapas.map((etapa) =>
-                        etapa.id_etapa === editEtapaId
-                            ? { ...etapa, ...etapaData }
-                            : etapa
-                    )
-                );
+
+                // Refetch etapas to ensure consistency
+                await fetchEtapas();
             } else {
-                // Crear nueva etapa
+                // Create new stage
                 const response = await axios.post(
                     "http://localhost:8000/api/etapas",
                     {
-                        ...etapaData,
+                        etapas_titulo: etapaData.etapas_titulo,
+                        etapas_descripcion: etapaData.etapas_descripcion,
+                        etapas_puntuacion: etapaData.etapas_puntuacion,
+                        etapas_duracion: etapaData.etapas_duracion,
                         id_proyecto: projectId,
                     },
-                    {
-                        withCredentials: true,
-                    }
+                    { withCredentials: true }
                 );
-                setEtapas([...etapas, response.data.etapa]);
+
+                // Refetch etapas to ensure consistency
+                await fetchEtapas();
             }
 
             closeEtapaModal();
         } catch (error) {
             console.error("Error al guardar la etapa:", error);
+            alert("Hubo un error al guardar la etapa. Intente nuevamente.");
         }
     };
 
@@ -156,9 +253,12 @@ const Etapas = () => {
             await axios.delete(`http://localhost:8000/api/etapas/${id}`, {
                 withCredentials: true,
             });
-            setEtapas(etapas.filter((etapa) => etapa.id_etapa !== id));
+
+            // Refetch etapas to ensure consistency
+            await fetchEtapas();
         } catch (error) {
             console.error("Error al eliminar la etapa:", error);
+            alert("Hubo un error al eliminar la etapa. Intente nuevamente.");
         }
     };
 
@@ -182,7 +282,7 @@ const Etapas = () => {
                         <h2>Etapas</h2>
                         <button
                             className="new-project-btn"
-                            onClick={openEtapaModal}
+                            onClick={openNewEtapaModal}
                         >
                             <i className="fas fa-plus"></i> Nueva Etapa
                         </button>
@@ -197,9 +297,9 @@ const Etapas = () => {
 
                     {etapas.length > 0 ? (
                         <div className="etapas-list">
-                            {etapas.map((etapa, index) => (
+                            {etapas.map((etapa) => (
                                 <div
-                                    key={etapa.ID_ETAPA || index}
+                                    key={etapa.ID_ETAPA}
                                     className="etapas-item"
                                 >
                                     <div className="etapas-info">
@@ -260,67 +360,13 @@ const Etapas = () => {
                 </div>
             </div>
 
-            {showEtapaModal && (
-                <div className="etapa-modal-overlay">
-                    <div className="etapa-modal-content">
-                        <h3 className="etapa-modal-title">
-                            {isEditMode ? "Editar Etapa" : "Crear Nueva Etapa"}
-                        </h3>
-                        <label className="etapa-label">Título:</label>
-                        <input
-                            type="text"
-                            value={titulo}
-                            onChange={(e) => setTitulo(e.target.value)}
-                            className="etapa-input"
-                            placeholder="Ingrese el título de la etapa"
-                        />
-                        <label className="etapa-label">Descripción:</label>
-                        <textarea
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            className="etapa-textarea"
-                            placeholder="Descripción de la etapa"
-                        ></textarea>
-                        <label className="etapa-label">
-                            Puntuación (0-100):
-                        </label>
-                        <input
-                            type="number"
-                            value={puntuacion}
-                            onChange={(e) => setPuntuacion(e.target.value)}
-                            className="etapa-input"
-                            min="0"
-                            max="100"
-                            placeholder="Puntuación de la etapa"
-                        />
-                        <label className="etapa-label">
-                            Duración (semanas):
-                        </label>
-                        <input
-                            type="number"
-                            value={duracion}
-                            onChange={(e) => setDuracion(e.target.value)}
-                            className="etapa-input"
-                            min="1"
-                            placeholder="Duración en semanas"
-                        />
-                        <div className="modal-actions">
-                            <button
-                                onClick={closeEtapaModal}
-                                className="cancel-btn"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSaveEtapa}
-                                className="create-btn"
-                            >
-                                {isEditMode ? "Guardar" : "Agregar"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <EtapaModal
+                isOpen={showEtapaModal}
+                isEditMode={!!editingEtapa}
+                onClose={closeEtapaModal}
+                onSave={handleSaveEtapa}
+                initialData={editingEtapa || {}}
+            />
         </div>
     );
 };

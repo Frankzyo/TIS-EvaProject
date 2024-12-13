@@ -30,8 +30,7 @@ const HomeDocente = () => {
         const role = localStorage.getItem("ROLE");
 
         if (!docenteId || role !== "Docente") {
-            // Si no hay un docente logueado, redirige al login
-            navigate("/login");
+            navigate("/login"); // Si no hay un docente logueado, redirige al login
         }
     }, [navigate]);
     useEffect(() => {

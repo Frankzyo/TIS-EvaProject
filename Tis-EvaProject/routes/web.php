@@ -19,6 +19,10 @@ use App\Http\Controllers\EvaluacionIndividualController;
 use App\Http\Controllers\EvaluacionIndividualEstudianteController;
 use App\Http\Controllers\EvaluacionParController;
 use App\Http\Controllers\SeguimientoSemanalController;
+use App\Http\Controllers\AutoevaluacionProyectoController;
+use App\Http\Controllers\ResultadoAutoevaluacionController;
+use App\Http\Controllers\EvaluacionCruzadaController;
+use App\Http\Controllers\ResultadoEvaluacionCruzadaController;
 
 // Ruta de login para cargar la aplicación React
 Route::get('/login', function () {
@@ -41,6 +45,7 @@ Route::prefix('estudiante')->group(function () {
 
 Route::middleware(['auth:estudiante'])->prefix('estudiante')->group(function () {
     Route::get('/proyecto-grupo', [EstudianteController::class, 'obtenerProyectoYGrupo']);
+    
 });
 
 // Ruta para restablecer la contraseña
@@ -60,6 +65,12 @@ Route::prefix('api')->middleware(['auth:docente,estudiante'])->group(function ()
 });
 Route::prefix('api-docente')->middleware(['auth:docente'])->group(function () {
     Route::get('/proyecto/{id}', [DocenteController::class, 'show']);
+});
+
+Route::middleware(['auth:estudiante'])->group(function () {
+    // Rutas exclusivas para estudiantes
+    Route::post('/api/evaluacion-pares/publicar-link/{idAsignacionPar}', [EvaluacionParController::class, 'publicarEnlace']);
+    Route::post('/api/evaluacion-pares/agregar-comentario/{idAsignacionPar}', [EvaluacionParController::class, 'agregarComentario']);
 });
 
 Route::prefix('api')->middleware(['auth:docente,estudiante'])->group(function () {
@@ -176,9 +187,27 @@ Route::prefix('api')->group(function () {
     Route::get('/evaluaciones/etapa/{etapaId}/grupo/{grupoId}', [EvaluacionIndividualEstudianteController::class, 'obtenerEvaluaciones']);
 
     Route::post('/evaluaciones-pares', [EvaluacionParController::class, 'store']);
+    
+    // Obtener todas las evaluaciones de pares de un proyecto específico
     Route::get('/evaluaciones-pares/proyecto/{projectId}', [EvaluacionParController::class, 'index']);
+    // Obtener detalles de una evaluación específica
     Route::get('/evaluaciones-pares/{id}', [EvaluacionParController::class, 'show']);
+    // Obtener evaluaciones de pares específicas para un proyecto (si lo necesitas)
+    Route::get('/evaluaciones-pares/pares/{projectId}', [EvaluacionParController::class, 'obtenerEvaluacionesDePares']);
+
+    Route::get('/evaluacion-cruzada/resultados/{idEvaluacionCruzada}', [ResultadoEvaluacionCruzadaController::class, 'index']);
+    Route::post('/evaluacion-cruzada/resultados', [ResultadoEvaluacionCruzadaController::class, 'store']);
+    Route::get('/evaluacion-cruzada/{idEvaluacion}/evaluacion/{idEstudiante}', [ResultadoEvaluacionCruzadaController::class, 'obtenerEvaluacionIndividual']);
+    Route::delete('/evaluacion-cruzada/resultados/{idResultado}', [ResultadoEvaluacionCruzadaController::class, 'destroy']);
+    Route::get('/evaluacion-cruzada/promedio/{idEstudiante}', [ResultadoEvaluacionCruzadaController::class, 'obtenerPromedioEvaluaciones']);
+    Route::get('/evaluaciones-cruzadas/grupos/{idGrupo}/notas', [ResultadoEvaluacionCruzadaController::class, 'obtenerResultadosEvaluacionesCruzadasPorGrupo']);
+
+    Route::get('/evaluacion-pares/{id_proyecto}/{id_grupo}', [EvaluacionParController::class, 'obtenerEvaluaciones']);
+
 });
+
+Route::get('/api/grupos/{groupId}/proyecto/{projectId}/promedio-notas', [EvaluacionParController::class, 'obtenerPromedioNotasPorGrupo']);
+
 
 Route::prefix('api/seguimiento-semanal')->group(function () {
     // Obtener seguimientos de un proyecto
@@ -211,6 +240,41 @@ Route::prefix('api/evaluaciones-individuales')->group(function () {
     Route::put('/{id}', [EvaluacionIndividualController::class, 'update']); // Actualizar evaluación
     Route::delete('/{id}', [EvaluacionIndividualController::class, 'destroy']); // Eliminar evaluación
 });
+
+Route::prefix('api/proyectos/{projectId}/autoevaluaciones')->group(function () {
+    Route::post('/', [AutoevaluacionProyectoController::class, 'store']); // Crear autoevaluación
+    Route::get('/', [AutoevaluacionProyectoController::class, 'index']);  // Obtener autoevaluaciones
+    Route::put('/{autoevaluacionId}', [AutoevaluacionProyectoController::class, 'update']); // Actualizar autoevaluación
+    Route::put('/pregunta/{preguntaId}', [AutoevaluacionProyectoController::class, 'updatePregunta']); // Actualizar pregunta
+    Route::delete('/{autoevaluacionId}', [AutoevaluacionProyectoController::class, 'destroy']); // Eliminar autoevaluación
+    Route::delete('/pregunta/{preguntaId}', [AutoevaluacionProyectoController::class, 'destroyPregunta']); // Eliminar pregunta
+    Route::delete('/opcion/{opcionId}', [AutoevaluacionProyectoController::class, 'destroyOpcion']); // Eliminar opción
+    Route::put('/pregunta/{preguntaId}/opciones', [AutoevaluacionProyectoController::class, 'updateOpciones']); // Actualizar opciones
+    Route::post('/pregunta', [AutoevaluacionProyectoController::class, 'addPregunta']);
+});
+
+Route::post('/autoevaluaciones/resultados', [ResultadoAutoevaluacionController::class, 'guardarResultado']);
+Route::get('/autoevaluaciones/resultados', [ResultadoAutoevaluacionController::class, 'index']);
+Route::get('api/autoevaluaciones/grupos/{idGrupo}/notas', [ResultadoAutoevaluacionController::class, 'obtenerNotasPorGrupo']);
+
+
+Route::prefix('api/proyectos/{projectId}/evaluacion-cruzada')->group(function () {
+    Route::post('/', [EvaluacionCruzadaController::class, 'store']);
+    Route::get('/', [EvaluacionCruzadaController::class, 'index']);
+    Route::put('/{evaluacionId}', [EvaluacionCruzadaController::class, 'update']);
+    Route::delete('/{evaluacionId}', [EvaluacionCruzadaController::class, 'destroy']);
+
+    // Rutas para preguntas
+    Route::post('/{evaluacionId}/preguntas', [EvaluacionCruzadaController::class, 'addPregunta']);
+    Route::put('/preguntas/{preguntaId}', [EvaluacionCruzadaController::class, 'updatePregunta']);
+
+
+    // Rutas para opciones
+    Route::post('/preguntas/{preguntaId}/opciones', [EvaluacionCruzadaController::class, 'addOpcion']);
+});
+
+Route::delete('/api/evaluacion-cruzada/opciones/{opcionId}', [EvaluacionCruzadaController::class, 'destroyOpcion']);
+Route::delete('/api/evaluacion-cruzada/preguntas/{preguntaId}', [EvaluacionCruzadaController::class, 'destroyPregunta']);
 
 // Ruta de prueba para verificar funcionamiento del backend
 Route::get('/test', function () {

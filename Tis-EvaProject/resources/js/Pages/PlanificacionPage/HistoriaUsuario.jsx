@@ -5,7 +5,7 @@ import ReactQuill from "react-quill";
 import SidebarEstudiante from "../../Components/ComponenteSidebar/SidebarEstudiante";
 import HeaderEstudiante from "../../Components/ComponenteHeader/HeaderEstudiante";
 import SeleccionarUsuarioModal from "../../Components/ComponenteModal/SeleccionarUsuarioModal";
-import useProjectAndGroupId from "../../Components/useProjectAndGroupId";
+import useProjectAndGroupId from "../../Components/ComponenteId/useProjectAndGroupId";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css"; // Importar el CSS del tema
 import "../../../css/EstilosSidebar/SidebarEstudiante.css"; // Importa el CSS del sidebar

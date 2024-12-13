@@ -82,6 +82,9 @@ class EtapaController extends Controller
     {
         try {
             $etapa = Etapa::findOrFail($id);
+            if (!$etapa) {
+                return response()->json(['error' => 'Etapa no encontrada'], 404);
+            }
             $etapa->delete();
 
             return response()->json(['message' => 'Etapa eliminada con éxito'], 200);

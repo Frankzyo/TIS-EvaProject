@@ -52,4 +52,13 @@ class Estudiante extends Authenticatable
     {
         return $this->belongsTo(Grupo::class, 'ID_GRUPO', 'ID_GRUPO');
     }
+    public function evaluacionesRealizadas()
+    {
+        return $this->hasMany(ResultadoEvaluacionCruzada::class, 'ID_EST_EVALUADOR');
+    }
+
+    public function evaluacionesRecibidas()
+    {
+        return $this->hasMany(ResultadoEvaluacionCruzada::class, 'ID_EST_EVALUADO');
+    }
 }
