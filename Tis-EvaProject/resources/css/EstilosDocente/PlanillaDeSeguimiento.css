@@ -16,14 +16,19 @@
 .dropdown-container {
     margin: 20px 20px;
     padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 15px;
 }
 
 .dropdown-container select {
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 14px;
     width: 100%;
+    height: 40px;
     max-width: 300px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -37,7 +42,7 @@
 }
 
 .custom-table .ant-table-thead > tr > th {
-    background-color: #002A4C;
+    background-color: #002a4c;
     color: white;
     text-align: center;
     font-weight: bold;
@@ -124,7 +129,7 @@
 .edit-notes-btn-container {
     margin-top: 20px; /* Margen superior para separar el botón de la tabla */
     text-align: left; /* Centra el botón horizontalmente */
-}/* Ajusta el ancho del input para que sea dinámico */
+} /* Ajusta el ancho del input para que sea dinámico */
 .custom-table input[type="number"] {
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -180,7 +185,7 @@
 .reportes-section h5 {
     margin-top: 20px;
     font-size: 16px; /* Más pequeño que h4 */
-    color: #002A4C; /* Gris para menor jerarquía */
+    color: #002a4c; /* Gris para menor jerarquía */
     border-bottom: 1px solid #d6d6d6; /* Línea más delgada */
     padding-left: 10px; /* Sangría para destacar nivel inferior */
     font-weight: bold; /* Menor peso que h4 */

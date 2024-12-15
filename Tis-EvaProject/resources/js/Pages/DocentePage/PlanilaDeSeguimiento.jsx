@@ -62,7 +62,7 @@ const PlanillaDeSeguimiento = () => {
             projectData.find(
                 (group) => group.ID_GRUPO === parseInt(selectedGroup)
             )?.fechas_defensa || [];
-
+        console.log(studentsData);
         studentsData.forEach((student) => {
             student.notas.forEach((nota) => {
                 const diaDefensa =
@@ -145,6 +145,7 @@ const PlanillaDeSeguimiento = () => {
                                                     }
                                                     return stu;
                                                 });
+
                                             setStudentsData(updatedData);
                                         }}
                                         style={{
@@ -163,7 +164,7 @@ const PlanillaDeSeguimiento = () => {
                 }
             });
         });
-
+        console.log(etapasMap);
         const dynamicColumns = Object.values(etapasMap).reduce(
             (acc, column) => {
                 const parentIndex = acc.findIndex(
@@ -183,7 +184,7 @@ const PlanillaDeSeguimiento = () => {
             },
             []
         );
-
+        console.log(dynamicColumns);
         const fixedColumns = [
             {
                 title: "Estudiantes",

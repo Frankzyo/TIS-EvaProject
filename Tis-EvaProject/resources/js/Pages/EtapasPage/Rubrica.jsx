@@ -126,6 +126,7 @@ const Rubrica = () => {
         (total, rubrica) => total + (rubrica.PESO_RUBRICA || 0),
         0
     );
+    console.log(totalRubricaPoints);
     const scaledRubricaPoints =
         (totalRubricaPoints / 100) * etapaDetails.ETAPAS_PUNTUACION;
 

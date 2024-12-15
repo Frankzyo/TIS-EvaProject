@@ -165,7 +165,6 @@ const RequerimientosDocente = () => {
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
-
         fetch(
             `http://localhost:8000/api/requerimientos/${requirement.ID_REQUERIMIENTO}`,
             {

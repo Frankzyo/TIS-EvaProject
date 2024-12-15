@@ -267,19 +267,7 @@ const EvaluacionDePares = () => {
                                                                 </p>
                                                             </div>
                                                             <div className="details-button-container">
-                                                                <button
-                                                                    className="details-button"
-                                                                    onClick={() =>
-                                                                        handleViewGroupDetails(
-                                                                            grupoEvaluador
-                                                                                .grupo_evaluador
-                                                                                ?.ID_GRUPO,
-                                                                            grupoEvaluado
-                                                                                ?.grupo_evaluado
-                                                                                ?.ID_GRUPO
-                                                                        )
-                                                                    }
-                                                                >
+                                                                <button className="details-button">
                                                                     Ver detalles
                                                                 </button>
                                                             </div>

@@ -17,11 +17,12 @@
 /* Contenedor principal del modal */
 .rubrica-modal-content {
     background-color: white;
+    margin: 0;
     padding: 20px;
     width: auto;
     min-width: 860px;
     max-width: 900px;
-    max-height: 850px;
+    max-height: 93vh;
     overflow-y: auto; /* Asegura el scroll vertical */
     overflow-x: hidden; /* Evita el scroll horizontal si no es necesario */
     border-radius: 15px;
@@ -95,15 +96,12 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: border-color 0.3s ease;
     box-sizing: border-box;
-
 }
 
 .nivel-textarea {
     height: 120px;
-
 }
-.rubrica-modal-textarea{
-
+.rubrica-modal-textarea {
     min-height: 100px;
 }
 
@@ -120,7 +118,7 @@
 .criterio-btn,
 .rubrica-modal-button.add-criterio-btn:hover,
 .rubrica-modal-button.add-nivel-btn:hover {
-    display: inline-flex; 
+    display: inline-flex;
     padding: 8px 16px;
     border-radius: 8px;
     background-color: #1a73e8;
