@@ -73,60 +73,78 @@ const NewRubricaModal = ({
     };
 
     const handleSave = async () => {
+        setError(""); // Limpia errores previos
+
         if (!titulo.trim()) {
             setError("El título de la rúbrica es obligatorio.");
             return;
         }
 
-        const newCriterios = criterios.map((criterio, criterioIndex) => {
-            const maxPuntaje = Math.max(
-                ...criterio.niveles.map((nivel) => Number(nivel.puntos || 0))
-            );
+        if (criterios.length === 0) {
+            setError("Debe haber al menos un criterio.");
+            return;
+        }
 
-            // Console para verificar el ID de cada criterio
-            console.log(
-                `Criterio ${criterioIndex} - ID_CRITERIO:`,
-                criterio.id
-            );
+        // Validación manual de criterios y niveles
+        for (let i = 0; i < criterios.length; i++) {
+            const criterio = criterios[i];
+            if (!criterio.titulo.trim()) {
+                setError(`El criterio ${i + 1} debe tener un título.`);
+                return;
+            }
 
-            const niveles = criterio.niveles.map((nivel, nivelIndex) => {
-                // Console para verificar el ID de cada nivel
-                console.log(
-                    `Criterio ${criterioIndex} - Nivel ${nivelIndex} - ID_NIVEL:`,
-                    nivel.id
-                );
+            if (criterio.niveles.length === 0) {
+                setError(`El criterio ${i + 1} debe tener al menos un nivel.`);
+                return;
+            }
 
-                return {
-                    id: nivel.id, // Esto mantiene el ID existente del nivel
-                    puntos: nivel.puntos,
-                    titulo: nivel.titulo,
-                    descripcion: nivel.descripcion,
-                };
-            });
+            for (let j = 0; j < criterio.niveles.length; j++) {
+                const nivel = criterio.niveles[j];
+                if (!nivel.titulo.trim()) {
+                    setError(
+                        `El nivel ${j + 1} del criterio ${
+                            i + 1
+                        } debe tener un título.`
+                    );
+                    return;
+                }
 
-            return {
-                id: criterio.id, // Esto mantiene el ID existente del criterio
-                titulo: criterio.titulo,
-                descripcion: criterio.descripcion,
-                maxPuntaje,
-                niveles,
-            };
-        });
+                if (nivel.puntos === "" || nivel.puntos === null) {
+                    setError(
+                        `El nivel ${j + 1} del criterio ${
+                            i + 1
+                        } debe tener un puntaje.`
+                    );
+                    return;
+                }
+            }
+        }
 
         const newRubrica = {
             titulo,
             descripcion,
-            criterios: newCriterios,
+            criterios: criterios.map((criterio) => ({
+                id: criterio.id, // Incluir solo si existe
+                titulo: criterio.titulo,
+                descripcion: criterio.descripcion,
+                maxPuntaje: Math.max(
+                    ...criterio.niveles.map((nivel) =>
+                        Number(nivel.puntos || 0)
+                    )
+                ),
+                niveles: criterio.niveles.map((nivel) => ({
+                    id: nivel.id, // Incluir solo si existe
+                    puntos: nivel.puntos,
+                    titulo: nivel.titulo,
+                    descripcion: nivel.descripcion,
+                })),
+            })),
             projectId,
             etapaId,
         };
 
-        console.log("isEditMode:", isEditMode);
-        console.log("rubrica.ID_RUBRICA:", rubrica?.ID_RUBRICA);
-
         try {
-            if (isEditMode && rubrica && rubrica.ID_RUBRICA) {
-                console.log("ID de la rúbrica:", rubrica.ID_RUBRICA);
+            if (isEditMode && rubrica?.ID_RUBRICA) {
                 await axios.put(
                     `http://localhost:8000/api/rubricas/${rubrica.ID_RUBRICA}`,
                     newRubrica
@@ -141,9 +159,13 @@ const NewRubricaModal = ({
             onSave(newRubrica);
             onClose();
         } catch (error) {
-            console.error("Error al guardar la rúbrica:", error);
+            console.error(
+                "Error al guardar la rúbrica:",
+                error.response?.data || error
+            );
             setError(
-                "Error al guardar la rúbrica. Por favor, inténtelo de nuevo."
+                error.response?.data?.message ||
+                    "Error al guardar la rúbrica. Por favor, inténtelo de nuevo."
             );
         }
     };

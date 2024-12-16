@@ -31,7 +31,7 @@ class RequerimientoController extends Controller
 
         $request->validate([
             'ID_PROYECTO' => 'required|string|exists:proyecto,ID_PROYECTO',
-            'DESCRIPCION_REQ' => 'required|string|max:1000',
+            'DESCRIPCION_REQ' => 'required|string|max:2000',
         ]);
 
         $requerimiento = Requerimiento::create($request->all());

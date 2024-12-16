@@ -15,6 +15,7 @@ const Autoevaluacion = () => {
     const [newPregunta, setNewPregunta] = useState("");
     const [opciones, setOpciones] = useState([]);
     const [editMode, setEditMode] = useState(false);
+    const [autoevaluacionId, setAutoevaluacionId] = useState(null);
     const [nuevaOpcion, setNuevaOpcion] = useState({
         texto: "",
         puntuacion: 0,
@@ -240,13 +241,12 @@ const Autoevaluacion = () => {
             alert("Por favor, ingrese una pregunta válida.");
             return;
         }
-
+    
         if (opciones.length === 0) {
             alert("Debe agregar al menos una opción a la pregunta.");
             return;
         }
-
-        // Construir la pregunta
+    
         const nuevaPregunta = {
             PREGUNTA_AUTOEVAL: newPregunta.trim(),
             opciones: opciones.map((opcion) => ({
@@ -254,14 +254,36 @@ const Autoevaluacion = () => {
                 puntuacion: opcion.puntuacion,
             })),
         };
-
+    
         try {
+            // Verificar si existe una autoevaluación
+            if (!autoevaluacionId) {
+                const autoevaluacionResponse = await axios.post(
+                    `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones`,
+                    {
+                        TITULO_AUTOEVAL: "Autoevaluación Inicial",
+                        DESCRIPCION_AUTOEVAL: "Autoevaluación generada automáticamente.",
+                        FECHA_INICIO_AUTOEVAL: new Date().toISOString().split("T")[0], // Fecha actual
+                        FECHA_FIN_AUTOEVAL: new Date(
+                            new Date().setDate(new Date().getDate() + 7)
+                        )
+                            .toISOString()
+                            .split("T")[0], // +7 días
+                        PUNTUACION_TOTAL_AUTOEVAL: 100, // Valor inicial
+                    },
+                    { withCredentials: true }
+                );
+    
+                setAutoevaluacionId(autoevaluacionResponse.data.ID_AUTOEVAL_PROYECTO); // Actualiza autoevaluacionId
+            }
+    
+            // Guardar la pregunta
             const response = await axios.post(
                 `http://localhost:8000/api/proyectos/${projectId}/autoevaluaciones/pregunta`,
                 nuevaPregunta,
                 { withCredentials: true }
             );
-
+    
             if (response.status === 201) {
                 setAutoevaluaciones((prev) => [
                     ...prev,
@@ -280,11 +302,11 @@ const Autoevaluacion = () => {
             );
             alert("Hubo un error al guardar la pregunta.");
         } finally {
-            setNewPregunta(""); // Resetea el campo de pregunta
-            setOpciones([]); // Limpia las opciones
+            setNewPregunta(""); // Resetear campo de pregunta
+            setOpciones([]); // Resetear opciones
         }
     };
-
+    
     const handleEditPregunta = (idPregunta) => {
         // Encuentra la pregunta seleccionada en el estado local
         const preguntaSeleccionada = autoevaluaciones.find(

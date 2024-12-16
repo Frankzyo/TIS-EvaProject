@@ -99,8 +99,7 @@
     gap: 10px;
     align-items: center;
     overflow: hidden;
-    height: auto;
-    max-height: 600px;
+    height: auto;;
     box-sizing: border-box;
 }
 
@@ -130,7 +129,7 @@
     justify-content: space-between; /* Asegura que el texto y los iconos estén en extremos opuestos */
     align-items: center;
     background-color: #1a355b;
-    color: white;
+    color: white !important; 
     padding: 10px;
     border-radius: 8px;
     width: 100%;
@@ -650,6 +649,7 @@ textarea {
 
 .texto-item {
     flex-grow: 1; /* Hace que el texto ocupe todo el espacio disponible */
+    color: white;
 }
 
 .confirm-modal-content h2 {
@@ -669,7 +669,7 @@ textarea {
     max-height: 150px;
     border: none; /* Elimina cualquier borde */
     box-shadow: none; /* Elimina cualquier sombra */
-    margin-bottom: 10px;
+    margin: 30px 0;
 }
 
 .planificacion-divisor-container {
@@ -727,3 +727,8 @@ textarea {
     overflow-y: auto; /* Permite el scroll dentro del contenedor */
     margin-bottom: -40px; /* Para extender el contenedor hasta el borde inferior */
 }
+
+.texto-item strong, .texto-item h2, .texto-item span{
+    color: white !important;
+}
+

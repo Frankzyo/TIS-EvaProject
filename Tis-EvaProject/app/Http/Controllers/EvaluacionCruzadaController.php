@@ -15,66 +15,66 @@ class EvaluacionCruzadaController extends Controller
      * Crear una nueva evaluación cruzada.
      */
     public function store(Request $request, $projectId)
-    {
-        Log::info('Datos recibidos para guardar evaluación cruzada:', $request->all());
+{
+    Log::info('Datos recibidos para guardar evaluación cruzada:', $request->all());
 
-        // Validación de los datos
-        try {
-            $validated = $request->validate([
-                'TITULO_EVAL_CRUZADA' => 'required|string|max:255', // Nombre corregido
-                'DESCRIPCION_EVAL_CRUZADA' => 'nullable|string',
-                'FECHA_INICIO_EVAL' => 'required|date',
-                'FECHA_FIN_EVAL' => 'required|date|after_or_equal:FECHA_INICIO_EVAL',
-                'PUNTUACION_TOTAL_EVAL' => 'required|numeric|min:0',
-                'evaluaciones' => 'required|array|min:1',
-                'evaluaciones.*.pregunta' => 'required|string|max:255',
-                'evaluaciones.*.opciones' => 'required|array|min:1',
-                'evaluaciones.*.opciones.*.texto' => 'required|string|max:255',
-                'evaluaciones.*.opciones.*.puntuacion' => 'required|numeric|min:0',
+    // Validación de los datos
+    try {
+        $validated = $request->validate([
+            'TITULO_EVAL_CRUZADA' => 'required|string|max:255',
+            'DESCRIPCION_EVAL_CRUZADA' => 'nullable|string',
+            'FECHA_INICIO_EVAL' => 'required|date',
+            'FECHA_FIN_EVAL' => 'required|date|after_or_equal:FECHA_INICIO_EVAL',
+            'PUNTUACION_TOTAL_EVAL' => 'required|numeric|min:0',
+            'evaluaciones' => 'required|array|min:1',
+            'evaluaciones.*.PREGUNTA_EVAL' => 'required|string|max:500',
+            'evaluaciones.*.opciones' => 'required|array|min:1',
+            'evaluaciones.*.opciones.*.TEXTO_OPCION_EVAL' => 'required|string|max:500',
+            'evaluaciones.*.opciones.*.PUNTUACION_OPCION_EVAL' => 'required|numeric|min:0',
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Errores de validación en store:', $e->errors());
+        return response()->json(['errors' => $e->errors()], 422);
+    }
+
+    // Usar transacción para garantizar atomicidad
+    try {
+        DB::transaction(function () use ($projectId, $validated) {
+            // Crear la evaluación cruzada
+            $evaluacion = EvaluacionCruzada::create([
+                'ID_PROYECTO' => $projectId,
+                'TITULO_EVAL_CRUZADA' => $validated['TITULO_EVAL_CRUZADA'],
+                'DESCRIPCION_EVAL_CRUZADA' => $validated['DESCRIPCION_EVAL_CRUZADA'],
+                'FECHA_INICIO_EVAL' => $validated['FECHA_INICIO_EVAL'],
+                'FECHA_FIN_EVAL' => $validated['FECHA_FIN_EVAL'],
+                'PUNTUACION_TOTAL_EVAL' => $validated['PUNTUACION_TOTAL_EVAL'],
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Errores de validación:', $e->errors());
-            return response()->json(['errors' => $e->errors()], 422);
-        }
 
-        // Usar transacción para garantizar atomicidad
-        try {
-            DB::transaction(function () use ($projectId, $validated) {
-                // Crear la evaluación cruzada
-                $evaluacion = EvaluacionCruzada::create([
-                    'ID_PROYECTO' => $projectId,
-                    'TITULO_EVAL_CRUZADA' => $validated['TITULO_EVAL_CRUZADA'], // Nombre corregido
-                    'DESCRIPCION_EVAL_CRUZADA' => $validated['DESCRIPCION_EVAL_CRUZADA'],
-                    'FECHA_INICIO_EVAL' => $validated['FECHA_INICIO_EVAL'],
-                    'FECHA_FIN_EVAL' => $validated['FECHA_FIN_EVAL'],
-                    'PUNTUACION_TOTAL_EVAL' => $validated['PUNTUACION_TOTAL_EVAL'],
+            Log::info('ID_EVAL_CRUZADA generado:', ['ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA]);
+
+            // Crear preguntas y opciones
+            foreach ($validated['evaluaciones'] as $pregunta) {
+                $preguntaModel = PreguntaEvaluacionCruzada::create([
+                    'ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA,
+                    'PREGUNTA_EVAL' => $pregunta['PREGUNTA_EVAL'],
                 ]);
 
-                Log::info('ID_EVAL_CRUZADA generado:', ['ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA]);
-
-                // Crear preguntas y opciones
-                foreach ($validated['evaluaciones'] as $pregunta) {
-                    $preguntaModel = PreguntaEvaluacionCruzada::create([
-                        'ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA,
-                        'PREGUNTA_EVAL' => $pregunta['pregunta'],
+                foreach ($pregunta['opciones'] as $opcion) {
+                    OpcionEvaluacionCruzada::create([
+                        'ID_PREGUNTA_EVAL' => $preguntaModel->ID_PREGUNTA_EVAL,
+                        'TEXTO_OPCION_EVAL' => $opcion['TEXTO_OPCION_EVAL'],
+                        'PUNTUACION_OPCION_EVAL' => $opcion['PUNTUACION_OPCION_EVAL'],
                     ]);
-
-                    foreach ($pregunta['opciones'] as $opcion) {
-                        OpcionEvaluacionCruzada::create([
-                            'ID_PREGUNTA_EVAL' => $preguntaModel->ID_PREGUNTA_EVAL,
-                            'TEXTO_OPCION_EVAL' => $opcion['texto'],
-                            'PUNTUACION_OPCION_EVAL' => $opcion['puntuacion'],
-                        ]);
-                    }
                 }
-            });
+            }
+        });
 
-            return response()->json(['message' => 'Evaluación cruzada creada con éxito'], 201);
-        } catch (\Exception $e) {
-            Log::error('Error al guardar la evaluación cruzada:', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error al crear la evaluación cruzada', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json(['message' => 'Evaluación cruzada creada con éxito'], 201);
+    } catch (\Exception $e) {
+        Log::error('Error al guardar la evaluación cruzada:', ['error' => $e->getMessage()]);
+        return response()->json(['message' => 'Error al crear la evaluación cruzada', 'error' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Listar todas las evaluaciones cruzadas de un proyecto.
@@ -95,8 +95,11 @@ class EvaluacionCruzadaController extends Controller
      * Actualizar una evaluación cruzada.
      */
     public function update(Request $request, $projectId, $evaluacionId)
-    {
-        // Validar datos recibidos
+{
+    Log::info('Datos recibidos para actualizar evaluación cruzada:', $request->all());
+
+    // Validar datos recibidos
+    try {
         $validated = $request->validate([
             'TITULO_EVAL_CRUZADA' => 'required|string|max:255',
             'DESCRIPCION_EVAL_CRUZADA' => 'nullable|string',
@@ -111,69 +114,84 @@ class EvaluacionCruzadaController extends Controller
             'evaluaciones.*.opciones.*.TEXTO_OPCION_EVAL' => 'required|string|max:255',
             'evaluaciones.*.opciones.*.PUNTUACION_OPCION_EVAL' => 'required|integer|min:0',
         ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Errores de validación en update:', ['errors' => $e->errors()]);
+        return response()->json(['errors' => $e->errors()], 422);
+    }
 
-        try {
-            DB::transaction(function () use ($validated, $projectId, $evaluacionId) {
-                // Buscar evaluación
-                $evaluacion = EvaluacionCruzada::where('ID_PROYECTO', $projectId)
-                    ->where('ID_EVAL_CRUZADA', $evaluacionId)
-                    ->firstOrFail();
+    try {
+        DB::transaction(function () use ($validated, $projectId, $evaluacionId) {
+            // Buscar evaluación existente
+            $evaluacion = EvaluacionCruzada::where('ID_PROYECTO', $projectId)
+                ->where('ID_EVAL_CRUZADA', $evaluacionId)
+                ->firstOrFail();
 
-                // Actualizar evaluación
-                $evaluacion->update([
-                    'TITULO_EVAL_CRUZADA' => $validated['TITULO_EVAL_CRUZADA'],
-                    'DESCRIPCION_EVAL_CRUZADA' => $validated['DESCRIPCION_EVAL_CRUZADA'],
-                    'FECHA_INICIO_EVAL' => $validated['FECHA_INICIO_EVAL'],
-                    'FECHA_FIN_EVAL' => $validated['FECHA_FIN_EVAL'],
-                    'PUNTUACION_TOTAL_EVAL' => $validated['PUNTUACION_TOTAL_EVAL'],
+            // Actualizar evaluación
+            $evaluacion->update([
+                'TITULO_EVAL_CRUZADA' => $validated['TITULO_EVAL_CRUZADA'],
+                'DESCRIPCION_EVAL_CRUZADA' => $validated['DESCRIPCION_EVAL_CRUZADA'],
+                'FECHA_INICIO_EVAL' => $validated['FECHA_INICIO_EVAL'],
+                'FECHA_FIN_EVAL' => $validated['FECHA_FIN_EVAL'],
+                'PUNTUACION_TOTAL_EVAL' => $validated['PUNTUACION_TOTAL_EVAL'],
+            ]);
+
+            Log::info('Evaluación actualizada:', ['ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA]);
+
+            // Procesar preguntas
+            $preguntaIdsEnviadas = collect($validated['evaluaciones'])->pluck('ID_PREGUNTA_EVAL')->filter();
+
+            // Eliminar preguntas no enviadas
+            PreguntaEvaluacionCruzada::where('ID_EVAL_CRUZADA', $evaluacionId)
+                ->whereNotIn('ID_PREGUNTA_EVAL', $preguntaIdsEnviadas)
+                ->delete();
+
+            Log::info('Preguntas no enviadas eliminadas.');
+
+            foreach ($validated['evaluaciones'] as $preguntaData) {
+                // Crear o actualizar preguntas
+                $pregunta = PreguntaEvaluacionCruzada::updateOrCreate(
+                    ['ID_PREGUNTA_EVAL' => $preguntaData['ID_PREGUNTA_EVAL'] ?? null],
+                    [
+                        'ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA,
+                        'PREGUNTA_EVAL' => $preguntaData['PREGUNTA_EVAL'],
+                    ]
+                );
+
+                Log::info('Pregunta procesada:', [
+                    'ID_PREGUNTA_EVAL' => $pregunta->ID_PREGUNTA_EVAL,
+                    'PREGUNTA_EVAL' => $pregunta->PREGUNTA_EVAL,
                 ]);
 
-                // Procesar preguntas
-                $preguntaIdsEnviadas = collect($validated['evaluaciones'])->pluck('ID_PREGUNTA_EVAL')->filter();
+                // Procesar opciones de cada pregunta
+                $opcionIdsEnviadas = collect($preguntaData['opciones'])->pluck('ID_OPCION_EVAL')->filter();
 
-                // Eliminar preguntas no enviadas
-                PreguntaEvaluacionCruzada::where('ID_EVAL_CRUZADA', $evaluacionId)
-                    ->whereNotIn('ID_PREGUNTA_EVAL', $preguntaIdsEnviadas)
+                // Eliminar opciones no enviadas
+                OpcionEvaluacionCruzada::where('ID_PREGUNTA_EVAL', $pregunta->ID_PREGUNTA_EVAL)
+                    ->whereNotIn('ID_OPCION_EVAL', $opcionIdsEnviadas)
                     ->delete();
 
-                // Procesar preguntas y sus opciones
-                foreach ($validated['evaluaciones'] as $preguntaData) {
-                    $pregunta = PreguntaEvaluacionCruzada::updateOrCreate(
-                        ['ID_PREGUNTA_EVAL' => $preguntaData['ID_PREGUNTA_EVAL'] ?? null],
+                Log::info('Opciones no enviadas eliminadas.');
+
+                foreach ($preguntaData['opciones'] as $opcionData) {
+                    // Crear o actualizar opciones
+                    OpcionEvaluacionCruzada::updateOrCreate(
+                        ['ID_OPCION_EVAL' => $opcionData['ID_OPCION_EVAL'] ?? null],
                         [
-                            'ID_EVAL_CRUZADA' => $evaluacion->ID_EVAL_CRUZADA,
-                            'PREGUNTA_EVAL' => $preguntaData['PREGUNTA_EVAL'],
+                            'ID_PREGUNTA_EVAL' => $pregunta->ID_PREGUNTA_EVAL,
+                            'TEXTO_OPCION_EVAL' => $opcionData['TEXTO_OPCION_EVAL'],
+                            'PUNTUACION_OPCION_EVAL' => $opcionData['PUNTUACION_OPCION_EVAL'],
                         ]
                     );
-
-                    // Procesar opciones de cada pregunta
-                    $opcionIdsEnviadas = collect($preguntaData['opciones'])->pluck('ID_OPCION_EVAL')->filter();
-
-                    // Eliminar opciones no enviadas
-                    OpcionEvaluacionCruzada::where('ID_PREGUNTA_EVAL', $pregunta->ID_PREGUNTA_EVAL)
-                        ->whereNotIn('ID_OPCION_EVAL', $opcionIdsEnviadas)
-                        ->delete();
-
-                    // Crear o actualizar opciones
-                    foreach ($preguntaData['opciones'] as $opcionData) {
-                        OpcionEvaluacionCruzada::updateOrCreate(
-                            ['ID_OPCION_EVAL' => $opcionData['ID_OPCION_EVAL'] ?? null],
-                            [
-                                'ID_PREGUNTA_EVAL' => $pregunta->ID_PREGUNTA_EVAL,
-                                'TEXTO_OPCION_EVAL' => $opcionData['TEXTO_OPCION_EVAL'],
-                                'PUNTUACION_OPCION_EVAL' => $opcionData['PUNTUACION_OPCION_EVAL'],
-                            ]
-                        );
-                    }
                 }
-            });
+            }
+        });
 
-            return response()->json(['message' => 'Evaluación cruzada actualizada con éxito'], 200);
-        } catch (\Exception $e) {
-            Log::error('Error al actualizar la evaluación cruzada:', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error al actualizar la evaluación cruzada', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json(['message' => 'Evaluación cruzada actualizada con éxito'], 200);
+    } catch (\Exception $e) {
+        Log::error('Error al actualizar la evaluación cruzada:', ['error' => $e->getMessage()]);
+        return response()->json(['message' => 'Error al actualizar la evaluación cruzada', 'error' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Eliminar una evaluación cruzada.

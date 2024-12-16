@@ -18,18 +18,17 @@ class HistoriaUsuario extends Model
     // Atributos asignables en masa
     protected $fillable = [
         'ID_GRUPO',
+        'ID_SPRINT', // Añadir el campo relacionado con la tabla sprint
         'TITULO_HU',
         'DESCRIP_HU',
         'IMAGEN_HU',
         'COMENTARIO_HU',
         'PONDERACION_HU',
-        'FECHACREACION_HU'
+        'FECHACREACION_HU',
     ];
 
     // Deshabilitar timestamps automáticos si no los estás usando
     public $timestamps = false;
-
-    // Si necesitas relaciones a futuro, aquí tienes ejemplos de posibles relaciones
 
     /**
      * Relación con el grupo al que pertenece la historia de usuario
@@ -40,8 +39,15 @@ class HistoriaUsuario extends Model
     }
 
     /**
-     * Otras relaciones a futuro pueden añadirse aquí, 
-     * dependiendo de las necesidades del sistema
+     * Relación con el sprint al que pertenece la historia de usuario
+     */
+    public function sprint()
+    {
+        return $this->belongsTo(Sprint::class, 'ID_SPRINT', 'ID_SPRINT');
+    }
+
+    /**
+     * Relación con las tareas asociadas a la historia de usuario
      */
     public function tareas()
     {
