@@ -26,6 +26,21 @@ const SeguimientoSemanalEstudiante = () => {
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
+    const formatDateLong = (date) => {
+        if (!date) return "";
+
+        const localDate = new Date(date);
+        const correctedDate = new Date(
+            localDate.getTime() + localDate.getTimezoneOffset() * 60000
+        );
+
+        return new Intl.DateTimeFormat("es-BO", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        }).format(correctedDate);
+    };
     useEffect(() => {
         const role = localStorage.getItem("ROLE");
         const estudianteId = localStorage.getItem("ID_EST");
@@ -115,6 +130,13 @@ const SeguimientoSemanalEstudiante = () => {
     };
 
     const handleEdit = (seguimiento) => {
+        console.log("Valor de fecha de revisión:", seguimiento.FECHA_REVISION);
+        console.log("Valor de revisión actual:", seguimiento.REVISO_ACTUAL);
+        console.log(
+            "Valor de revisión siguiente:",
+            seguimiento.REVISARA_SIGUIENTE
+        );
+
         setEditingId(seguimiento.ID_SEGUIMIENTO);
         setRevisionDate(seguimiento.FECHA_REVISION);
         setCurrentReview(seguimiento.REVISO_ACTUAL);
@@ -188,7 +210,7 @@ const SeguimientoSemanalEstudiante = () => {
                             <input
                                 type="date"
                                 id="revisionDate"
-                                value={revisionDate}
+                                value={revisionDate} // Este valor debería ser actualizado correctamente
                                 onChange={(e) =>
                                     setRevisionDate(e.target.value)
                                 }
@@ -201,7 +223,7 @@ const SeguimientoSemanalEstudiante = () => {
                             </label>
                             <ReactQuill
                                 theme="snow"
-                                value={currentReview}
+                                value={currentReview} // Este también debería reflejar el estado correctamente
                                 onChange={setCurrentReview}
                             />
                         </div>
@@ -211,7 +233,7 @@ const SeguimientoSemanalEstudiante = () => {
                             </label>
                             <ReactQuill
                                 theme="snow"
-                                value={nextReview}
+                                value={nextReview} // Este también debería reflejar el estado correctamente
                                 onChange={setNextReview}
                             />
                         </div>
@@ -221,6 +243,7 @@ const SeguimientoSemanalEstudiante = () => {
                                 : "Guardar Seguimiento"}
                         </button>
                     </form>
+
                     <div className="seguimientos-list">
                         {seguimientos.length > 0 ? (
                             seguimientos.map((seguimiento) => (
@@ -230,9 +253,9 @@ const SeguimientoSemanalEstudiante = () => {
                                 >
                                     <h4 className="seguimiento-card-title">
                                         Fecha:{" "}
-                                        {new Date(
+                                        {formatDateLong(
                                             seguimiento.FECHA_REVISION
-                                        ).toLocaleDateString("es-BO")}
+                                        )}
                                     </h4>
                                     <div className="seguimiento-card-content">
                                         <div className="seguimiento-section">

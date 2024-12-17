@@ -62,7 +62,8 @@ const PlanillaDeSeguimiento = () => {
             projectData.find(
                 (group) => group.ID_GRUPO === parseInt(selectedGroup)
             )?.fechas_defensa || [];
-        console.log(studentsData);
+
+        // Generar columnas dinámicas para las etapas
         studentsData.forEach((student) => {
             student.notas.forEach((nota) => {
                 const diaDefensa =
@@ -71,6 +72,11 @@ const PlanillaDeSeguimiento = () => {
                         : "Sin día";
 
                 const columnKey = `${nota.ETAPA_TITULO}_${nota.FECHA_REVISION}`;
+                const isNonEditable =
+                    nota.isEvaluacionPares ||
+                    nota.isEvaluacionCruzada ||
+                    nota.isAutoevaluacion;
+
                 if (!etapasMap[columnKey]) {
                     etapasMap[columnKey] = {
                         title: (
@@ -84,17 +90,21 @@ const PlanillaDeSeguimiento = () => {
                         key: columnKey,
                         align: "center",
                         render: (value, record) => {
+                            if (isNonEditable) {
+                                // Si es no editable, solo muestra el valor
+                                return value ? Math.round(value) : "-";
+                            }
+
                             if (isEditing) {
                                 return (
                                     <input
                                         type="number"
-                                        value={value || ""}
+                                        value={Math.round(value) || ""}
                                         onChange={(e) => {
-                                            const newValue = parseFloat(
-                                                e.target.value
+                                            const newValue = Math.floor(
+                                                parseFloat(e.target.value)
                                             );
 
-                                            // Validar que la nota no sea negativa
                                             if (newValue < 0) {
                                                 alert(
                                                     "La nota no puede ser negativa."
@@ -102,7 +112,6 @@ const PlanillaDeSeguimiento = () => {
                                                 return;
                                             }
 
-                                            // Validar que la nota no exceda la puntuación máxima
                                             const maxPuntuacion = studentsData
                                                 .find(
                                                     (stu) =>
@@ -123,7 +132,6 @@ const PlanillaDeSeguimiento = () => {
                                                 return;
                                             }
 
-                                            // Actualizar los datos
                                             const updatedData =
                                                 studentsData.map((stu) => {
                                                     if (
@@ -145,26 +153,26 @@ const PlanillaDeSeguimiento = () => {
                                                     }
                                                     return stu;
                                                 });
-
                                             setStudentsData(updatedData);
                                         }}
                                         style={{
                                             textAlign: "center",
                                             padding: "4px 6px",
-                                            width: "auto", // Ancho dinámico
-                                            minWidth: "60px", // Ancho mínimo
-                                            maxWidth: "100px", // Ancho máximo opcional
+                                            width: "auto",
+                                            minWidth: "60px",
+                                            maxWidth: "100px",
                                         }}
                                     />
                                 );
                             }
-                            return value || "-";
+
+                            return value ? Math.round(value) : "-";
                         },
                     };
                 }
             });
         });
-        console.log(etapasMap);
+
         const dynamicColumns = Object.values(etapasMap).reduce(
             (acc, column) => {
                 const parentIndex = acc.findIndex(
@@ -174,7 +182,6 @@ const PlanillaDeSeguimiento = () => {
                     acc.push({
                         title: column.parent,
                         align: "center",
-                        className: "ant-table-grouped-column-title",
                         children: [column],
                     });
                 } else {
@@ -184,7 +191,7 @@ const PlanillaDeSeguimiento = () => {
             },
             []
         );
-        console.log(dynamicColumns);
+
         const fixedColumns = [
             {
                 title: "Estudiantes",
@@ -206,7 +213,7 @@ const PlanillaDeSeguimiento = () => {
                 const total = Object.keys(row)
                     .filter((key) => key.includes("_"))
                     .reduce((sum, key) => sum + (parseFloat(row[key]) || 0), 0);
-                return Math.round(total); // Redondear el total al número entero más cercano
+                return Math.round(total);
             },
         };
 
@@ -262,23 +269,81 @@ const PlanillaDeSeguimiento = () => {
 
         if (groupId) {
             try {
-                const [notasResponse, gruposResponse] = await Promise.all([
+                const [
+                    notasResponse,
+                    evaluacionesCruzadasResponse,
+                    autoevaluacionesResponse,
+                    evaluacionParesResponse,
+                ] = await Promise.all([
                     axios.get(
                         `http://localhost:8000/api/grupos/${groupId}/notas`,
                         { withCredentials: true }
                     ),
                     axios.get(
-                        `http://localhost:8000/api/proyectos/${projectId}/grupos`,
+                        `http://localhost:8000/api/evaluaciones-cruzadas/grupos/${groupId}/notas`,
+                        { withCredentials: true }
+                    ),
+                    axios.get(
+                        `http://localhost:8000/api/autoevaluaciones/grupos/${groupId}/notas`,
+                        { withCredentials: true }
+                    ),
+                    axios.get(
+                        `http://localhost:8000/api/grupos/${groupId}/proyecto/${projectId}/promedio-notas`,
                         { withCredentials: true }
                     ),
                 ]);
 
-                setStudentsData(notasResponse.data || []);
+                const combinedData = notasResponse.data.map((estudiante) => {
+                    const evaluacionParesNotas =
+                        evaluacionParesResponse.data
+                            .find(
+                                (paresData) =>
+                                    paresData.estudiante.ID_ESTUDIANTE ===
+                                    estudiante.estudiante.ID_ESTUDIANTE
+                            )
+                            ?.notas.map((nota) => ({
+                                ...nota,
+                                isEvaluacionPares: true,
+                            })) || [];
+
+                    const evaluacionCruzadaNotas =
+                        evaluacionesCruzadasResponse.data
+                            .find(
+                                (evalData) =>
+                                    evalData.estudiante.ID_ESTUDIANTE ===
+                                    estudiante.estudiante.ID_ESTUDIANTE
+                            )
+                            ?.notas.map((nota) => ({
+                                ...nota,
+                                isEvaluacionCruzada: true,
+                            })) || [];
+
+                    const autoevaluacionNotas =
+                        autoevaluacionesResponse.data
+                            .find(
+                                (autoEvalData) =>
+                                    autoEvalData.estudiante.ID_ESTUDIANTE ===
+                                    estudiante.estudiante.ID_ESTUDIANTE
+                            )
+                            ?.notas.map((nota) => ({
+                                ...nota,
+                                isAutoevaluacion: true,
+                            })) || [];
+
+                    return {
+                        ...estudiante,
+                        notas: [
+                            ...estudiante.notas,
+                            ...evaluacionParesNotas,
+                            ...evaluacionCruzadaNotas,
+                            ...autoevaluacionNotas,
+                        ],
+                    };
+                });
+
+                setStudentsData(combinedData || []);
             } catch (error) {
-                console.error(
-                    "Error al obtener datos de los estudiantes o del grupo:",
-                    error
-                );
+                console.error("Error al obtener datos del grupo:", error);
             }
         }
     };
@@ -289,12 +354,25 @@ const PlanillaDeSeguimiento = () => {
 
     const handleSave = async () => {
         try {
+            // Excluir autoevaluaciones y evaluaciones cruzadas
+            const payload = studentsData.map((student) => ({
+                ID_ESTUDIANTE: student.estudiante.ID_ESTUDIANTE,
+                notas: student.notas.filter(
+                    (nota) =>
+                        !nota.isEvaluacionPares &&
+                        !nota.isEvaluacionCruzada &&
+                        !nota.isAutoevaluacion
+                ),
+            }));
+
+            // Realiza el POST al backend
             await axios.post(
                 `http://localhost:8000/api/grupos/${selectedGroup}/notas`,
-                { studentsData },
+                { studentsData: payload },
                 { withCredentials: true }
             );
-            console.log("Notas guardadas exitosamente.");
+
+            console.log("Notas actualizadas exitosamente.");
             setIsEditing(false);
         } catch (error) {
             console.error("Error al guardar las notas:", error);

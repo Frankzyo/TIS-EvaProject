@@ -46,7 +46,7 @@ Route::prefix('estudiante')->group(function () {
 
 Route::middleware(['auth:estudiante'])->prefix('estudiante')->group(function () {
     Route::get('/proyecto-grupo', [EstudianteController::class, 'obtenerProyectoYGrupo']);
-    
+
 });
 
 // Ruta para restablecer la contraseña
@@ -63,9 +63,6 @@ Route::prefix('api')->middleware(['auth:docente,estudiante'])->group(function ()
     Route::put('/proyectos/{id}', [ProyectosController::class, 'update']);
     Route::delete('/proyectos/{id}', [ProyectosController::class, 'destroy']);
     Route::get('/proyectos/{id}', [ProyectosController::class, 'show']);
-});
-Route::prefix('api-docente')->middleware(['auth:docente'])->group(function () {
-    Route::get('/proyecto/{id}', [DocenteController::class, 'show']);
 });
 
 Route::middleware(['auth:estudiante'])->group(function () {
@@ -188,7 +185,7 @@ Route::prefix('api')->group(function () {
     Route::get('/evaluaciones/etapa/{etapaId}/grupo/{grupoId}', [EvaluacionIndividualEstudianteController::class, 'obtenerEvaluaciones']);
 
     Route::post('/evaluaciones-pares', [EvaluacionParController::class, 'store']);
-    
+
     // Obtener todas las evaluaciones de pares de un proyecto específico
     Route::get('/evaluaciones-pares/proyecto/{projectId}', [EvaluacionParController::class, 'index']);
     // Obtener detalles de una evaluación específica
